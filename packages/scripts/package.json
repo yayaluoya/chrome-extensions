@@ -8,7 +8,8 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "@yayaluoya-extensions/typescript-config": "workspace:^"
+  "devDependencies": {
+    "@yayaluoya-extensions/typescript-config": "workspace:^",
+    "chrome-types": "^0.1.347"
   }
 }
