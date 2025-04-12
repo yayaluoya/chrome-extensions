@@ -1,0 +1,11 @@
+{
+  "name": "yayaluoya-chrome-extensions",
+  "version": "1.0.0",
+  "description": "一个浏览器插件",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

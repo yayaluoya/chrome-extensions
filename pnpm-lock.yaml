@@ -1,0 +1,19 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .: {}
+
+  packages/pages: {}
+
+  packages/scripts:
+    dependencies:
+      '@yayaluoya-extensions/typescript-config':
+        specifier: workspace:^
+        version: link:../typescript-config
+
+  packages/typescript-config: {}
