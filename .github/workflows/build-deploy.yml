@@ -41,7 +41,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Package extensions
-        run: zip -r yayaluoya-extension.zip ./extensions
+        run: zip -r yayaluoya-extensions.zip ./extensions
 
       - name: Create Release
         id: create_release
@@ -61,7 +61,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./yayaluoya-extension.zip
-          asset_name: yayaluoya-extension-${{ github.ref }}.zip
+          asset_path: ./yayaluoya-extensions.zip
+          asset_name: yayaluoya-extensions-${{ github.ref }}.zip
           asset_content_type: application/zip
       
