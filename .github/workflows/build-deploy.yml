@@ -35,11 +35,12 @@ jobs:
         run: pnpm run deploy
 
   deploy: 
+    needs: build
     runs-on: ubuntu-latest
 
     steps:
       - name: Package extensions
-        run: tar -zcvf yayaluoya-extension.tar.gz extensions
+        run: tar -zcvf yayaluoya-extension.tar.gz ./extensions
 
       - name: Create Release
         id: create_release
