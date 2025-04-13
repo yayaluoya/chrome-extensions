@@ -39,8 +39,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Package extensions
-        run: zip  -r yayaluoya-extension.zip ./extensions
+        run: zip -r yayaluoya-extension.zip ./extensions
 
       - name: Create Release
         id: create_release
