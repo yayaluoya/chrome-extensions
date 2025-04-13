@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "bin": {
-    "deploy": "./bin/deploy.js"
+    "package": "./bin/package.js"
   },
   "keywords": [],
   "author": "",

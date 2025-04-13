@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "rollup -c",
-    "deploy": "deploy ./dist scripts"
+    "package": "package ./dist scripts"
   },
   "keywords": [],
   "author": "",

@@ -29,10 +29,8 @@ jobs:
           cache: 'pnpm'
       - name: 安装依赖
         run: pnpm install
-      - name: build
-        run: pnpm run build
-      - name: deploy
-        run: pnpm run deploy
+      - name: build-package
+        run: pnpm run build-package
 
   deploy: 
     needs: build

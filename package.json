@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "description": "一个浏览器插件",
   "scripts": {
-    "build": "turbo run build",
-    "deploy": "turbo run deploy"
+    "build-package": "turbo run build package"
   },
   "keywords": [],
   "author": "",

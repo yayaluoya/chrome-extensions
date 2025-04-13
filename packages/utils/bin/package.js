@@ -3,7 +3,7 @@ import { getExtensionsDir } from "../getExtensionsDir.js";
 import path from "path";
 import fs from "fs";
 
-export function deploy(distDir, target) {
+export function packageF(distDir, target) {
   const targetDir = path.resolve(getExtensionsDir(), target);
 
   fs.readdirSync(targetDir).forEach(item => {
@@ -17,4 +17,4 @@ export function deploy(distDir, target) {
   copyDirectorySync(distDir, targetDir);
 }
 
-deploy(...process.argv.slice(2));
+packageF(...process.argv.slice(2));
