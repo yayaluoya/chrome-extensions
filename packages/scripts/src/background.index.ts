@@ -1,16 +1,16 @@
-import { AllUrlsMatches, ContentScriptPath } from "./constant/enum";
+import { AllUrlsMatches } from "./constant/const";
 
 chrome.scripting.registerContentScripts([
   {
-    id: ContentScriptPath.Default,
+    id: "default",
     matches: [AllUrlsMatches],
-    js: [ContentScriptPath.Default],
+    js: ["scripts/inject.js"],
     runAt: "document_idle"
   },
   {
-    id: ContentScriptPath.Codesign,
+    id: "codesign-inject",
     matches: ["*://codesign.qq.com/*"],
-    js: [ContentScriptPath.Codesign],
+    js: ["scripts/codesign-inject.js"],
     runAt: "document_idle"
   }
 ]);
