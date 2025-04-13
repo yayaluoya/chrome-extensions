@@ -1,0 +1,4 @@
+pages/*
+!pages/README.md
+scripts/*
+!scripts/README.md

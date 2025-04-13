@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@yayaluoya-extensions/typescript-config": "workspace:^",
+    "chrome-types": "^0.1.347",
     "@tsconfig/node22": "^22.0.1",
     "@types/node": "^22.14.0",
     "@vitejs/plugin-vue": "^5.2.3",
