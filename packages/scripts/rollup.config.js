@@ -11,7 +11,7 @@ const srcDir = path.resolve(__dirname, "src");
 
 const inputs = fs
   .readdirSync(srcDir)
-  .map(item => item.match(/^(\w*)\.index\.ts$/))
+  .map(item => item.match(/^([\w-]+)\.index\.ts$/))
   .filter(Boolean)
   .reduce((a, b) => {
     a[b[1]] = path.resolve(srcDir, b[0]);
