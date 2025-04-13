@@ -1,0 +1,12 @@
+{
+  "name": "@yayaluoya-extensions/utils",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "bin": {
+    "deploy": "./bin/deploy.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

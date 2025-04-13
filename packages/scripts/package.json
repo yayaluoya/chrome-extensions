@@ -4,7 +4,8 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "rollup": "rollup -c"
+    "build": "rollup -c",
+    "deploy": "deploy ./dist scripts"
   },
   "keywords": [],
   "author": "",
@@ -12,6 +13,7 @@
   "devDependencies": {
     "@rollup/plugin-typescript": "^12.1.2",
     "@yayaluoya-extensions/typescript-config": "workspace:^",
+    "@yayaluoya-extensions/utils": "workspace:^",
     "chrome-types": "^0.1.347",
     "rollup": "^4.40.0",
     "tslib": "^2.8.1"

@@ -3,9 +3,14 @@
   "version": "1.0.0",
   "description": "一个浏览器插件",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "deploy": "turbo run deploy"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "packageManager": "pnpm@9.11.0",
+  "devDependencies": {
+    "turbo": "^2.5.0"
+  }
 }
