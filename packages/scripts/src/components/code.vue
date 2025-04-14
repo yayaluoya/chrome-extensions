@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { getCssRules } from "@/getCssRules";
+import type { CssRulesType, getCssRules } from "@/getCssRules";
 import { computed, onMounted, ref, watch } from "vue";
 
 /** 名字转大小写 */
@@ -46,7 +46,7 @@ const handleName2 = (name: string) => {
 const props = defineProps<{
   type: "img" | "icon" | "text" | "div";
   content: string;
-  cssRules: ReturnType<typeof getCssRules>;
+  cssRules: CssRulesType[];
 }>();
 
 const codeName = "code-name";
@@ -88,49 +88,28 @@ const jss = computed(() => {
 });
 
 const csss = computed(() => {
+  const getCssProps = (item: CssRulesType) => {
+    return "\n" + item.props.map(prop => `  ${prop.name}: ${prop.value};`).join("\n") + "\n";
+  };
   switch (props.type) {
     case "text": {
       return props.cssRules.map((item, i) => {
-        return `
-.${handleName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}{
-${Object.keys(item.props)
-  .map(name => `${name}: ${item.props[name]};`)
-  .join("\n")}
-}
-    `.trim();
+        return `.${handleName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}{${getCssProps(item)}}`.trim();
       });
     }
     case "img": {
       return props.cssRules.map(item => {
-        return `
-.${handleName2(`${nameInput.value}-img`)}{
-${Object.keys(item.props)
-  .map(name => `${name}: ${item.props[name]};`)
-  .join("\n")}
-}
-    `.trim();
+        return `.${handleName2(`${nameInput.value}-img`)}{${getCssProps(item)}}`.trim();
       });
     }
     case "icon": {
       return props.cssRules.map(item => {
-        return `
-.${handleName2(`${nameInput.value}-icon`)}{
-${Object.keys(item.props)
-  .map(name => `${name}: ${item.props[name]};`)
-  .join("\n")}
-}
-    `.trim();
+        return `.${handleName2(`${nameInput.value}-icon`)}{${getCssProps(item)}}`.trim();
       });
     }
     case "div": {
       return props.cssRules.map(item => {
-        return `
-.${handleName2(nameInput.value)}{
-${Object.keys(item.props)
-  .map(name => `${name}: ${item.props[name]};`)
-  .join("\n")}
-}
-    `.trim();
+        return `.${handleName2(nameInput.value)}{${getCssProps(item)}}`.trim();
       });
     }
   }

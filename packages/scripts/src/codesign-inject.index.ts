@@ -1,11 +1,12 @@
 import { createApp, h } from "vue";
-import { getCssRules } from "./getCssRules";
+import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
+import { ScriptsDir } from "./constant/const";
 
 document.addEventListener(
   "click",
-  (e) => {
-    if (e.target instanceof Node && document.querySelector('.screen-inspector.inspector.expanded')?.contains(e.target)) {
+  e => {
+    if (e.target instanceof Node && document.querySelector(".screen-inspector.inspector.expanded")?.contains(e.target)) {
       return;
     }
     setTimeout(() => {
@@ -23,81 +24,80 @@ function trigger() {
     return;
   }
   const sectionNodeBoxs = getAllSectionNodeBox(screenInspectorEl);
-  const codeSectionNode = sectionNodeBoxs.find(item => item.title === '代码');
-  if (!codeSectionNode) { return; }
+  const codeSectionNode = sectionNodeBoxs.find(item => item.title === "代码");
+  if (!codeSectionNode) {
+    return;
+  }
 
-  let renderType: 'img' | 'icon' | 'text' | 'div';
-  let renderTagContent = '';
-  let cssRules: ReturnType<typeof getCssRules> = [];
+  let renderType: "img" | "icon" | "text" | "div";
+  let renderTagContent = "";
+  let cssRules: CssRulesType[] = [];
   // 文本
   if (sectionNodeBoxs.some(item => item.title === "文本")) {
-    renderType = 'text';
-    cssRules = getCssRules(codeSectionNode.contentEl, [
-      'color',
-      'text-align',
-      'font-family',
-      'font-size',
-      'font-style',
-      'font-weight',
-      'letter-spacing',
-    ], [
-      {
-        name: 'font-style', value: 'normal',
-      }
-    ]);
-    renderTagContent = cssRules.map(item => item.query).join('');
+    renderType = "text";
+    cssRules = getCssRules(
+      codeSectionNode.contentEl,
+      ["color", "text-align", "font-family", "font-size", "font-style", "font-weight", "letter-spacing"],
+      [
+        {
+          name: "font-style",
+          value: "normal"
+        }
+      ],
+      [
+        {
+          name: "display",
+          value: "flex"
+        }
+      ]
+    );
+    renderTagContent = cssRules.map(item => item.query).join("");
   }
   // 图片
   else if (sectionNodeBoxs.some(item => /^image/.test(item.title))) {
-    renderType = 'img';
+    renderType = "img";
     cssRules = getCssRules(codeSectionNode.contentEl, [
-      'width',
-      'height',
-      'box-sizing',
-      'background',
-      'box-shadow',
-      'border-radius',
-      'padding'
+      "width",
+      "height",
+      "box-shadow",
+      "border-radius",
     ]);
   }
   // 切图
   else if (sectionNodeBoxs.some(item => item.title === "切图")) {
-    renderType = 'icon';
-    cssRules = getCssRules(codeSectionNode.contentEl, [
-      'width',
-      'height',
-    ]);
+    renderType = "icon";
+    cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height"]);
   }
   // 盒子
   else {
-    renderType = 'div';
+    renderType = "div";
     cssRules = getCssRules(codeSectionNode.contentEl, [
-      'width',
-      'height',
-      'display',
+      "width",
+      "height",
+      "display",
       /^flex-/,
-      'align-items',
-      'justify-content',
-      'overflow',
-      'box-sizing',
-      'background',
-      'background-color',
-      'box-shadow',
-      'border-radius',
-      'padding'
+      "align-items",
+      "justify-content",
+      "overflow",
+      "box-sizing",
+      "background",
+      "background-color",
+      "box-shadow",
+      "border-radius",
+      "padding"
     ]);
   }
 
-  const customElClass = 'custom-el-class';
+  const customElClass = "custom-el-class";
   codeSectionNode.contentEl.querySelector(`.${customElClass}`)?.remove();
-  const el = document.createElement('div');
+  const el = document.createElement("div");
   el.className = customElClass;
   codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
-  const shadowRoot = el.attachShadow({ mode: 'open' });
-  const mountEl = document.createElement('div');
-  const link = document.createElement('link');
-  link.rel = 'stylesheet';
-  link.href = chrome.runtime.getURL("scripts/index.css");
+  const shadowRoot = el.attachShadow({ mode: "open" });
+  const mountEl = document.createElement("div");
+  const link = document.createElement("link");
+  link.rel = "stylesheet";
+  link.href = chrome.runtime.getURL(ScriptsDir + "index.css");
   shadowRoot.appendChild(link);
   shadowRoot.appendChild(mountEl);
   createApp({
@@ -105,8 +105,8 @@ function trigger() {
       return h(Code, {
         type: renderType,
         content: renderTagContent,
-        cssRules,
-      })
+        cssRules
+      });
     }
   }).mount(mountEl);
 }
