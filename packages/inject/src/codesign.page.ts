@@ -3,7 +3,6 @@ import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
 
 export function codesignStart() {
-  console.log("codesignStart");
   document.addEventListener(
     "click",
     e => {
@@ -100,6 +99,7 @@ function trigger() {
   createApp({
     render() {
       return h(Code, {
+        identification: sectionNodeBoxs[0].title,
         type: renderType,
         content: renderTagContent,
         cssRules

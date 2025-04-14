@@ -44,12 +44,15 @@ const handleName2 = (name: string) => {
 };
 
 const props = defineProps<{
+  identification: string;
   type: "img" | "icon" | "text" | "div";
   content: string;
   cssRules: CssRulesType[];
 }>();
 
-const codeName = "code-name";
+const getCodeName = () => {
+  return `code-name-${props.identification}`;
+};
 
 const nameInput = ref("");
 
@@ -120,12 +123,12 @@ const handleCodeItem = (item: string) => {
 };
 
 watch(nameInput, () => {
-  chrome.storage.local.set({ [codeName]: nameInput.value });
+  chrome.storage.local.set({ [getCodeName()]: nameInput.value });
 });
 
 onMounted(() => {
-  chrome.storage.local.get(codeName).then(values => {
-    nameInput.value = values[codeName];
+  chrome.storage.local.get(getCodeName()).then(values => {
+    nameInput.value = values[getCodeName()];
   });
 });
 </script>
