@@ -1,0 +1,185 @@
+<template>
+  <div class="code">
+    <span>类名</span>
+    <input v-model="nameInput" />
+    <template v-if="htmls && htmls.length > 0">
+      <span>html</span>
+      <div v-for="(item, index) in htmls" :key="index" class="code-item" @click="handleCodeItem(item)">
+        <code>{{ item }}</code>
+      </div>
+    </template>
+    <template v-if="jss && jss.length > 0">
+      <span>js</span>
+      <div v-for="(item, index) in jss" :key="index" class="code-item" @click="handleCodeItem(item)">
+        <code>{{ item }}</code>
+      </div>
+    </template>
+    <template v-if="csss && csss.length > 0">
+      <span>css</span>
+      <div v-for="(item, index) in csss" :key="index" class="code-item" @click="handleCodeItem(item)">
+        <code>{{ item }}</code>
+      </div>
+    </template>
+  </div>
+</template>
+
+<script setup lang="ts">
+import type { getCssRules } from "@/getCssRules";
+import { computed, onMounted, ref, watch } from "vue";
+
+/** 名字转大小写 */
+const handleName1 = (name: string, capitalCase = false) => {
+  if (capitalCase) {
+    name = name.replace(/^./, a => a.toLocaleUpperCase());
+  }
+  return name.replace(/-(.)/g, (_, a) => {
+    return a.toLocaleUpperCase();
+  });
+};
+
+const handleName2 = (name: string) => {
+  return name.replace(/([A-Z])/g, (_, a: string) => {
+    return "-" + a.toLocaleLowerCase();
+  });
+};
+
+const props = defineProps<{
+  type: "img" | "icon" | "text" | "div";
+  content: string;
+  cssRules: ReturnType<typeof getCssRules>;
+}>();
+
+const codeName = "code-name";
+
+const nameInput = ref("");
+
+const htmls = computed(() => {
+  switch (props.type) {
+    case "text": {
+      return props.cssRules.map((item, i) => {
+        return `<text class="${handleName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`;
+      });
+    }
+    case "img": {
+      return [`<image class="${handleName2(`${nameInput.value}-img`)}" mode="scaleToFill" />`];
+    }
+    case "icon": {
+      return [
+        `<image :src="${handleName1(`${nameInput.value}-icon`, true)}" class="${handleName2(
+          `${nameInput.value}-icon`
+        )}" mode="scaleToFill" />`
+      ];
+    }
+    case "div": {
+      return [
+        `<view class="${handleName2(nameInput.value)}"></view>`,
+        `<button class="${handleName2(nameInput.value)}"></button>`
+      ];
+    }
+  }
+});
+
+const jss = computed(() => {
+  switch (props.type) {
+    case "icon": {
+      return [`const ${handleName1(`${nameInput.value}-icon`, true)} = "";`];
+    }
+  }
+});
+
+const csss = computed(() => {
+  switch (props.type) {
+    case "text": {
+      return props.cssRules.map((item, i) => {
+        return `
+.${handleName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}{
+${Object.keys(item.props)
+  .map(name => `${name}: ${item.props[name]};`)
+  .join("\n")}
+}
+    `.trim();
+      });
+    }
+    case "img": {
+      return props.cssRules.map(item => {
+        return `
+.${handleName2(`${nameInput.value}-img`)}{
+${Object.keys(item.props)
+  .map(name => `${name}: ${item.props[name]};`)
+  .join("\n")}
+}
+    `.trim();
+      });
+    }
+    case "icon": {
+      return props.cssRules.map(item => {
+        return `
+.${handleName2(`${nameInput.value}-icon`)}{
+${Object.keys(item.props)
+  .map(name => `${name}: ${item.props[name]};`)
+  .join("\n")}
+}
+    `.trim();
+      });
+    }
+    case "div": {
+      return props.cssRules.map(item => {
+        return `
+.${handleName2(nameInput.value)}{
+${Object.keys(item.props)
+  .map(name => `${name}: ${item.props[name]};`)
+  .join("\n")}
+}
+    `.trim();
+      });
+    }
+  }
+});
+
+const handleCodeItem = (item: string) => {
+  navigator.clipboard.writeText(item);
+};
+
+watch(nameInput, () => {
+  chrome.storage.local.set({ [codeName]: nameInput.value });
+});
+
+onMounted(() => {
+  chrome.storage.local.get(codeName).then(values => {
+    nameInput.value = values[codeName];
+  });
+});
+</script>
+
+<style lang="scss" scoped>
+.code {
+  display: flex;
+  flex-direction: column;
+  > input {
+    width: 100%;
+    border-radius: 5px;
+    outline: none;
+    border: 1px solid #d9d9d9;
+    padding: 5px;
+    box-sizing: border-box;
+  }
+  > span {
+    font-weight: 500;
+    margin-bottom: 5px;
+  }
+  > .code-item {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 5px;
+    box-sizing: border-box;
+    border-radius: 5px;
+    margin-bottom: 5px;
+    &:nth-last-child(1) {
+      margin-bottom: 0;
+    }
+    code {
+      white-space: pre-wrap;
+      font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    }
+  }
+}
+</style>

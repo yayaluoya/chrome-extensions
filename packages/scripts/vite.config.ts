@@ -2,6 +2,7 @@ import path, { dirname } from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vite'
+import vue from "@vitejs/plugin-vue";
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 
@@ -21,8 +22,10 @@ export default defineConfig({
     lib: {
       entry: libs,
       formats: ['es'],
+      cssFileName: 'index',
     },
   },
+  plugins: [vue()],
   define: {
     'process.env': {},
     __VUE_OPTIONS_API__: false,
