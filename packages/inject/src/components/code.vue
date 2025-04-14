@@ -128,7 +128,7 @@ watch(nameInput, () => {
 
 onMounted(() => {
   chrome.storage.local.get(getCodeName()).then(values => {
-    nameInput.value = values[getCodeName()];
+    nameInput.value = values[getCodeName()] || "";
   });
 });
 </script>
@@ -137,6 +137,9 @@ onMounted(() => {
 .code {
   display: flex;
   flex-direction: column;
+  > * {
+    margin-bottom: 5px;
+  }
   > input {
     width: 100%;
     border-radius: 5px;
@@ -144,17 +147,19 @@ onMounted(() => {
     border: 1px solid #d9d9d9;
     padding: 5px;
     box-sizing: border-box;
+    background-color: #d6e6f2;
+    font-size: 14px;
+    font-weight: 700;
   }
   > span {
-    font-weight: 500;
-    margin-bottom: 5px;
+    font-weight: 700;
+    font-size: 14px;
   }
   > .code-item {
-    background: rgba(0, 0, 0, 0.04);
+    background: #d6e6f2;
     padding: 5px;
     box-sizing: border-box;
     border-radius: 5px;
-    margin-bottom: 5px;
     &:nth-last-child(1) {
       margin-bottom: 0;
     }
