@@ -1,3 +1,5 @@
+import { createApp } from "vue";
+
 document.addEventListener(
   "click",
   () => {
@@ -9,6 +11,8 @@ document.addEventListener(
     capture: true
   }
 );
+
+createApp({})
 
 function trigger() {
   const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");

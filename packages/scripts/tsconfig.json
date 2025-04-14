@@ -1,9 +1,11 @@
 {
-  "extends": "@yayaluoya-extensions/typescript-config/base.json",
-  "compilerOptions": {
-    "types": ["chrome-types"],
-    "declaration": false,
-    "declarationMap": false
-  },
-  "include": ["src/**/*.ts", "src/**/*.d.ts"]
+  "files": [],
+  "references": [
+    {
+      "path": "./tsconfig.node.json"
+    },
+    {
+      "path": "./tsconfig.app.json"
+    }
+  ]
 }

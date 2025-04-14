@@ -23,6 +23,7 @@ export function copyDirectorySync(src, dest) {
       if (stats.isDirectory()) {
         copyDirectorySync(srcPath, destPath);
       } else {
+        console.log('copyFile', srcPath, destPath);
         fs.copyFileSync(srcPath, destPath);
       }
     });
