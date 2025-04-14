@@ -128,7 +128,14 @@ watch(nameInput, () => {
 
 onMounted(() => {
   chrome.storage.local.get(getCodeName()).then(values => {
-    nameInput.value = values[getCodeName()] || "";
+    nameInput.value =
+      values[getCodeName()] ||
+      {
+        text: "text",
+        img: "img",
+        icon: "icon",
+        div: "view"
+      }[props.type];
   });
 });
 </script>
