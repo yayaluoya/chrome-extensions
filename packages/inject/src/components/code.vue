@@ -154,7 +154,7 @@ onMounted(() => {
     border: 1px solid #d9d9d9;
     padding: 5px;
     box-sizing: border-box;
-    background-color: #d6e6f2;
+    background-color: #b8b0b0;
     font-size: 14px;
     font-weight: 700;
   }
@@ -163,7 +163,7 @@ onMounted(() => {
     font-size: 14px;
   }
   > .code-item {
-    background: #d6e6f2;
+    background: #b8b0b0;
     padding: 5px;
     box-sizing: border-box;
     border-radius: 5px;
