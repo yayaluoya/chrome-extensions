@@ -1,22 +1,24 @@
 import { createApp, h } from "vue";
 import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
-import { ScriptsDir } from "./constant/const";
 
-document.addEventListener(
-  "click",
-  e => {
-    if (e.target instanceof Node && document.querySelector(".screen-inspector.inspector.expanded")?.contains(e.target)) {
-      return;
+export function codesignStart() {
+  console.log("codesignStart");
+  document.addEventListener(
+    "click",
+    e => {
+      if (e.target instanceof Node && document.querySelector(".screen-inspector.inspector.expanded")?.contains(e.target)) {
+        return;
+      }
+      setTimeout(() => {
+        trigger();
+      }, 0);
+    },
+    {
+      capture: true
     }
-    setTimeout(() => {
-      trigger();
-    }, 0);
-  },
-  {
-    capture: true
-  }
-);
+  );
+}
 
 function trigger() {
   const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
@@ -56,12 +58,7 @@ function trigger() {
   // 图片
   else if (sectionNodeBoxs.some(item => /^image/.test(item.title))) {
     renderType = "img";
-    cssRules = getCssRules(codeSectionNode.contentEl, [
-      "width",
-      "height",
-      "box-shadow",
-      "border-radius",
-    ]);
+    cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height", "box-shadow", "border-radius"]);
   }
   // 切图
   else if (sectionNodeBoxs.some(item => item.title === "切图")) {
@@ -97,7 +94,7 @@ function trigger() {
   const mountEl = document.createElement("div");
   const link = document.createElement("link");
   link.rel = "stylesheet";
-  link.href = chrome.runtime.getURL(ScriptsDir + "index.css");
+  link.href = chrome.runtime.getURL("inject/index.css");
   shadowRoot.appendChild(link);
   shadowRoot.appendChild(mountEl);
   createApp({

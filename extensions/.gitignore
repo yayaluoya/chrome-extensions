@@ -1,4 +1,6 @@
 pages/*
 !pages/README.md
-scripts/*
-!scripts/README.md
+inject/*
+!inject/README.md
+background/*
+!background/README.md

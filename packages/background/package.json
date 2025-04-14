@@ -1,0 +1,28 @@
+{
+  "name": "@yayaluoya-extensions/background",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "run-p type-check \"build-only {@}\" --",
+    "preview": "vite preview",
+    "build-only": "vite build",
+    "type-check": "vue-tsc --build",
+    "package": "package ./dist background"
+  },
+  "dependencies": {
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@tsconfig/node22": "^22.0.1",
+    "@types/node": "^22.14.0",
+    "@vue/tsconfig": "^0.7.0",
+    "@yayaluoya-extensions/utils": "workspace:^",
+    "chrome-types": "^0.1.347",
+    "npm-run-all2": "^7.0.2",
+    "typescript": "~5.8.0",
+    "vite": "^6.2.4",
+    "vue-tsc": "^2.2.8"
+  }
+}

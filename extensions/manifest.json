@@ -19,14 +19,14 @@
     "128": "images/icon-128.png"
   },
   "background": {
-    "service_worker": "scripts/background.js",
+    "service_worker": "background/index.iife.js",
     "type": "module"
   },
   "permissions": ["tabs", "scripting", "activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
   "web_accessible_resources": [
     {
-      "resources": ["scripts/index.css"],
+      "resources": ["inject/index.css"],
       "matches": ["*://*/*"]
     }
   ]

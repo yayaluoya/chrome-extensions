@@ -1,5 +1,5 @@
 {
-  "name": "@yayaluoya-extensions/scripts",
+  "name": "@yayaluoya-extensions/inject",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "package": "package ./dist scripts"
+    "package": "package ./dist inject"
   },
   "dependencies": {
     "vue": "^3.5.13"
