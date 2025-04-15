@@ -25,12 +25,10 @@ export function getCssRules(
       const name = b[1].trim();
       let value = b[2].trim();
 
-      const backVarRegexp = /^var\(--.*?,\s*#(.*?)\)$/;
       // 处理一些特殊值
-      if (name === 'background' && backVarRegexp.test(value)) {
-        const match = value.match(backVarRegexp);
-        value = match ? '#' + match?.[1] : value;
-      }
+      value = value.replace(/var\(--.*?,\s*#(.*?)\)/,(_,a)=>{
+        return '#'+a;
+      });
 
       if (
         includePropsName.some(item => (typeof item === "string" ? item === name : item.test(name))) &&
