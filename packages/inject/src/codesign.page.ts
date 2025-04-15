@@ -92,7 +92,7 @@ function trigger() {
   createApp({
     render() {
       return h(Code, {
-        identification: sectionNodeBoxs[0].title,
+        identification: renderType=='text'? renderTagContent: sectionNodeBoxs[0].title,
         type: renderType,
         content: renderTagContent,
         cssRules

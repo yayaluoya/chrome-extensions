@@ -24,8 +24,9 @@
 </template>
 
 <script setup lang="ts">
-import type { cssPropType, CssRulesType, getCssRules } from "@/getCssRules";
+import type { cssPropType, CssRulesType } from "@/getCssRules";
 import { computed, onMounted, ref, watch } from "vue";
+import CryptoJS from "crypto-js";
 
 /** 名字转大小写 */
 const handleName1 = (name: string, capitalCase = false) => {
@@ -51,7 +52,7 @@ const props = defineProps<{
 }>();
 
 const getCodeName = () => {
-  return `code-name-${props.identification}`;
+  return CryptoJS.MD5(`code-name-${props.identification}`).toString();
 };
 
 const nameInput = ref("");

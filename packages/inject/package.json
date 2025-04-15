@@ -12,6 +12,8 @@
     "package": "package ./dist inject"
   },
   "dependencies": {
+    "@types/crypto-js": "^4.2.2",
+    "crypto-js": "^4.2.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
