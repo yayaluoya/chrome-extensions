@@ -12,10 +12,12 @@
     "package": "package ./dist background"
   },
   "dependencies": {
+    "crypto-js": "^4.2.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
     "@tsconfig/node22": "^22.0.1",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.14.0",
     "@vue/tsconfig": "^0.7.0",
     "@yayaluoya-extensions/utils": "workspace:^",

@@ -1,6 +1,10 @@
 <template>
   <div class="code">
     <span>类名</span>
+    <div class="translate-input">
+      <input v-model="translateInput" />
+      <button @click="handleTranslate">生成类名</button>
+    </div>
     <input v-model="nameInput" />
     <template v-if="htmls && htmls.length > 0">
       <span>html</span>
@@ -55,7 +59,23 @@ const getCodeName = () => {
   return CryptoJS.MD5(`code-name-${props.identification}`).toString();
 };
 
+const translateInput = ref("");
 const nameInput = ref("");
+
+const handleTranslate = () => {
+  if (!translateInput.value) {
+    return;
+  }
+  chrome.runtime
+    .sendMessage({ type: "translate", str: translateInput.value })
+    .then((res: { succeed: boolean; content?: string }) => {
+      if (res.succeed && res.content) {
+        nameInput.value = res.content
+          .replace(/\s+([a-zA-Z])/g, (_, a) => a.toLocaleUpperCase())
+          .replace(/^[A-Z]/, _ => _.toLocaleLowerCase());
+      }
+    });
+};
 
 const htmls = computed(() => {
   switch (props.type) {
@@ -149,6 +169,7 @@ onMounted(() => {
         div: "view"
       }[props.type];
   });
+  translateInput.value = props.content;
 });
 </script>
 
@@ -163,6 +184,31 @@ onMounted(() => {
   > .code-item {
     box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15), inset 1px 2px 0 0 #fff;
     background-color: #f4f4f6;
+  }
+
+  > .translate-input {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    > input {
+      flex: 1;
+      border-radius: 5px;
+      outline: none;
+      padding: 5px;
+      box-sizing: border-box;
+      border: 2px solid #d9d9d9;
+      font-size: 14px;
+    }
+    > button {
+      margin-left: 5px;
+      background: #006ffd;
+      box-shadow: 0 28px 8px #2787fc00, 0 18px 7px #2787fc03, 0 10px 6px #2787fc0d, 0 5px 5px #2787fc17, 0 1px 2px #2787fc1a;
+      color: #fff;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 10px;
+      cursor: pointer;
+    }
   }
 
   > input {
