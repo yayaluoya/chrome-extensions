@@ -147,14 +147,19 @@ onMounted(() => {
   > * {
     margin-bottom: 5px;
   }
+  > input,
+  > .code-item {
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15), inset 1px 2px 0 0 #fff;
+    background-color: #f4f4f6;
+  }
+
   > input {
     width: 100%;
     border-radius: 5px;
     outline: none;
-    border: 1px solid #d9d9d9;
+    border: 2px solid #d9d9d9;
     padding: 5px;
     box-sizing: border-box;
-    background-color: #b8b0b0;
     font-size: 14px;
     font-weight: 700;
   }
@@ -163,7 +168,6 @@ onMounted(() => {
     font-size: 14px;
   }
   > .code-item {
-    background: #b8b0b0;
     padding: 5px;
     box-sizing: border-box;
     border-radius: 5px;
