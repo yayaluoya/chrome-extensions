@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import type { CssRulesType, getCssRules } from "@/getCssRules";
+import type { cssPropType, CssRulesType, getCssRules } from "@/getCssRules";
 import { computed, onMounted, ref, watch } from "vue";
 
 /** 名字转大小写 */
@@ -64,7 +64,21 @@ const htmls = computed(() => {
       });
     }
     case "img": {
-      return [`<image class="${handleName2(`${nameInput.value}-img`)}" mode="scaleToFill" />`];
+      const getSize = (name: string) => {
+        return (
+          props.cssRules
+            .reduce<cssPropType[]>((a, b) => {
+              a.push(...b.props);
+              return a;
+            }, [])
+            .find(item => item.name === name)?.value || "500"
+        );
+      };
+      return [
+        `<image src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleName2(
+          `${nameInput.value}-img`
+        )}" mode="scaleToFill" />`
+      ];
     }
     case "icon": {
       return [
@@ -74,10 +88,7 @@ const htmls = computed(() => {
       ];
     }
     case "div": {
-      return [
-        `<view class="${handleName2(nameInput.value)}"></view>`,
-        `<button class="${handleName2(nameInput.value)}"></button>`
-      ];
+      return [`<view class="${handleName2(nameInput.value)}"></view>`];
     }
   }
 });
