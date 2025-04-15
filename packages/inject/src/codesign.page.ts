@@ -70,12 +70,10 @@ function trigger() {
       "justify-content",
       "overflow",
       "box-sizing",
-      "background",
-      "background-color",
+      /^background-?/,
       "box-shadow",
-      "border",
-      "border-radius",
-      "padding"
+      /^border-?/,
+      /^padding-?/
     ]);
   }
 
