@@ -38,17 +38,11 @@ function trigger() {
     renderType = "text";
     cssRules = getCssRules(
       codeSectionNode.contentEl,
-      ["color", "text-align", "font-family", "font-size", "font-style", "font-weight", "letter-spacing"],
+      ["color", "text-align", "font-family", "font-size", "font-style", "font-weight", "line-height", "letter-spacing"],
       [
         {
           name: "font-style",
           value: "normal"
-        }
-      ],
-      [
-        {
-          name: "display",
-          value: "flex"
         }
       ]
     );
@@ -79,6 +73,7 @@ function trigger() {
       "background",
       "background-color",
       "box-shadow",
+      "border",
       "border-radius",
       "padding"
     ]);

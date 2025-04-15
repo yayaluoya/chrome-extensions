@@ -22,8 +22,16 @@ export function getCssRules(
   const getProps = (css: string) => {
     const cssPropsRegexp = /\s*([a-zA-Z-]+)\s*:\s*([^;]+)\s*;/g;
     return [...css.matchAll(cssPropsRegexp)].reduce<cssPropType[]>((a, b) => {
-      const name = b[1];
-      const value = b[2];
+      const name = b[1].trim();
+      let value = b[2].trim();
+
+      const backVarRegexp = /^var\(--.*?,\s*#(.*?)\)$/;
+      // 处理一些特殊值
+      if (name === 'background' && backVarRegexp.test(value)) {
+        const match = value.match(backVarRegexp);
+        value = match ? '#' + match?.[1] : value;
+      }
+
       if (
         includePropsName.some(item => (typeof item === "string" ? item === name : item.test(name))) &&
         !excludeProps.some(item => item.name === name && item.value === value)
