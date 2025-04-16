@@ -9,7 +9,7 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
-    "package": "node .node/index.js && package ./dist inject"
+    "package": "node .node/cssHandle.js && package ./dist inject"
   },
   "dependencies": {
     "element-plus": "^2.9.7",

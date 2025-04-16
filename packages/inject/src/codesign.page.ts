@@ -1,7 +1,6 @@
-import { createApp, h } from "vue";
 import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
-import "element-plus/dist/index.css";
+import { createAppEl } from "./createAppEl";
 
 export function codesignStart() {
   document.addEventListener(
@@ -96,33 +95,14 @@ function trigger() {
 
   const customElClass = "custom-el-class";
   codeSectionNode.contentEl.querySelector(`.${customElClass}`)?.remove();
-  const el = document.createElement("div");
+  const el = createAppEl(Code, {
+    identification: renderType == "text" ? renderTagContent : sectionNodeBoxs[0].title,
+    type: renderType,
+    content: renderTagContent,
+    cssRules
+  });
   el.className = customElClass;
   codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
-  const shadowRoot = el.attachShadow({ mode: "open" });
-  const html = document.createElement("html");
-  shadowRoot.appendChild(html);
-  const head = document.createElement("head");
-  html.appendChild(head);
-  const body = document.createElement("body");
-  body.style.margin = "none";
-  html.appendChild(body);
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = chrome.runtime.getURL("inject/index.css");
-  head.appendChild(link);
-  const mountEl = document.createElement("div");
-  body.appendChild(mountEl);
-  createApp({
-    render() {
-      return h(Code, {
-        identification: renderType == "text" ? renderTagContent : sectionNodeBoxs[0].title,
-        type: renderType,
-        content: renderTagContent,
-        cssRules
-      });
-    }
-  }).mount(mountEl);
 }
 
 function getAllSectionNodeBox(screenInspectorEl: Element) {
