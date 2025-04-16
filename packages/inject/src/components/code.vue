@@ -27,6 +27,10 @@
     </template>
     <template v-if="jss && jss.length > 0">
       <span>js</span>
+      <div class="icon-url-input">
+        <span>iconUrl</span>
+        <input v-if="type === 'icon'" v-model="iconUrlInput" type="text" />
+      </div>
       <div v-for="(item, index) in jss" :key="index" class="code-item" @click="handleCodeItem(item)">
         <code>{{ item }}</code>
       </div>
@@ -81,6 +85,7 @@ const translateInputLocal = storageLocal(() => {
 const translateInput = ref("");
 const nameInput = ref("");
 const translateLoading = ref(false);
+const iconUrlInput = ref("");
 
 const handleTranslate = () => {
   if (!translateInput.value || translateLoading.value) {
@@ -148,7 +153,7 @@ const htmls = computed(() => {
 const jss = computed(() => {
   switch (props.type) {
     case "icon": {
-      return [`const ${handleName1(`${nameInput.value}-icon`, true)} = "";`];
+      return [`const ${handleName1(`${nameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
     }
   }
 });
@@ -220,7 +225,8 @@ onMounted(() => {
   }
 
   > .translate-input,
-  > .name-input {
+  > .name-input,
+  > .icon-url-input {
     display: flex;
     flex-direction: row;
     align-items: center;
