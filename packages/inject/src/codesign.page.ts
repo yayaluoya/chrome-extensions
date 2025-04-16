@@ -1,7 +1,7 @@
 import { createApp, h } from "vue";
 import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
-import 'element-plus/dist/index.css'
+import "element-plus/dist/index.css";
 
 export function codesignStart() {
   document.addEventListener(
@@ -55,12 +55,25 @@ function trigger() {
     cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height"]);
   }
   // 图片
-  else if (sectionNodeBoxs.some(item => item.title === '填充' && [...item.contentEl.querySelectorAll('span.node-item__text')].some(item2 => item2.textContent?.trim() === '图片填充'))) {
+  else if (
+    sectionNodeBoxs.some(
+      item =>
+        item.title === "填充" &&
+        [...item.contentEl.querySelectorAll("span.node-item__text")].some(item2 => item2.textContent?.trim() === "图片填充")
+    )
+  ) {
     renderType = "img";
-    cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height", "box-shadow", "border-radius"], [], [{
-      name: 'overflow',
-      value: 'hidden'
-    }]);
+    cssRules = getCssRules(
+      codeSectionNode.contentEl,
+      ["width", "height", "box-shadow", "border-radius"],
+      [],
+      [
+        {
+          name: "overflow",
+          value: "hidden"
+        }
+      ]
+    );
   }
   // 盒子
   else {
@@ -87,11 +100,12 @@ function trigger() {
   el.className = customElClass;
   codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
   const shadowRoot = el.attachShadow({ mode: "open" });
-  const html = document.createElement('html');
+  const html = document.createElement("html");
   shadowRoot.appendChild(html);
-  const head = document.createElement('head');
+  const head = document.createElement("head");
   html.appendChild(head);
-  const body = document.createElement('body');
+  const body = document.createElement("body");
+  body.style.margin = "none";
   html.appendChild(body);
   const link = document.createElement("link");
   link.rel = "stylesheet";

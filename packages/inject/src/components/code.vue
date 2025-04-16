@@ -12,13 +12,15 @@
     </div>
     <span>class</span>
     <div class="translate-input">
-      <ElInput v-model="translateInput" type="text" @keyup.enter="handleTranslate" />
-      <ElButton type="primary" @click="handleTranslate">generate</ElButton>
+      <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
+        <template #append>
+          <ElButton size="small" @click="handleTranslate" :loading="translateLoading">generate</ElButton>
+        </template>
+      </ElInput>
     </div>
-    <div class="name-input">
-      <span v-if="translateLoading">...</span>
-      <ElInput v-model="nameInput" type="text" />
-    </div>
+    <ElInput v-model="nameInput" size="small" type="text">
+      <template #prepend> <ElButton size="small">className</ElButton> </template>
+    </ElInput>
     <template v-if="htmls && htmls.length > 0">
       <span>html</span>
       <div v-for="(item, index) in htmls" :key="index" class="code-item" @click="handleCodeItem(item)">
@@ -27,10 +29,9 @@
     </template>
     <template v-if="jss && jss.length > 0">
       <span>js</span>
-      <div class="icon-url-input">
-        <span>iconUrl</span>
-        <ElInput v-if="type === 'icon'" v-model="iconUrlInput" type="text" />
-      </div>
+      <ElInput v-if="type === 'icon'" size="small" v-model="iconUrlInput" type="text">
+        <template #prepend> <span>iconUrl</span> </template>
+      </ElInput>
       <div v-for="(item, index) in jss" :key="index" class="code-item" @click="handleCodeItem(item)">
         <code>{{ item }}</code>
       </div>
@@ -212,11 +213,9 @@ onMounted(() => {
 .code {
   display: flex;
   flex-direction: column;
-  > * {
-    margin-bottom: 5px;
-  }
+  gap: 5px;
 
-  > .type {
+  .type {
     background-color: #252a34;
     color: white;
     text-align: center;
@@ -225,44 +224,11 @@ onMounted(() => {
     font-weight: bold;
   }
 
-  > .translate-input,
-  > .name-input,
-  > .icon-url-input {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    > span {
-      margin-right: 5px;
-    }
-    > input {
-      flex: 1;
-      border-radius: 5px;
-      outline: none;
-      padding: 5px;
-      box-sizing: border-box;
-      border: 2px solid #d9d9d9;
-      font-size: 14px;
-    }
-    > button {
-      margin-left: 5px;
-      background: #222324;
-      color: #fff;
-      border: none;
-      padding: 5px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-  }
-  > span {
-    font-weight: 700;
-    font-size: 14px;
-  }
-  > .code-item {
-    padding: 5px;
-    box-sizing: border-box;
-    border-radius: 5px;
-    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15), inset 1px 2px 0 0 #fff;
-    background-color: rgba(0, 0, 0, 0.04);
+  .code-item {
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: text;
+    background: rgba(0, 0, 0, 0.04);
     &:nth-last-child(1) {
       margin-bottom: 0;
     }
