@@ -2,10 +2,10 @@
   <div class="code">
     <span>类名</span>
     <div class="translate-input">
-      <input v-model="translateInput" />
+      <input v-model="translateInput" type="text" />
       <button @click="handleTranslate">生成类名</button>
     </div>
-    <input v-model="nameInput" />
+    <input v-model="nameInput" type="text" />
     <template v-if="htmls && htmls.length > 0">
       <span>html</span>
       <div v-for="(item, index) in htmls" :key="index" class="code-item" @click="handleCodeItem(item)">
@@ -30,7 +30,10 @@
 <script setup lang="ts">
 import type { cssPropType, CssRulesType } from "@/getCssRules";
 import { computed, onMounted, ref, watch } from "vue";
-import CryptoJS from "crypto-js";
+import { storageLocal } from "@yayaluoya-extensions/common/src/local";
+import { md5 } from "@yayaluoya-extensions/common/src/md5";
+import { sendMessage } from "@yayaluoya-extensions/common/src/message";
+import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
 
 /** 名字转大小写 */
 const handleName1 = (name: string, capitalCase = false) => {
@@ -55,9 +58,9 @@ const props = defineProps<{
   cssRules: CssRulesType[];
 }>();
 
-const getCodeName = () => {
-  return CryptoJS.MD5(`code-name-${props.identification}`).toString();
-};
+const classNameLocal = storageLocal(() => {
+  return md5(`code-name-${props.identification}`).toString();
+});
 
 const translateInput = ref("");
 const nameInput = ref("");
@@ -66,14 +69,20 @@ const handleTranslate = () => {
   if (!translateInput.value) {
     return;
   }
-  chrome.runtime
-    .sendMessage({ type: "translate", str: translateInput.value })
-    .then((res: { succeed: boolean; content?: string }) => {
-      if (res.succeed && res.content) {
-        nameInput.value = res.content
+  sendMessage<string>({
+    type: MessageType.baiduTranslate,
+    value: translateInput.value
+  })
+    .then(res => {
+      if (res) {
+        nameInput.value = res
+          .replace(/-/g, "")
           .replace(/\s+([a-zA-Z])/g, (_, a) => a.toLocaleUpperCase())
           .replace(/^[A-Z]/, _ => _.toLocaleLowerCase());
       }
+    })
+    .catch(err => {
+      console.log(err);
     });
 };
 
@@ -155,13 +164,13 @@ const handleCodeItem = (item: string) => {
 };
 
 watch(nameInput, () => {
-  chrome.storage.local.set({ [getCodeName()]: nameInput.value });
+  classNameLocal.set(nameInput.value);
 });
 
 onMounted(() => {
-  chrome.storage.local.get(getCodeName()).then(values => {
+  classNameLocal.get().then(value => {
     nameInput.value =
-      values[getCodeName()] ||
+      value ||
       {
         text: "text",
         img: "img",

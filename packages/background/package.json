@@ -12,15 +12,14 @@
     "package": "package ./dist background"
   },
   "dependencies": {
-    "crypto-js": "^4.2.0",
     "vue": "^3.5.13"
   },
   "devDependencies": {
+    "@yayaluoya-extensions/scripts": "workspace:^",
+    "@yayaluoya-extensions/common": "workspace:^",
     "@tsconfig/node22": "^22.0.1",
-    "@types/crypto-js": "^4.2.2",
     "@types/node": "^22.14.0",
     "@vue/tsconfig": "^0.7.0",
-    "@yayaluoya-extensions/utils": "workspace:^",
     "chrome-types": "^0.1.347",
     "npm-run-all2": "^7.0.2",
     "typescript": "~5.8.0",
