@@ -1,6 +1,7 @@
 import { createApp, h } from "vue";
 import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
+import "element-plus/dist/index.css";
 
 export function codesignStart() {
   document.addEventListener(
@@ -85,13 +86,6 @@ function trigger() {
   const el = document.createElement("div");
   el.className = customElClass;
   codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
-  const shadowRoot = el.attachShadow({ mode: "open" });
-  const mountEl = document.createElement("div");
-  const link = document.createElement("link");
-  link.rel = "stylesheet";
-  link.href = chrome.runtime.getURL("inject/index.css");
-  shadowRoot.appendChild(link);
-  shadowRoot.appendChild(mountEl);
   createApp({
     render() {
       return h(Code, {
@@ -101,7 +95,7 @@ function trigger() {
         cssRules
       });
     }
-  }).mount(mountEl);
+  }).mount(el);
 }
 
 function getAllSectionNodeBox(screenInspectorEl: Element) {

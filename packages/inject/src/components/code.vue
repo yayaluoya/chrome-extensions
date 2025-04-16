@@ -12,12 +12,12 @@
     </div>
     <span>class</span>
     <div class="translate-input">
-      <input v-model="translateInput" type="text" @keyup.enter="handleTranslate" />
-      <button @click="handleTranslate">generate</button>
+      <ElInput v-model="translateInput" type="text" @keyup.enter="handleTranslate" />
+      <ElButton type="primary" @click="handleTranslate">generate</ElButton>
     </div>
     <div class="name-input">
       <span v-if="translateLoading">...</span>
-      <input v-model="nameInput" type="text" />
+      <ElInput v-model="nameInput" type="text" />
     </div>
     <template v-if="htmls && htmls.length > 0">
       <span>html</span>
@@ -29,7 +29,7 @@
       <span>js</span>
       <div class="icon-url-input">
         <span>iconUrl</span>
-        <input v-if="type === 'icon'" v-model="iconUrlInput" type="text" />
+        <ElInput v-if="type === 'icon'" v-model="iconUrlInput" type="text" />
       </div>
       <div v-for="(item, index) in jss" :key="index" class="code-item" @click="handleCodeItem(item)">
         <code>{{ item }}</code>
@@ -51,6 +51,7 @@ import { storageLocal } from "@yayaluoya-extensions/common/src/local";
 import { md5 } from "@yayaluoya-extensions/common/src/md5";
 import { sendMessage } from "@yayaluoya-extensions/common/src/message";
 import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
+import { ElButton, ElInput } from "element-plus";
 
 /** 名字转大小写 */
 const handleName1 = (name: string, capitalCase = false) => {
