@@ -74,6 +74,9 @@ const props = defineProps<{
 const classNameLocal = storageLocal(() => {
   return md5(`code-name-${props.identification}`).toString();
 });
+const translateInputLocal = storageLocal(() => {
+  return md5(`translate-input-${props.identification}`).toString();
+});
 
 const translateInput = ref("");
 const nameInput = ref("");
@@ -83,6 +86,7 @@ const handleTranslate = () => {
   if (!translateInput.value || translateLoading.value) {
     return;
   }
+  translateInputLocal.set(translateInput.value);
   translateLoading.value = true;
   sendMessage<string>({
     type: MessageType.baiduTranslate,
@@ -184,12 +188,17 @@ const handleCodeItem = (item: string) => {
 watch(nameInput, () => {
   classNameLocal.set(nameInput.value);
 });
+watch(translateInput, () => {
+  translateInputLocal.set(translateInput.value);
+});
 
 onMounted(() => {
   classNameLocal.get().then(value => {
     nameInput.value = value || "item";
   });
-  translateInput.value = props.content;
+  translateInputLocal.get().then(value => {
+    translateInput.value = value || props.content;
+  });
 });
 </script>
 
@@ -207,6 +216,7 @@ onMounted(() => {
     text-align: center;
     padding: 5px 0;
     border-radius: 5px;
+    font-weight: bold;
   }
 
   > .translate-input,
