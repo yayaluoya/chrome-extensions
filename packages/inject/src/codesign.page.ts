@@ -48,15 +48,18 @@ function trigger() {
     );
     renderTagContent = cssRules.map(item => item.query).join("");
   }
-  // 图片
-  else if (sectionNodeBoxs.some(item => /^image/.test(item.title))) {
-    renderType = "img";
-    cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height", "box-shadow", "border-radius"]);
-  }
   // 切图
   else if (sectionNodeBoxs.some(item => item.title === "切图")) {
     renderType = "icon";
     cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height"]);
+  }
+  // 图片
+  else if (sectionNodeBoxs.some(item => /^image/.test(item.title))) {
+    renderType = "img";
+    cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height", "box-shadow", "border-radius"], [], [{
+      name: 'overflow',
+      value: 'hidden'
+    }]);
   }
   // 盒子
   else {

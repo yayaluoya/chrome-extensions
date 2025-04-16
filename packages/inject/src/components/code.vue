@@ -1,11 +1,24 @@
 <template>
   <div class="code">
+    <div class="type">
+      {{
+        {
+          img: "图片",
+          icon: "切图",
+          text: "文本",
+          div: "盒子"
+        }[type]
+      }}
+    </div>
     <span>类名</span>
     <div class="translate-input">
-      <input v-model="translateInput" type="text" />
-      <button @click="handleTranslate">生成类名</button>
+      <input v-model="translateInput" type="text" @keyup.enter="handleTranslate" />
+      <button @click="handleTranslate">生成class</button>
     </div>
-    <input v-model="nameInput" type="text" />
+    <div class="name-input">
+      <span v-if="translateLoading">...</span>
+      <input v-model="nameInput" type="text" />
+    </div>
     <template v-if="htmls && htmls.length > 0">
       <span>html</span>
       <div v-for="(item, index) in htmls" :key="index" class="code-item" @click="handleCodeItem(item)">
@@ -64,11 +77,13 @@ const classNameLocal = storageLocal(() => {
 
 const translateInput = ref("");
 const nameInput = ref("");
+const translateLoading = ref(false);
 
 const handleTranslate = () => {
-  if (!translateInput.value) {
+  if (!translateInput.value || translateLoading.value) {
     return;
   }
+  translateLoading.value = true;
   sendMessage<string>({
     type: MessageType.baiduTranslate,
     value: translateInput.value
@@ -83,6 +98,9 @@ const handleTranslate = () => {
     })
     .catch(err => {
       console.log(err);
+    })
+    .finally(() => {
+      translateLoading.value = false;
     });
 };
 
@@ -107,7 +125,7 @@ const htmls = computed(() => {
       return [
         `<image src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleName2(
           `${nameInput.value}-img`
-        )}" mode="scaleToFill" />`
+        )}" mode="aspectFit" />`
       ];
     }
     case "icon": {
@@ -169,14 +187,7 @@ watch(nameInput, () => {
 
 onMounted(() => {
   classNameLocal.get().then(value => {
-    nameInput.value =
-      value ||
-      {
-        text: "text",
-        img: "img",
-        icon: "icon",
-        div: "view"
-      }[props.type];
+    nameInput.value = value || "item";
   });
   translateInput.value = props.content;
 });
@@ -189,16 +200,23 @@ onMounted(() => {
   > * {
     margin-bottom: 5px;
   }
-  > input,
-  > .code-item {
-    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15), inset 1px 2px 0 0 #fff;
-    background-color: #f4f4f6;
+
+  > .type {
+    background-color: #252a34;
+    color: white;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 5px;
   }
 
-  > .translate-input {
+  > .translate-input,
+  > .name-input {
     display: flex;
     flex-direction: row;
     align-items: center;
+    > span {
+      margin-right: 5px;
+    }
     > input {
       flex: 1;
       border-radius: 5px;
@@ -210,25 +228,13 @@ onMounted(() => {
     }
     > button {
       margin-left: 5px;
-      background: #006ffd;
-      box-shadow: 0 28px 8px #2787fc00, 0 18px 7px #2787fc03, 0 10px 6px #2787fc0d, 0 5px 5px #2787fc17, 0 1px 2px #2787fc1a;
+      background: #222324;
       color: #fff;
       border: none;
       padding: 5px 10px;
-      border-radius: 10px;
+      border-radius: 5px;
       cursor: pointer;
     }
-  }
-
-  > input {
-    width: 100%;
-    border-radius: 5px;
-    outline: none;
-    border: 2px solid #d9d9d9;
-    padding: 5px;
-    box-sizing: border-box;
-    font-size: 14px;
-    font-weight: 700;
   }
   > span {
     font-weight: 700;
@@ -238,6 +244,8 @@ onMounted(() => {
     padding: 5px;
     box-sizing: border-box;
     border-radius: 5px;
+    box-shadow: 1px 1px 2px 0 rgba(0, 0, 0, 0.15), inset 1px 2px 0 0 #fff;
+    background-color: rgba(0, 0, 0, 0.04);
     &:nth-last-child(1) {
       margin-bottom: 0;
     }
