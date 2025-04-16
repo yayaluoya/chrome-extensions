@@ -54,7 +54,7 @@ function trigger() {
     cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height"]);
   }
   // 图片
-  else if (sectionNodeBoxs.some(item => /^image/.test(item.title))) {
+  else if (sectionNodeBoxs.some(item => item.title === '填充' && [...item.contentEl.querySelectorAll('span.node-item__text')].some(item2 => item2.textContent?.trim() === '图片填充'))) {
     renderType = "img";
     cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height", "box-shadow", "border-radius"], [], [{
       name: 'overflow',

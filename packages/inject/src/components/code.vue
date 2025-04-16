@@ -10,10 +10,10 @@
         }[type]
       }}
     </div>
-    <span>类名</span>
+    <span>class</span>
     <div class="translate-input">
       <input v-model="translateInput" type="text" @keyup.enter="handleTranslate" />
-      <button @click="handleTranslate">生成class</button>
+      <button @click="handleTranslate">generate</button>
     </div>
     <div class="name-input">
       <span v-if="translateLoading">...</span>
