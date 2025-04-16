@@ -1,6 +1,7 @@
 import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
 import { createAppEl } from "./createAppEl";
+import { md5 } from "@yayaluoya-extensions/common/src/md5";
 
 export function codesignStart() {
   document.addEventListener(
@@ -30,14 +31,18 @@ function trigger() {
     return;
   }
 
-  let renderType: "img" | "icon" | "text" | "div";
-  let renderTagContent = "";
+  const cssCode = codeSectionNode.contentEl.querySelectorAll(".css-node__code--item")[0]?.textContent || "";
+
+  const title = sectionNodeBoxs[0].title;
+  let identificationText = "";
+  let type: "img" | "icon" | "text" | "div";
+  let textContent = "";
   let cssRules: CssRulesType[] = [];
   // 文本
   if (sectionNodeBoxs.some(item => item.title === "文本")) {
-    renderType = "text";
+    type = "text";
     cssRules = getCssRules(
-      codeSectionNode.contentEl,
+      cssCode,
       ["color", "text-align", "font-family", "font-size", "font-style", "font-weight", "line-height", "letter-spacing"],
       [
         {
@@ -46,12 +51,16 @@ function trigger() {
         }
       ]
     );
-    renderTagContent = cssRules.map(item => item.query).join("");
+    textContent = cssRules.map(item => item.query).join("");
+    identificationText = textContent + JSON.stringify(cssRules);
   }
   // 切图
   else if (sectionNodeBoxs.some(item => item.title === "切图")) {
-    renderType = "icon";
-    cssRules = getCssRules(codeSectionNode.contentEl, ["width", "height"]);
+    type = "icon";
+    cssRules = getCssRules(cssCode, ["width", "height"]);
+    identificationText =
+      sectionNodeBoxs.find(item => item.title === "切图")!.contentEl.querySelector<HTMLImageElement>(".thumb img")!.src +
+      JSON.stringify(cssRules);
   }
   // 图片
   else if (
@@ -61,9 +70,9 @@ function trigger() {
         [...item.contentEl.querySelectorAll("span.node-item__text")].some(item2 => item2.textContent?.trim() === "图片填充")
     )
   ) {
-    renderType = "img";
+    type = "img";
     cssRules = getCssRules(
-      codeSectionNode.contentEl,
+      cssCode,
       ["width", "height", "box-shadow", "border-radius"],
       [],
       [
@@ -73,11 +82,12 @@ function trigger() {
         }
       ]
     );
+    identificationText = title + JSON.stringify(cssRules);
   }
   // 盒子
   else {
-    renderType = "div";
-    cssRules = getCssRules(codeSectionNode.contentEl, [
+    type = "div";
+    cssRules = getCssRules(cssCode, [
       "width",
       "height",
       "display",
@@ -91,14 +101,16 @@ function trigger() {
       /^border-?/,
       /^padding-?/
     ]);
+    identificationText = title + JSON.stringify(cssRules);
   }
 
   const customElClass = "custom-el-class";
   codeSectionNode.contentEl.querySelector(`.${customElClass}`)?.remove();
   const el = createAppEl(Code, {
-    identification: renderType == "text" ? renderTagContent : sectionNodeBoxs[0].title,
-    type: renderType,
-    content: renderTagContent,
+    // identification: identificationText,
+    identification: md5(identificationText).toString(),
+    type,
+    textContent,
     cssRules
   });
   el.className = customElClass;

@@ -9,13 +9,13 @@ export type CssRulesType = {
 };
 
 export function getCssRules(
-  sectionNodeContentEl: Element,
+  cssCode: string,
   includePropsName: (string | RegExp)[] = [],
   excludeProps: cssPropType[] = [],
   addProps: cssPropType[] = []
 ) {
   const cssRules: CssRulesType[] = [];
-  const cssCode = sectionNodeContentEl.querySelectorAll(".css-node__code--item")[0]?.textContent || "";
+
   const cssRulesRegexp = /\s*\.(.*?)\s*{([\s\S]*?)}/g;
   const cssRulesMatch = [...cssCode.matchAll(cssRulesRegexp)];
 
@@ -26,8 +26,8 @@ export function getCssRules(
       let value = b[2].trim();
 
       // 处理一些特殊值
-      value = value.replace(/var\(--.*?,\s*#(.*?)\)/,(_,a)=>{
-        return '#'+a;
+      value = value.replace(/var\(--.*?,\s*#(.*?)\)/, (_, a) => {
+        return "#" + a;
       });
 
       if (

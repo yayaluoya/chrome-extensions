@@ -8,7 +8,7 @@
           text: "文本",
           div: "盒子"
         }[type]
-      }}
+      }}-{{ identification }}
     </div>
     <span>class</span>
     <div class="translate-input">
@@ -73,7 +73,7 @@ const handleName2 = (name: string) => {
 const props = defineProps<{
   identification: string;
   type: "img" | "icon" | "text" | "div";
-  content: string;
+  textContent: string;
   cssRules: CssRulesType[];
 }>();
 
@@ -204,7 +204,7 @@ onMounted(() => {
     nameInput.value = value || "item";
   });
   translateInputLocal.get().then(value => {
-    translateInput.value = value || props.content;
+    translateInput.value = value || props.textContent;
   });
 });
 </script>
