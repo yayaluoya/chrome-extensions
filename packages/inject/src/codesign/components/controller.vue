@@ -22,7 +22,10 @@
       <template #prepend> <ElButton size="small">className</ElButton> </template>
     </ElInput>
     <template v-if="htmls && htmls.length > 0">
-      <span>html</span>
+      <span>
+        html
+        <ElCheckbox v-model="textVar" label="变量" size="large" />
+      </span>
       <div v-for="(item, index) in htmls" :key="index" class="code-item" @click="handleCodeItem(item)">
         <code>{{ item }}</code>
       </div>
@@ -52,7 +55,7 @@ import { storageLocal } from "@yayaluoya-extensions/common/src/local";
 import { md5 } from "@yayaluoya-extensions/common/src/md5";
 import { sendMessage } from "@yayaluoya-extensions/common/src/message";
 import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
-import { ElButton, ElInput } from "element-plus";
+import { ElButton, ElInput, ElCheckbox } from "element-plus";
 import type { ItemType } from "../type";
 import { handleVarName1, handleVarName2 } from "@yayaluoya-extensions/common/src/utils/global";
 
@@ -63,17 +66,21 @@ const props = defineProps<{
   cssRules: CssRulesType[];
 }>();
 
-const classNameLocal = storageLocal(() => {
-  return md5(`code-name-${props.identification}`).toString();
-});
 const translateInputLocal = storageLocal(() => {
   return md5(`translate-input-${props.identification}`).toString();
+});
+const classNameLocal = storageLocal(() => {
+  return md5(`class-name-${props.identification}`).toString();
+});
+const textVarLocal = storageLocal<string, "true">(() => {
+  return md5(`text-var-${props.identification}`).toString();
 });
 
 const translateInput = ref("");
 const nameInput = ref("");
 const translateLoading = ref(false);
 const iconUrlInput = ref("");
+const textVar = ref(false);
 
 const handleTranslate = () => {
   if (!translateInput.value || translateLoading.value) {
@@ -105,7 +112,9 @@ const htmls = computed(() => {
   switch (props.type) {
     case "text": {
       return props.cssRules.map((item, i) => {
-        return `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`;
+        return `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${
+          textVar.value ? `{{ "${item.query || ""}" }}` : item.query || ""
+        }</text>`;
       });
     }
     case "img": {
@@ -184,6 +193,9 @@ watch(nameInput, () => {
 watch(translateInput, () => {
   translateInputLocal.set(translateInput.value);
 });
+watch(textVar, () => {
+  textVarLocal.set(textVar.value ? "true" : undefined);
+});
 
 onMounted(() => {
   classNameLocal.get().then(value => {
@@ -191,6 +203,9 @@ onMounted(() => {
   });
   translateInputLocal.get().then(value => {
     translateInput.value = value || props.textContent;
+  });
+  textVarLocal.get().then(value => {
+    textVar.value = !!value;
   });
 });
 </script>

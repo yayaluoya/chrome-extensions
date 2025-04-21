@@ -14,8 +14,8 @@ watch(keyInput, () => {
 });
 
 onMounted(async () => {
-  appIdInput.value = await baiduAppIdStorage.get();
-  keyInput.value = await baiduKeyStorage.get();
+  appIdInput.value = (await baiduAppIdStorage.get()) || "";
+  keyInput.value = (await baiduKeyStorage.get()) || "";
 });
 </script>
 

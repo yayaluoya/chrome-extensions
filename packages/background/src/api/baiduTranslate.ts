@@ -7,9 +7,9 @@ import { baiduAppIdStorage, baiduKeyStorage } from "@yayaluoya-extensions/common
  * @returns
  */
 export async function requestBaiduTranslate(str: string) {
-  const appId = await baiduAppIdStorage.get();
+  const appId = (await baiduAppIdStorage.get()) || "";
   const salt = md5(Date.now().toString());
-  const key = await baiduKeyStorage.get();
+  const key = (await baiduKeyStorage.get()) || "";
   return fetch(
     `https://fanyi-api.baidu.com/api/trans/vip/translate?q=${str}&from=zh&to=en&appid=${appId}&salt=${salt}&sign=${md5(
       appId + str + salt + key

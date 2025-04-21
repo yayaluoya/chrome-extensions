@@ -1,4 +1,4 @@
-import Code from "./components/code.vue";
+import Controller from "./components/controller.vue";
 import { createAppEl } from "../createAppEl";
 import { md5 } from "@yayaluoya-extensions/common/src/md5";
 import type { ItemType } from "./type";
@@ -108,7 +108,7 @@ function trigger() {
 
   const customElClass = "custom-el-class";
   codeSectionNode.contentEl.querySelector(`.${customElClass}`)?.remove();
-  const el = createAppEl(Code, {
+  const el = createAppEl(Controller, {
     identification: md5(identificationText).toString(),
     type,
     textContent,
