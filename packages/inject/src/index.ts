@@ -1,7 +1,7 @@
-import { codesignStart } from "./codesign.page";
+import { codesignInject } from "./codesign/index";
 
 switch (location.hostname) {
   case "codesign.qq.com":
-    codesignStart();
+    codesignInject();
     break;
 }

@@ -46,33 +46,19 @@
 </template>
 
 <script setup lang="ts">
-import type { cssPropType, CssRulesType } from "@/getCssRules";
+import type { cssPropType, CssRulesType } from "@/codesign/parseCssRules";
 import { computed, onMounted, ref, watch } from "vue";
 import { storageLocal } from "@yayaluoya-extensions/common/src/local";
 import { md5 } from "@yayaluoya-extensions/common/src/md5";
 import { sendMessage } from "@yayaluoya-extensions/common/src/message";
 import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
 import { ElButton, ElInput } from "element-plus";
-
-/** 名字转大小写 */
-const handleName1 = (name: string, capitalCase = false) => {
-  if (capitalCase) {
-    name = name.replace(/^./, a => a.toLocaleUpperCase());
-  }
-  return name.replace(/-(.)/g, (_, a) => {
-    return a.toLocaleUpperCase();
-  });
-};
-
-const handleName2 = (name: string) => {
-  return name.replace(/([A-Z])/g, (_, a: string) => {
-    return "-" + a.toLocaleLowerCase();
-  });
-};
+import type { ItemType } from "../type";
+import { handleVarName1, handleVarName2 } from "@yayaluoya-extensions/common/src/utils/global";
 
 const props = defineProps<{
   identification: string;
-  type: "img" | "icon" | "text" | "div";
+  type: ItemType;
   textContent: string;
   cssRules: CssRulesType[];
 }>();
@@ -119,7 +105,7 @@ const htmls = computed(() => {
   switch (props.type) {
     case "text": {
       return props.cssRules.map((item, i) => {
-        return `<text class="${handleName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`;
+        return `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`;
       });
     }
     case "img": {
@@ -134,20 +120,20 @@ const htmls = computed(() => {
         );
       };
       return [
-        `<image src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleName2(
+        `<image src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleVarName2(
           `${nameInput.value}-img`
         )}" mode="aspectFit" />`
       ];
     }
     case "icon": {
       return [
-        `<image :src="${handleName1(`${nameInput.value}-icon`, true)}" class="${handleName2(
+        `<image :src="${handleVarName1(`${nameInput.value}-icon`, true)}" class="${handleVarName2(
           `${nameInput.value}-icon`
         )}" mode="scaleToFill" />`
       ];
     }
     case "div": {
-      return [`<view class="${handleName2(nameInput.value)}"></view>`];
+      return [`<view class="${handleVarName2(nameInput.value)}"></view>`];
     }
   }
 });
@@ -155,7 +141,7 @@ const htmls = computed(() => {
 const jss = computed(() => {
   switch (props.type) {
     case "icon": {
-      return [`const ${handleName1(`${nameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
+      return [`const ${handleVarName1(`${nameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
     }
   }
 });
@@ -167,22 +153,22 @@ const csss = computed(() => {
   switch (props.type) {
     case "text": {
       return props.cssRules.map((item, i) => {
-        return `.${handleName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}{${getCssProps(item)}}`.trim();
       });
     }
     case "img": {
       return props.cssRules.map(item => {
-        return `.${handleName2(`${nameInput.value}-img`)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${nameInput.value}-img`)}{${getCssProps(item)}}`.trim();
       });
     }
     case "icon": {
       return props.cssRules.map(item => {
-        return `.${handleName2(`${nameInput.value}-icon`)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${nameInput.value}-icon`)}{${getCssProps(item)}}`.trim();
       });
     }
     case "div": {
       return props.cssRules.map(item => {
-        return `.${handleName2(nameInput.value)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(nameInput.value)}{${getCssProps(item)}}`.trim();
       });
     }
   }

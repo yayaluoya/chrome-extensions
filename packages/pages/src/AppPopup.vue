@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { baiduAppIdStorage, baiduKeyStorage } from "@yayaluoya-extensions/common/src/local/baidu";
+import { baiduAppIdStorage, baiduKeyStorage } from "@yayaluoya-extensions/common/src/local/baiduApp";
+import { ElInput, ElForm, ElFormItem } from "element-plus";
 
 const appIdInput = ref("");
 const keyInput = ref("");
@@ -20,10 +21,14 @@ onMounted(async () => {
 
 <template>
   <div class="popup">
-    <span>baidu-appId</span>
-    <input type="text" v-model="appIdInput" />
-    <span>baidu-key</span>
-    <input type="text" v-model="keyInput" />
+    <ElForm :model="{}" :rules="{}" label-width="auto">
+      <ElFormItem label="baidu-appId">
+        <ElInput type="text" v-model="appIdInput" />
+      </ElFormItem>
+      <ElFormItem label="baidu-key">
+        <ElInput type="text" v-model="keyInput" />
+      </ElFormItem>
+    </ElForm>
   </div>
 </template>
 
@@ -32,6 +37,5 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   width: 370px;
-  height: 750px;
 }
 </style>

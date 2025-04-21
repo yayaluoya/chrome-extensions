@@ -1,23 +1,30 @@
-export type cssPropType = {
-  name: string;
-  value: string;
-};
-
 export type CssRulesType = {
   query?: string;
   props: cssPropType[];
 };
 
-export function getCssRules(
+export type cssPropType = {
+  name: string;
+  value: string;
+};
+
+/**
+ * 解析css规则
+ * @param cssCode
+ * @param includePropsName 包含的css属性
+ * @param excludeProps 排除的css属性
+ * @param supplementProps 补充的css属性
+ * @returns
+ */
+export function parseCssRules(
   cssCode: string,
   includePropsName: (string | RegExp)[] = [],
   excludeProps: cssPropType[] = [],
-  addProps: cssPropType[] = []
+  supplementProps: cssPropType[] = []
 ) {
   const cssRules: CssRulesType[] = [];
 
-  const cssRulesRegexp = /\s*\.(.*?)\s*{([\s\S]*?)}/g;
-  const cssRulesMatch = [...cssCode.matchAll(cssRulesRegexp)];
+  const rulesMatch = [...cssCode.matchAll(/\s*\.(.*?)\s*{([\s\S]*?)}/g)];
 
   const getProps = (css: string) => {
     const cssPropsRegexp = /\s*([a-zA-Z-]+)\s*:\s*([^;]+)\s*;/g;
@@ -43,20 +50,22 @@ export function getCssRules(
     }, []);
   };
 
-  if (cssRulesMatch.length === 0) {
+  if (rulesMatch.length === 0) {
     cssRules.push({
       props: getProps(cssCode)
     });
   } else {
-    cssRulesMatch.forEach(item => {
+    rulesMatch.forEach(item => {
       cssRules.push({
         query: item[1],
         props: getProps(item[2])
       });
     });
   }
+
+  // 添加需要补充的css属性
   cssRules.forEach(({ props }) => {
-    addProps.forEach(addProp => {
+    supplementProps.forEach(addProp => {
       if (!props.some(p => p.name === addProp.name)) {
         props.push(addProp);
       }

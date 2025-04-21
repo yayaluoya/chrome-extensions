@@ -1,9 +1,11 @@
-import { getCssRules, type CssRulesType } from "./getCssRules";
 import Code from "./components/code.vue";
-import { createAppEl } from "./createAppEl";
+import { createAppEl } from "../createAppEl";
 import { md5 } from "@yayaluoya-extensions/common/src/md5";
+import type { ItemType } from "./type";
+import type { CssRulesType } from "./parseCssRules";
+import { parseCssRules } from "./parseCssRules";
 
-export function codesignStart() {
+export function codesignInject() {
   document.addEventListener(
     "click",
     e => {
@@ -35,13 +37,13 @@ function trigger() {
 
   const title = sectionNodeBoxs[0].title;
   let identificationText = "";
-  let type: "img" | "icon" | "text" | "div";
+  let type: ItemType;
   let textContent = "";
   let cssRules: CssRulesType[] = [];
   // 文本
   if (sectionNodeBoxs.some(item => item.title === "文本")) {
     type = "text";
-    cssRules = getCssRules(
+    cssRules = parseCssRules(
       cssCode,
       ["color", "text-align", "font-family", "font-size", "font-style", "font-weight", "line-height", "letter-spacing"],
       [
@@ -57,7 +59,7 @@ function trigger() {
   // 切图
   else if (sectionNodeBoxs.some(item => item.title === "切图")) {
     type = "icon";
-    cssRules = getCssRules(cssCode, ["width", "height"]);
+    cssRules = parseCssRules(cssCode, ["width", "height"]);
     identificationText =
       sectionNodeBoxs.find(item => item.title === "切图")!.contentEl.querySelector<HTMLImageElement>(".thumb img")!.src +
       JSON.stringify(cssRules);
@@ -71,7 +73,7 @@ function trigger() {
     )
   ) {
     type = "img";
-    cssRules = getCssRules(
+    cssRules = parseCssRules(
       cssCode,
       ["width", "height", "box-shadow", "border-radius"],
       [],
@@ -87,7 +89,7 @@ function trigger() {
   // 盒子
   else {
     type = "div";
-    cssRules = getCssRules(cssCode, [
+    cssRules = parseCssRules(cssCode, [
       "width",
       "height",
       "display",
@@ -107,7 +109,6 @@ function trigger() {
   const customElClass = "custom-el-class";
   codeSectionNode.contentEl.querySelector(`.${customElClass}`)?.remove();
   const el = createAppEl(Code, {
-    // identification: identificationText,
     identification: md5(identificationText).toString(),
     type,
     textContent,
