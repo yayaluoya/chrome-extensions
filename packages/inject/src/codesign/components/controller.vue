@@ -24,7 +24,7 @@
     <template v-if="htmls && htmls.length > 0">
       <span>
         html
-        <ElCheckbox v-model="textVar" label="变量" size="large" />
+        <ElCheckbox v-if="type === 'text'" v-model="textVar" label="变量" size="large" />
       </span>
       <div v-for="(item, index) in htmls" :key="index" class="code-item" @click="handleCodeItem(item)">
         <code>{{ item }}</code>
