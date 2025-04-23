@@ -1,34 +1,40 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from "vue";
-import { baiduAppIdStorage, baiduKeyStorage } from "@yayaluoya-extensions/common/src/local/baiduApp";
-import { ElInput, ElForm, ElFormItem } from "element-plus";
+import { ref } from "vue";
+import BaiDuAppConfig from "./components/BaiDuAppConfig/index.vue";
+import GenVarName from "./components/GenVarName/index.vue";
+import Head from "./components/Head/index.vue";
+import Tabs from "./components/Tabs/index.vue";
 
-const appIdInput = ref("");
-const keyInput = ref("");
-
-watch(appIdInput, () => {
-  baiduAppIdStorage.set(appIdInput.value);
-});
-watch(keyInput, () => {
-  baiduKeyStorage.set(keyInput.value);
-});
-
-onMounted(async () => {
-  appIdInput.value = (await baiduAppIdStorage.get()) || "";
-  keyInput.value = (await baiduKeyStorage.get()) || "";
-});
+enum TabType {
+  GenVarName = "GenVarName",
+  BaiDuAppConfig = "BaiDuAppConfig"
+}
+const tabs: {
+  label: string;
+  value: TabType;
+}[] = [
+  {
+    label: "生成变量名",
+    value: TabType.GenVarName
+  },
+  {
+    label: "百度翻译api配置",
+    value: TabType.BaiDuAppConfig
+  }
+];
+const activeTab = ref(TabType.GenVarName);
 </script>
 
 <template>
   <div class="popup">
-    <ElForm :model="{}" :rules="{}" label-width="auto">
-      <ElFormItem label="baidu-appId">
-        <ElInput type="text" v-model="appIdInput" />
-      </ElFormItem>
-      <ElFormItem label="baidu-key">
-        <ElInput type="text" v-model="keyInput" />
-      </ElFormItem>
-    </ElForm>
+    <div class="head">
+      <Head />
+    </div>
+    <Tabs v-model:value="activeTab" :list="tabs" class="tabs" />
+    <div class="content">
+      <GenVarName v-if="activeTab === TabType.GenVarName" />
+      <BaiDuAppConfig v-if="activeTab === TabType.BaiDuAppConfig" />
+    </div>
   </div>
 </template>
 
@@ -36,6 +42,22 @@ onMounted(async () => {
 .popup {
   display: flex;
   flex-direction: column;
-  width: 370px;
+  width: 600px;
+  > .tabs {
+    --color: #666666;
+    --on-color: #666666;
+    --background-color: #ffffff;
+    --on-background-color: #f7f7f7;
+    --font-size: 14px;
+    --padding: 5px 12px;
+  }
+  > .head {
+    background-color: white;
+    padding: 12px;
+  }
+  > .content {
+    background: #f7f7f7;
+    padding: 12px;
+  }
 }
 </style>

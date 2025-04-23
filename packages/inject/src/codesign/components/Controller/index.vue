@@ -56,14 +56,14 @@ import { md5 } from "@yayaluoya-extensions/common/src/md5";
 import { sendMessage } from "@yayaluoya-extensions/common/src/message";
 import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
 import { ElButton, ElInput, ElCheckbox } from "element-plus";
-import type { ItemType } from "../type";
-import { handleVarName1, handleVarName2 } from "@yayaluoya-extensions/common/src/utils/global";
+import type { ItemType } from "../../type";
+import { handleVarName1, handleVarName2, strToVarName } from "@yayaluoya-extensions/common/src/utils/global";
 
 const props = defineProps<{
   identification: string;
   type: ItemType;
-  textContent: string;
   cssRules: CssRulesType[];
+  textContent?: string;
 }>();
 
 const translateInputLocal = storageLocal(() => {
@@ -94,10 +94,7 @@ const handleTranslate = () => {
   })
     .then(res => {
       if (res) {
-        nameInput.value = res
-          .replace(/-/g, "")
-          .replace(/\s+([a-zA-Z])/g, (_, a) => a.toLocaleUpperCase())
-          .replace(/^[A-Z]/, _ => _.toLocaleLowerCase());
+        nameInput.value = strToVarName(res);
       }
     })
     .catch(err => {
@@ -202,7 +199,7 @@ onMounted(() => {
     nameInput.value = value || "item";
   });
   translateInputLocal.get().then(value => {
-    translateInput.value = value || props.textContent;
+    translateInput.value = value || props.textContent || "";
   });
   textVarLocal.get().then(value => {
     textVar.value = !!value;

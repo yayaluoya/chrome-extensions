@@ -1,4 +1,4 @@
-import Controller from "./components/controller.vue";
+import Controller from "./components/Controller/index.vue";
 import { createAppEl } from "../createAppEl";
 import { md5 } from "@yayaluoya-extensions/common/src/md5";
 import type { ItemType } from "./type";

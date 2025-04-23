@@ -2,10 +2,10 @@ export interface MessageReq<T = any> {
   type: string;
   value?: T;
 }
-export interface MessageRes<T = any> {
+interface MessageRes<T = any> {
   succeed: boolean;
   msg?: string;
-  content?: T;
+  data?: T;
 }
 
 /**
@@ -13,10 +13,10 @@ export interface MessageRes<T = any> {
  * @param req
  * @returns
  */
-export function sendMessage<T>(req: MessageReq) {
+export function sendMessage<T = any>(req: MessageReq) {
   return chrome.runtime.sendMessage(req).then((res: MessageRes<T>) => {
     if (res.succeed) {
-      return res.content;
+      return res.data;
     } else {
       throw new Error(res.msg || "");
     }
@@ -26,7 +26,7 @@ export function sendMessage<T>(req: MessageReq) {
 type handleFType = (
   req: MessageReq,
   sender: chrome.runtime.MessageSender,
-  sendResponse: (res: MessageRes | Promise<MessageRes>) => void,
+  sendResponse: (res: any | Promise<any>) => void,
   next?: () => void
 ) => void;
 
@@ -35,9 +35,13 @@ const listeners: {
   handleF: handleFType;
 }[] = [];
 
-chrome.runtime.onMessage.addListener((req: MessageReq, sender, sendResponse) => {
-  const handleListeners = listeners.filter(item => item.type == req.type);
+chrome.runtime.onMessage.addListener((req: MessageReq, sender, sendResponse_: any) => {
+  const sendResponse = (res: MessageRes) => {
+    sendResponse_(res);
+  };
+  const handleListeners = listeners.filter(item => item.type === req.type);
   if (handleListeners.length <= 0) {
+    sendResponse({ succeed: false, msg: "找不到消息处理服务" });
     return false;
   }
   const handleF = () => {
@@ -45,14 +49,28 @@ chrome.runtime.onMessage.addListener((req: MessageReq, sender, sendResponse) => 
       return;
     }
     let onHandle = handleListeners.shift()!;
-    onHandle.handleF(
-      req,
-      sender,
-      res => {
-        Promise.resolve(res).then(sendResponse);
-      },
-      handleF
-    );
+    try {
+      onHandle.handleF(
+        req,
+        sender,
+        res => {
+          Promise.resolve(res)
+            .then(data => sendResponse({ succeed: true, data }))
+            .catch(err =>
+              sendResponse({
+                succeed: false,
+                msg: err.toString()
+              })
+            );
+        },
+        handleF
+      );
+    } catch (err: any) {
+      sendResponse({
+        succeed: false,
+        msg: err.toString()
+      });
+    }
   };
   handleF();
   return true;
