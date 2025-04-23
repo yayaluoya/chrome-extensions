@@ -39,7 +39,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   > a {
-    margin-bottom: 6px;
+    margin-bottom: 12px;
   }
 }
 </style>
