@@ -31,9 +31,11 @@ const activeTab = ref(TabType.GenVarName);
       <Head />
     </div>
     <Tabs v-model:value="activeTab" :list="tabs" class="tabs" />
-    <div class="content">
-      <GenVarName v-if="activeTab === TabType.GenVarName" />
-      <BaiDuAppConfig v-if="activeTab === TabType.BaiDuAppConfig" />
+    <div class="content-container">
+      <div class="content">
+        <GenVarName v-if="activeTab === TabType.GenVarName" />
+        <BaiDuAppConfig v-if="activeTab === TabType.BaiDuAppConfig" />
+      </div>
     </div>
   </div>
 </template>
@@ -55,9 +57,14 @@ const activeTab = ref(TabType.GenVarName);
     background-color: white;
     padding: 12px;
   }
-  > .content {
+  > .content-container {
     background: #f7f7f7;
     padding: 12px;
+    .content {
+      background-color: #ffffff;
+      border-radius: 12px;
+      padding: 12px;
+    }
   }
 }
 </style>

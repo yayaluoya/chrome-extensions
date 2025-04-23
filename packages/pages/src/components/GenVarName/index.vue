@@ -64,7 +64,7 @@ const handleCodeItem = (item: string) => {
   .try-result {
     padding: 12px;
     border-radius: 6px;
-    background: #ffffff;
+    background: #f7f7f7;
     margin-top: 6px;
   }
 }
