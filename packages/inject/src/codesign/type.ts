@@ -1,1 +1,0 @@
-export type ItemType = "img" | "icon" | "text" | "div";

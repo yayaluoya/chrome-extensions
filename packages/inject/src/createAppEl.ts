@@ -3,7 +3,7 @@ import { createApp, h, type DefineSetupFnComponent } from "vue";
 
 export function createAppEl<T extends DefineSetupFnComponent<any>>(
   com: T,
-  props: T extends DefineSetupFnComponent<infer P> ? P : never
+  props?: T extends DefineSetupFnComponent<infer P> ? P : never
 ) {
   const el = document.createElement("div");
   const shadowRoot = el.attachShadow({ mode: "open" });
