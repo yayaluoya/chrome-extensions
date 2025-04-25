@@ -1,9 +1,10 @@
 import { requestApiDetails, requestDataSchemas } from "../../api/apifox";
 import { ApiMethod, ValueType, type ApiDetail, type Type } from "../../api/type";
+import { apiTemLocal } from "@yayaluoya-extensions/common/src/local/apiTem";
 
 type DependencyInterfacesType = { id: number; name: string; description: string; typeStr: string };
 
-export async function getApiCallFile(projectId: string, apiId: number) {
+export async function getApiCallFile(projectId: string, apiId: number, objectType: string) {
   const ApiDetails = await requestApiDetails(projectId);
   const DataSchemas = await requestDataSchemas(projectId);
 
@@ -15,13 +16,12 @@ export async function getApiCallFile(projectId: string, apiId: number) {
 
   const dependencyInterfaces: DependencyInterfacesType[] = [];
 
-  const apiFunStr = generateTheApiFun(apiDetail, dependencyInterfaces);
+  const apiFunInfo = await generateTheApiFun(apiDetail, dependencyInterfaces);
 
   /**
    * 生成api调用方法
-   * @param apiDetail
    */
-  function generateTheApiFun(apiDetail: ApiDetail, dependencyInterfaces: DependencyInterfacesType[] = []) {
+  async function generateTheApiFun(apiDetail: ApiDetail, dependencyInterfaces: DependencyInterfacesType[] = []) {
     const {
       id: apiId,
       name: apiName,
@@ -46,20 +46,15 @@ export async function getApiCallFile(projectId: string, apiId: number) {
     const responsesType = responses?.contentType === "json" ? getType(responses.jsonSchema, dependencyInterfaces) : undefined;
     const apiFunName = `request${(apiPath.match(/(\w+)$/)?.[1] || "").replace(/^[a-z]/, _ => _.toLocaleUpperCase())}`;
     const argType = apiMethod === ApiMethod.Get ? queryType : apiMethod === ApiMethod.Post ? requestBodyType?.typeStr : "";
-    return `
-    /**
-     * ${apiName}
-     * ${apiMethod} ${apiPath}
-     * 接口ID: ${apiId}
-     * 接口地址: https://app.apifox.com/link/project/${projectId}/apis/api-${apiId}
-     */
-    export const ${apiFunName} = (${argType ? `data: ${argType}` : ""})=>{
-      return request.${apiMethod}<${responsesType ? responsesType.typeStr : "none"}>({
-        url: "${apiPath}",
-        ${argType ? "data" : ""}
-      }); 
-    }
-    `.trim();
+
+    return {
+      apiName,
+      apiMethod,
+      apiPath,
+      apiFunName,
+      argType,
+      responsesType: responsesType?.typeStr
+    };
   }
 
   /**
@@ -135,17 +130,29 @@ export async function getApiCallFile(projectId: string, apiId: number) {
     return `${description ? `/** ${description} */\n` : ""}${name}?: ${type};`;
   }
 
-  return `
-  ${dependencyInterfaces
-    .map(item =>
-      `
+  const apiTem = (await apiTemLocal.get())?.find(item => item.objectType === objectType)?.value || "";
+
+  return apiTem.replace(/\$\{(.*?)\}/g, (_, a: string) => {
+    return {
+      projectId: projectId,
+      apiId: apiId,
+      apiName: apiFunInfo.apiName,
+      apiMethod: apiFunInfo.apiMethod,
+      apiPath: apiFunInfo.apiPath,
+      apiFunName: apiFunInfo.apiFunName,
+      argType: apiFunInfo.argType ? `data: ${apiFunInfo.argType}` : "",
+      dataArg: apiFunInfo.argType ? "data" : "",
+      responsesType: apiFunInfo.responsesType ? apiFunInfo.responsesType : "void",
+      dependencyInterfaces: dependencyInterfaces
+        .map(item =>
+          `
 /** 
 * ${item.description || item.name}
 * ID: ${item.id}
 */    
 export interface ${item.name} ${item.typeStr}`.trim()
-    )
-    .join("\n")}
-  ${apiFunStr}
-  `;
+        )
+        .join("\n")
+    }[a.trim()] as string;
+  });
 }

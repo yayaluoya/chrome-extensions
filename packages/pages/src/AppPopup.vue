@@ -66,7 +66,7 @@ onMounted(() => {
 .popup {
   display: flex;
   flex-direction: column;
-  width: 600px;
+  width: 800px;
   > .tabs {
     --color: #666666;
     --on-color: #666666;
