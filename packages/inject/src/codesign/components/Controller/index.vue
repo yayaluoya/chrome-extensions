@@ -13,7 +13,7 @@
     <ElRadioGroup v-model="objectType" size="small">
       <ElRadioButton v-for="item in objectTypeList" :key="item.value" :label="item.label" :value="item.value" />
     </ElRadioGroup>
-    <span>class</span>
+    <span>className</span>
     <div class="translate-input">
       <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
         <template #append>
@@ -58,7 +58,7 @@ import { storageLocal } from "@yayaluoya-extensions/common/src/local";
 import { md5 } from "@yayaluoya-extensions/common/src/md5";
 import { sendMessage } from "@yayaluoya-extensions/common/src/message";
 import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
-import { ElButton, ElInput, ElCheckbox, ElRadioGroup, ElRadioButton } from "element-plus";
+import { ElButton, ElInput, ElCheckbox, ElRadioGroup, ElRadioButton, ElMessage } from "element-plus";
 import { handleVarName1, handleVarName2, strToVarName } from "@yayaluoya-extensions/common/src/utils/global";
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";
 
@@ -168,6 +168,10 @@ const handleTranslate = () => {
     })
     .catch(err => {
       console.log(err);
+      ElMessage({
+        message: err,
+        type: "error"
+      });
     })
     .finally(() => {
       translateLoading.value = false;
@@ -272,7 +276,12 @@ const csss = computed(() => {
 });
 
 const handleCodeItem = (item: string) => {
-  navigator.clipboard.writeText(item);
+  navigator.clipboard.writeText(item).then(() => {
+    ElMessage({
+      message: "复制成功",
+      type: "success"
+    });
+  });
 };
 
 onMounted(() => {

@@ -5,10 +5,16 @@ import { ElInput, ElForm, ElFormItem, ElButton, ElMessage, ElDivider } from "ele
 import { sendMessage } from "@yayaluoya-extensions/common/src/message";
 import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
 import { handleVarName1, handleVarName2, strToVarName } from "@yayaluoya-extensions/common/src/utils/global";
+import { storageLocal } from "@yayaluoya-extensions/common/src/local";
 
+const inputLocal = storageLocal("gen-var-name-input");
 const input = ref("");
 const loading = ref(false);
 const results = ref<string[]>([]);
+
+watch(input, () => {
+  inputLocal.set(input.value);
+});
 
 const handleClick = () => {
   if (loading.value) {
@@ -40,8 +46,19 @@ const handleClick = () => {
 };
 
 const handleCodeItem = (item: string) => {
-  navigator.clipboard.writeText(item);
+  navigator.clipboard.writeText(item).then(() => {
+    ElMessage({
+      message: "复制成功",
+      type: "success"
+    });
+  });
 };
+
+onMounted(() => {
+  inputLocal.get().then(v => {
+    input.value = v || "";
+  });
+});
 </script>
 
 <template>

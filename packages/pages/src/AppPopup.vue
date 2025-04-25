@@ -1,28 +1,49 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import BaiDuAppConfig from "./components/BaiDuAppConfig/index.vue";
 import GenVarName from "./components/GenVarName/index.vue";
 import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
+import Apifox from "./components/Apifox/index.vue";
+import { storageLocal } from "@yayaluoya-extensions/common/src/local";
+
+const activeTabLocal = storageLocal<string, TabType>("popup-active-tab");
 
 enum TabType {
   GenVarName = "GenVarName",
+  Apifox = "Apifox",
   BaiDuAppConfig = "BaiDuAppConfig"
 }
-const tabs: {
-  label: string;
-  value: TabType;
-}[] = [
+const tabs = ref<
+  {
+    label: string;
+    value: TabType;
+  }[]
+>([
   {
     label: "生成变量名",
     value: TabType.GenVarName
   },
   {
+    label: "Apifox",
+    value: TabType.Apifox
+  },
+  {
     label: "百度翻译api配置",
     value: TabType.BaiDuAppConfig
   }
-];
+]);
 const activeTab = ref(TabType.GenVarName);
+
+watch(activeTab, () => {
+  activeTabLocal.set(activeTab.value);
+});
+
+onMounted(() => {
+  activeTabLocal.get().then(v => {
+    activeTab.value = v || TabType.GenVarName;
+  });
+});
 </script>
 
 <template>
@@ -34,6 +55,7 @@ const activeTab = ref(TabType.GenVarName);
     <div class="content-container">
       <div class="content">
         <GenVarName v-if="activeTab === TabType.GenVarName" />
+        <Apifox v-if="activeTab === TabType.Apifox" />
         <BaiDuAppConfig v-if="activeTab === TabType.BaiDuAppConfig" />
       </div>
     </div>
