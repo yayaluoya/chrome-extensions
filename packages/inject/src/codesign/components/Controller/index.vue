@@ -1,5 +1,5 @@
 <template>
-  <div class="code">
+  <div class="controller">
     <div class="type">
       {{
         {
@@ -348,7 +348,7 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
-.code {
+.controller {
   display: flex;
   flex-direction: column;
   gap: 5px;
