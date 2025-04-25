@@ -35,11 +35,11 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
 
     const queryType =
       query.length > 0
-        ? `{${query
+        ? `{\n${query
             .map(item => {
-              return getProp(item.name, getType({ type: item.type as ValueType }).typeStr, item.description);
+              return getProp(item.name, getType({ type: item.type as ValueType }).typeStr, item.description, item.required, "s");
             })
-            .join("\n")}}`.trim()
+            .join("\n")}\n}`.trim()
         : "";
     const requestBodyType =
       requestBody.type === "application/json" ? getType(requestBody.jsonSchema, dependencyInterfaces) : undefined;
@@ -101,7 +101,7 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
       return {
         typeStr: `{\n${propertieTypes
           .map(({ key, t }) => {
-            return getProp(key, t.typeStr, properties[key].description);
+            return getProp(key, t.typeStr, properties[key].description, type.required?.includes(key), "m");
           })
           .join("\n")}\n}`
       };
@@ -126,8 +126,27 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
     }
   }
 
-  function getProp(name: string, type: string, description?: string) {
-    return `${description ? `/** ${description} */\n` : ""}${name}?: ${type};`;
+  function getProp(name: string, type: string, description?: string, required?: boolean, descriptionType: "s" | "m" = "s") {
+    return (
+      `
+${
+  description
+    ? descriptionType === "s"
+      ? `/** ${description} */`
+      : `
+/** 
+${description
+  .split(/\n+/)
+  .map(item => ` * ${item}`)
+  .join("\n")}
+ */
+`.trim()
+    : ""
+}
+`.trim() +
+      (description ? "\n" : "") +
+      `${name}${required ? "" : "?"}: ${type};`
+    );
   }
 
   const apiTem = (await apiTemLocal.get())?.find(item => item.objectType === objectType)?.value || "";
@@ -138,6 +157,7 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
       apiId: apiId,
       apiName: apiFunInfo.apiName,
       apiMethod: apiFunInfo.apiMethod,
+      apiMethodCapital: apiFunInfo.apiMethod.toLocaleUpperCase(),
       apiPath: apiFunInfo.apiPath,
       apiFunName: apiFunInfo.apiFunName,
       argType: apiFunInfo.argType ? `data: ${apiFunInfo.argType}` : "",
@@ -152,7 +172,7 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
 */    
 export interface ${item.name} ${item.typeStr}`.trim()
         )
-        .join("\n")
+        .join("\n\n")
     }[a.trim()] as string;
   });
 }

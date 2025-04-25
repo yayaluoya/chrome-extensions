@@ -29,7 +29,7 @@ export async function apifoxInject() {
 }
 
 async function trigger() {
-  const projectId = location.pathname.match(/^\/project\/([0-9]+)$/)?.[1];
+  const projectId = location.pathname.match(/\/project\/([0-9]+)\/?/)?.[1];
   if (!projectId) {
     return;
   }

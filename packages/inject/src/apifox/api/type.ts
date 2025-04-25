@@ -30,6 +30,7 @@ export interface Type {
   properties?: Record<string, Type>;
   items?: Type;
   description?: string;
+  required?: string[];
 }
 
 export interface ApiDetail {
