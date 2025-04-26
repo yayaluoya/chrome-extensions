@@ -51,8 +51,15 @@ export interface ApiDetail {
     }[];
   };
   requestBody: {
-    type: "application/json" | "none";
+    type: "application/json" | "application/x-www-form-urlencoded" | "none";
     jsonSchema: Type;
+    parameters?: {
+      id: string;
+      name: string;
+      required: boolean;
+      type: string;
+      description: string;
+    }[];
   };
   responses: {
     id: number;

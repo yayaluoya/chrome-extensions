@@ -78,13 +78,16 @@ onMounted(() => {
   > .head {
     background-color: white;
     padding: 12px;
+    box-sizing: border-box;
   }
   > .content-container {
     background: #f7f7f7;
     padding: 12px;
+    box-sizing: border-box;
     .content {
       background-color: #ffffff;
       border-radius: 12px;
+      box-sizing: border-box;
       padding: 12px;
     }
   }

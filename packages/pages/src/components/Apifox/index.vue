@@ -1,5 +1,11 @@
 <template>
   <div class="apifox">
+    <ElDescriptions title="字段说明" :column="2" size="small" border>
+      <ElDescriptionsItem v-for="key of Object.keys(ApifoxTemFieldsDocs)" :label="key">{{
+        ApifoxTemFieldsDocs[key as ApifoxTemFields]
+      }}</ElDescriptionsItem>
+    </ElDescriptions>
+    <ElDivider />
     <ElForm v-for="(item, index) in tems" :key="index" :model="{}" class="items" label-width="auto">
       <ElFormItem label="项目名">
         <ElInput v-model="item.objectType" />
@@ -27,14 +33,16 @@
           tems.push({ objectType: '', value: '' });
         }
       "
-      >添加</ElButton
     >
+      添加项目
+    </ElButton>
   </div>
 </template>
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
 import { apiTemLocal, type ApiTemLocalType } from "@yayaluoya-extensions/common/src/local/apiTem";
-import { ElInput, ElButton, ElForm, ElFormItem } from "element-plus";
+import { ElInput, ElButton, ElForm, ElFormItem, ElDescriptions, ElDescriptionsItem, ElDivider } from "element-plus";
+import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@yayaluoya-extensions/common/src/constant/apifoxTemFields";
 
 const tems = ref<ApiTemLocalType>([]);
 

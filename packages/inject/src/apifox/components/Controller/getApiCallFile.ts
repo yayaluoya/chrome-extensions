@@ -1,8 +1,15 @@
+import { handleVarName1 } from "@yayaluoya-extensions/common/src/utils/global";
 import { requestApiDetails, requestDataSchemas } from "../../api/apifox";
 import { ApiMethod, ValueType, type ApiDetail, type Type } from "../../api/type";
 import { apiTemLocal } from "@yayaluoya-extensions/common/src/local/apiTem";
+import { ApifoxTemFields } from "@yayaluoya-extensions/common/src/constant/apifoxTemFields";
 
-type DependencyInterfacesType = { id: number; name: string; description: string; typeStr: string };
+type DependencyInterfacesType = {
+  id: number;
+  name: string;
+  description: string;
+  typeStr: string;
+};
 
 export async function getApiCallFile(projectId: string, apiId: number, objectType: string) {
   const ApiDetails = await requestApiDetails(projectId);
@@ -16,14 +23,10 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
 
   const dependencyInterfaces: DependencyInterfacesType[] = [];
 
-  const apiFunInfo = await generateTheApiFun(apiDetail, dependencyInterfaces);
+  const apiFunInfo = await getApiFunInfo(apiDetail, dependencyInterfaces);
 
-  /**
-   * 生成api调用方法
-   */
-  async function generateTheApiFun(apiDetail: ApiDetail, dependencyInterfaces: DependencyInterfacesType[] = []) {
+  async function getApiFunInfo(apiDetail: ApiDetail, dependencyInterfaces: DependencyInterfacesType[] = []) {
     const {
-      id: apiId,
       name: apiName,
       method: apiMethod,
       path: apiPath,
@@ -31,29 +34,62 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
       requestBody,
       responses: responsess
     } = apiDetail;
-    const responses = responsess.find(item => item.code === 200);
+    const responses = responsess.find(item => [200, 201, 204].includes(item.code));
 
-    const queryType =
+    const queryTypeStr =
       query.length > 0
         ? `{\n${query
             .map(item => {
-              return getProp(item.name, getType({ type: item.type as ValueType }).typeStr, item.description, item.required, "s");
+              return getTypeProp(
+                item.name,
+                getType({ type: item.type as ValueType }).typeStr,
+                item.description,
+                item.required,
+                "s"
+              );
             })
             .join("\n")}\n}`.trim()
         : "";
-    const requestBodyType =
-      requestBody.type === "application/json" ? getType(requestBody.jsonSchema, dependencyInterfaces) : undefined;
+    const requestBodyTypeStr =
+      requestBody.type === "application/json"
+        ? getType(requestBody.jsonSchema, dependencyInterfaces)?.typeStr
+        : requestBody.type === "application/x-www-form-urlencoded"
+        ? requestBody.parameters
+          ? `{\n${requestBody.parameters
+              .map(item => {
+                return getTypeProp(
+                  item.name,
+                  getType({ type: item.type as ValueType }).typeStr,
+                  item.description,
+                  item.required,
+                  "s"
+                );
+              })
+              .join("\n")}\n}`.trim()
+          : ""
+        : "";
+    let responsesTypeStr = "void";
     const responsesType = responses?.contentType === "json" ? getType(responses.jsonSchema, dependencyInterfaces) : undefined;
-    const apiFunName = `request${(apiPath.match(/(\w+)$/)?.[1] || "").replace(/^[a-z]/, _ => _.toLocaleUpperCase())}`;
-    const argType = apiMethod === ApiMethod.Get ? queryType : apiMethod === ApiMethod.Post ? requestBodyType?.typeStr : "";
+    if (responsesType) {
+      const { properties, interfaceId } = responsesType;
+      const i = dependencyInterfaces.findIndex(item => item.id === interfaceId);
+      if (i >= 0) {
+        dependencyInterfaces.splice(i, 0);
+      }
+      responsesTypeStr = properties?.["data"]?.typeStr || responsesTypeStr;
+    }
+    const apiCallFunName = handleVarName1(
+      `request${(apiPath.match(/(\w+)$/)?.[1] || "").replace(/^[a-z]/, _ => _.toLocaleUpperCase())}`
+    );
+    const funParamTypeStr = apiMethod === ApiMethod.Get ? queryTypeStr : requestBodyTypeStr;
 
     return {
       apiName,
       apiMethod,
       apiPath,
-      apiFunName,
-      argType,
-      responsesType: responsesType?.typeStr
+      apiCallFunName,
+      funParamTypeStr,
+      responsesTypeStr
     };
   }
 
@@ -66,7 +102,9 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
     dependencyInterfaces: DependencyInterfacesType[] = []
   ): {
     typeStr: string;
-    interface?: string;
+    interfaceId?: number;
+    interfaceName?: string;
+    properties?: Record<string, ReturnType<typeof getType>>;
   } {
     // 引用
     if (type.$ref) {
@@ -88,7 +126,17 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
       }
       return {
         typeStr: schemaName,
-        interface: schemaName
+        interfaceId: schema.id,
+        interfaceName: schemaName,
+        properties:
+          schema.jsonSchema.properties &&
+          Object.keys(schema.jsonSchema.properties).reduce<Record<string, ReturnType<typeof getType>>>((a, b) => {
+            if (!schema.jsonSchema.properties?.[b]) {
+              return a;
+            }
+            a[b] = getType(schema.jsonSchema?.properties?.[b]);
+            return a;
+          }, {})
       };
     }
     // 对象
@@ -101,9 +149,13 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
       return {
         typeStr: `{\n${propertieTypes
           .map(({ key, t }) => {
-            return getProp(key, t.typeStr, properties[key].description, type.required?.includes(key), "m");
+            return getTypeProp(key, t.typeStr, properties[key].description, type.required?.includes(key), "m");
           })
-          .join("\n")}\n}`
+          .join("\n")}\n}`,
+        properties: propertieTypes.reduce<Record<string, ReturnType<typeof getType>>>((a, b) => {
+          a[b.key] = b.t;
+          return a;
+        }, {})
       };
     }
     // 数组
@@ -126,7 +178,7 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
     }
   }
 
-  function getProp(name: string, type: string, description?: string, required?: boolean, descriptionType: "s" | "m" = "s") {
+  function getTypeProp(name: string, type: string, description?: string, required?: boolean, descriptionType: "s" | "m" = "s") {
     return (
       `
 ${
@@ -152,27 +204,29 @@ ${description
   const apiTem = (await apiTemLocal.get())?.find(item => item.objectType === objectType)?.value || "";
 
   return apiTem.replace(/\$\{(.*?)\}/g, (_, a: string) => {
-    return {
-      projectId: projectId,
-      apiId: apiId,
-      apiName: apiFunInfo.apiName,
-      apiMethod: apiFunInfo.apiMethod,
-      apiMethodCapital: apiFunInfo.apiMethod.toLocaleUpperCase(),
-      apiPath: apiFunInfo.apiPath,
-      apiFunName: apiFunInfo.apiFunName,
-      argType: apiFunInfo.argType ? `data: ${apiFunInfo.argType}` : "",
-      dataArg: apiFunInfo.argType ? "data" : "",
-      responsesType: apiFunInfo.responsesType ? apiFunInfo.responsesType : "void",
-      dependencyInterfaces: dependencyInterfaces
-        .map(item =>
-          `
+    return (
+      {
+        [ApifoxTemFields.projectId]: projectId,
+        [ApifoxTemFields.apiId]: apiId.toString(),
+        [ApifoxTemFields.apiName]: apiFunInfo.apiName,
+        [ApifoxTemFields.apiMethod]: apiFunInfo.apiMethod,
+        [ApifoxTemFields.apiMethodCapital]: apiFunInfo.apiMethod.toLocaleUpperCase(),
+        [ApifoxTemFields.apiPath]: apiFunInfo.apiPath,
+        [ApifoxTemFields.apiCallFunName]: apiFunInfo.apiCallFunName,
+        [ApifoxTemFields.funParamTypeStr]: apiFunInfo.funParamTypeStr ? `data: ${apiFunInfo.funParamTypeStr}` : "",
+        [ApifoxTemFields.apiData]: apiFunInfo.funParamTypeStr ? "data," : "",
+        [ApifoxTemFields.responsesTypeStr]: apiFunInfo.responsesTypeStr ? apiFunInfo.responsesTypeStr : "void",
+        [ApifoxTemFields.dependencyInterfacesTypeStr]: dependencyInterfaces
+          .map(item =>
+            `
 /** 
 * ${item.description || item.name}
 * ID: ${item.id}
 */    
 export interface ${item.name} ${item.typeStr}`.trim()
-        )
-        .join("\n\n")
-    }[a.trim()] as string;
+          )
+          .join("\n\n")
+      } as Record<ApifoxTemFields, string>
+    )[a.trim() as ApifoxTemFields];
   });
 }
