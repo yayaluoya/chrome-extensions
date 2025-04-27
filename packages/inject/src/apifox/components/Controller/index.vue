@@ -8,7 +8,7 @@
             <ElRadioButton v-for="(item, index) in codeTypes" :key="index" :label="item.objectType" :value="item.objectType" />
           </ElRadioGroup>
         </div>
-        <code v-for="(code, index) in codes" :key="index" @click="handleCopyCode(code)">{{ code }}</code>
+        <code v-for="(code, index) in codes?.filter(Boolean)" :key="index" @click="handleCopyCode(code)">{{ code }}</code>
       </div>
     </ElDialog>
   </div>
@@ -54,6 +54,7 @@ const handleGenCode = async () => {
     await genCode();
     dialogVisible.value = true;
   } catch (err: any) {
+    console.error(err);
     ElMessage({
       message: err.toString(),
       type: "error"

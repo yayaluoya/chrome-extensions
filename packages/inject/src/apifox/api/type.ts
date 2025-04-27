@@ -52,7 +52,7 @@ export interface ApiDetail {
   };
   requestBody: {
     type: "application/json" | "application/x-www-form-urlencoded" | "none";
-    jsonSchema: Type;
+    jsonSchema?: Type;
     parameters?: {
       id: string;
       name: string;
