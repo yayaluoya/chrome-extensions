@@ -70,14 +70,16 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
           : ""
         : "";
     let responsesTypeStr = "void";
-    const responsesType = responses?.contentType === "json" ? getType(responses.jsonSchema, dependencyInterfaces) : undefined;
-    if (responsesType) {
-      const { properties, interfaceId } = responsesType;
-      const i = dependencyInterfaces.findIndex(item => item.id === interfaceId);
-      if (i >= 0) {
-        dependencyInterfaces.splice(i, 1);
+    if (responses && responses.contentType === "json") {
+      let jsonSchema: Type | undefined = responses.jsonSchema;
+      if (jsonSchema.$ref) {
+        const schemaId = jsonSchema.$ref.match(/^#\/definitions\/([0-9]+)$/)?.[1] || "";
+        jsonSchema = DataSchemas.find(item => item.id === parseInt(schemaId))?.jsonSchema;
       }
-      responsesTypeStr = properties?.["data"]?.typeStr || responsesTypeStr;
+      jsonSchema = jsonSchema?.properties?.["data"];
+      if (jsonSchema) {
+        responsesTypeStr = getType(jsonSchema, dependencyInterfaces)?.typeStr || responsesTypeStr;
+      }
     }
     const apiCallFunName = handleVarName1(
       `request${(apiPath.match(/(\w+)$/)?.[1] || "").replace(/^[a-z]/, _ => _.toLocaleUpperCase())}`
@@ -105,7 +107,6 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
     typeStr: string;
     interfaceId?: number;
     interfaceName?: string;
-    properties?: Record<string, ReturnType<typeof getType>>;
   } {
     // 引用
     if (type.$ref) {
@@ -128,16 +129,7 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
       return {
         typeStr: schemaName,
         interfaceId: schema.id,
-        interfaceName: schemaName,
-        properties:
-          schema.jsonSchema.properties &&
-          Object.keys(schema.jsonSchema.properties).reduce<Record<string, ReturnType<typeof getType>>>((a, b) => {
-            if (!schema.jsonSchema.properties?.[b]) {
-              return a;
-            }
-            a[b] = getType(schema.jsonSchema?.properties?.[b]);
-            return a;
-          }, {})
+        interfaceName: schemaName
       };
     }
     // 对象
@@ -157,11 +149,7 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
           .map(({ key, t }) => {
             return getTypeProp(key, t.typeStr, properties[key].description, type.required?.includes(key), "m");
           })
-          .join("\n")}\n}`,
-        properties: propertieTypes.reduce<Record<string, ReturnType<typeof getType>>>((a, b) => {
-          a[b.key] = b.t;
-          return a;
-        }, {})
+          .join("\n")}\n}`
       };
     }
     // 数组
@@ -225,7 +213,7 @@ ${description
         `
 /** 
 * ${item.description || item.name}
-* ID: ${item.id}
+* SchemaID: ${item.id}
 */    
 export interface ${item.name} ${item.typeStr}
 `.trim()
