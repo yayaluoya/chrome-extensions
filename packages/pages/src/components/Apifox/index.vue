@@ -1,6 +1,6 @@
 <template>
   <div class="apifox">
-    <ElDescriptions title="字段说明" :column="2" size="small" border>
+    <ElDescriptions title="可用字段" :column="2" size="small" border>
       <ElDescriptionsItem v-for="key of Object.keys(ApifoxTemFieldsDocs)" :label="key">{{
         ApifoxTemFieldsDocs[key as ApifoxTemFields]
       }}</ElDescriptionsItem>
@@ -18,7 +18,8 @@
           type="danger"
           @click="
             () => {
-              tems.splice(index, 1);
+              deleteItemDlalog.visible = true;
+              deleteItemDlalog.itemIndex = index;
             }
           "
         >
@@ -36,12 +37,28 @@
     >
       添加项目
     </ElButton>
+    <ElDialog v-model="deleteItemDlalog.visible">
+      <div class="delete-item-dlalog">
+        <span>确认删除这个项目？</span>
+        <ElButton
+          type="primary"
+          @click="
+            () => {
+              tems.splice(deleteItemDlalog.itemIndex, 1);
+              deleteItemDlalog.visible = false;
+            }
+          "
+        >
+          确认
+        </ElButton>
+      </div>
+    </ElDialog>
   </div>
 </template>
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
 import { apiTemLocal, type ApiTemLocalType } from "@yayaluoya-extensions/common/src/local/apiTem";
-import { ElInput, ElButton, ElForm, ElFormItem, ElDescriptions, ElDescriptionsItem, ElDivider } from "element-plus";
+import { ElInput, ElButton, ElForm, ElFormItem, ElDescriptions, ElDescriptionsItem, ElDivider, ElDialog } from "element-plus";
 import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@yayaluoya-extensions/common/src/constant/apifoxTemFields";
 
 const tems = ref<ApiTemLocalType>([]);
@@ -56,6 +73,11 @@ watch(
   }
 );
 
+const deleteItemDlalog = ref({
+  visible: false,
+  itemIndex: 0
+});
+
 onMounted(async () => {
   tems.value = (await apiTemLocal.get()) || [];
 });
@@ -64,5 +86,17 @@ onMounted(async () => {
 .apifox {
   display: flex;
   flex-direction: column;
+}
+.delete-item-dlalog {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  > span {
+    color: #1f2024;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 22px;
+    margin-bottom: 12px;
+  }
 }
 </style>

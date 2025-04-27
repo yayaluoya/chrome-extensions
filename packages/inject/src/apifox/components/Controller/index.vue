@@ -2,11 +2,13 @@
   <div class="controller">
     <ElButton type="primary" @click="handleGenCode" :loading="genCodeLoading">生成代码</ElButton>
     <ElDialog v-model="dialogVisible" width="800" title="api调用代码" append-to-body>
-      <ElRadioGroup v-model="onCodeType" @change="onCodeTypeChange">
-        <ElRadioButton v-for="(item, index) in codeTypes" :key="index" :label="item.objectType" :value="item.objectType" />
-      </ElRadioGroup>
-      <div class="controller-dialog" @click="handleCopyCode">
-        <code>{{ code }}</code>
+      <div class="controller-dialog">
+        <div class="top">
+          <ElRadioGroup v-model="onCodeType" @change="onCodeTypeChange">
+            <ElRadioButton v-for="(item, index) in codeTypes" :key="index" :label="item.objectType" :value="item.objectType" />
+          </ElRadioGroup>
+        </div>
+        <code v-for="(code, index) in codes" :key="index" @click="handleCopyCode(code)">{{ code }}</code>
       </div>
     </ElDialog>
   </div>
@@ -30,7 +32,7 @@ const dialogVisible = ref(false);
 const genCodeLoading = ref(false);
 const codeTypes = ref<ApiTemLocalType>([]);
 const onCodeType = ref<string>("");
-const code = ref("");
+const codes = ref<string[]>();
 
 const onCodeTypeChange = () => {
   onCodeTypeLocal.set(onCodeType.value);
@@ -65,11 +67,11 @@ const genCode = async () => {
   if (!onCodeType.value) {
     return;
   }
-  code.value = (await getApiCallFile(props.projectId, props.apiId, onCodeType.value)) || "";
+  codes.value = (await getApiCallFile(props.projectId, props.apiId, onCodeType.value)) || [];
 };
 
-const handleCopyCode = () => {
-  navigator.clipboard.writeText(code.value).then(() => {
+const handleCopyCode = (code: string) => {
+  navigator.clipboard.writeText(code).then(() => {
     ElMessage({
       message: "复制成功",
       type: "success"
@@ -82,14 +84,23 @@ const handleCopyCode = () => {
   display: flex;
 }
 .controller-dialog {
-  margin-top: 12px;
-  padding: 5px 12px;
-  border-radius: 4px;
-  cursor: text;
-  background: rgba(0, 0, 0, 0.04);
-  code {
+  display: flex;
+  flex-direction: column;
+
+  > .top {
+    margin-bottom: 12px;
+  }
+  > code {
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: text;
+    background: rgba(0, 0, 0, 0.04);
     white-space: pre-wrap;
     font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
+    margin-bottom: 6px;
+    &:nth-last-child(1) {
+      margin-bottom: 0;
+    }
   }
 }
 </style>

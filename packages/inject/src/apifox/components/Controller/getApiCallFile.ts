@@ -203,30 +203,33 @@ ${description
 
   const apiTem = (await apiTemLocal.get())?.find(item => item.objectType === objectType)?.value || "";
 
-  return apiTem.replace(/\$\{(.*?)\}/g, (_, a: string) => {
-    return (
-      {
-        [ApifoxTemFields.projectId]: projectId,
-        [ApifoxTemFields.apiId]: apiId.toString(),
-        [ApifoxTemFields.apiName]: apiFunInfo.apiName,
-        [ApifoxTemFields.apiMethod]: apiFunInfo.apiMethod,
-        [ApifoxTemFields.apiMethodCapital]: apiFunInfo.apiMethod.toLocaleUpperCase(),
-        [ApifoxTemFields.apiPath]: apiFunInfo.apiPath,
-        [ApifoxTemFields.apiCallFunName]: apiFunInfo.apiCallFunName,
-        [ApifoxTemFields.funParamTypeStr]: apiFunInfo.funParamTypeStr ? `data: ${apiFunInfo.funParamTypeStr}` : "",
-        [ApifoxTemFields.apiData]: apiFunInfo.funParamTypeStr ? "data," : "",
-        [ApifoxTemFields.responsesTypeStr]: apiFunInfo.responsesTypeStr ? apiFunInfo.responsesTypeStr : "void",
-        [ApifoxTemFields.dependencyInterfacesTypeStr]: dependencyInterfaces
-          .map(item =>
-            `
+  return apiTem.split(/\n----\n/g).map(item => {
+    return item.replace(/\$\{(.*?)\}/g, (_, a: string) => {
+      return (
+        {
+          [ApifoxTemFields.projectId]: projectId,
+          [ApifoxTemFields.apiId]: apiId.toString(),
+          [ApifoxTemFields.apiName]: apiFunInfo.apiName,
+          [ApifoxTemFields.apiMethod]: apiFunInfo.apiMethod,
+          [ApifoxTemFields.apiMethodCapital]: apiFunInfo.apiMethod.toLocaleUpperCase(),
+          [ApifoxTemFields.apiPath]: apiFunInfo.apiPath,
+          [ApifoxTemFields.apiCallFunName]: apiFunInfo.apiCallFunName,
+          [ApifoxTemFields.funParamTypeStr]: apiFunInfo.funParamTypeStr ? `data: ${apiFunInfo.funParamTypeStr}` : "",
+          [ApifoxTemFields.apiData]: apiFunInfo.funParamTypeStr ? "data," : "",
+          [ApifoxTemFields.responsesTypeStr]: apiFunInfo.responsesTypeStr ? apiFunInfo.responsesTypeStr : "void",
+          [ApifoxTemFields.dependencyInterfacesTypeStr]: dependencyInterfaces
+            .map(item =>
+              `
 /** 
 * ${item.description || item.name}
 * ID: ${item.id}
 */    
-export interface ${item.name} ${item.typeStr}`.trim()
-          )
-          .join("\n\n")
-      } as Record<ApifoxTemFields, string>
-    )[a.trim() as ApifoxTemFields];
+export interface ${item.name} ${item.typeStr}
+`.trim()
+            )
+            .join("\n\n")
+        } as Record<ApifoxTemFields, string>
+      )[a.trim() as ApifoxTemFields];
+    });
   });
 }
