@@ -7,7 +7,6 @@ export enum ApifoxTemFields {
   apiPath = "apiPath",
   apiCallFunName = "apiCallFunName",
   funParamTypeStr = "funParamTypeStr",
-  apiData = "apiData",
   responsesTypeStr = "responsesTypeStr",
   dependencyInterfacesTypeStr = "dependencyInterfacesTypeStr"
 }
@@ -20,8 +19,7 @@ export const ApifoxTemFieldsDocs: Record<ApifoxTemFields, string> = {
   [ApifoxTemFields.apiMethodCapital]: "api调用方法名大写",
   [ApifoxTemFields.apiPath]: "api路径",
   [ApifoxTemFields.apiCallFunName]: "api调用方法名",
-  [ApifoxTemFields.funParamTypeStr]: `调用方法参数类型字符串 "data: xxx" | ""`,
-  [ApifoxTemFields.apiData]: `数据 "data," | ""`,
+  [ApifoxTemFields.funParamTypeStr]: `调用方法参数类型字符串`,
   [ApifoxTemFields.responsesTypeStr]: "响应类型字符串",
   [ApifoxTemFields.dependencyInterfacesTypeStr]: "依赖接口类型字符串"
 };

@@ -4,14 +4,14 @@ import BaiDuAppConfig from "./components/BaiDuAppConfig/index.vue";
 import GenVarName from "./components/GenVarName/index.vue";
 import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
-import Apifox from "./components/Apifox/index.vue";
+import ApifoxTem from "./components/ApifoxTem/index.vue";
 import { storageLocal } from "@yayaluoya-extensions/common/src/local";
 
 const activeTabLocal = storageLocal<string, TabType>("popup-active-tab");
 
 enum TabType {
   GenVarName = "GenVarName",
-  Apifox = "Apifox",
+  ApifoxTem = "ApifoxTem",
   BaiDuAppConfig = "BaiDuAppConfig"
 }
 const tabs = ref<
@@ -25,8 +25,8 @@ const tabs = ref<
     value: TabType.GenVarName
   },
   {
-    label: "Apifox",
-    value: TabType.Apifox
+    label: "ApifoxTem",
+    value: TabType.ApifoxTem
   },
   {
     label: "百度翻译api配置",
@@ -55,7 +55,7 @@ onMounted(() => {
     <div class="content-container">
       <div class="content">
         <GenVarName v-if="activeTab === TabType.GenVarName" />
-        <Apifox v-if="activeTab === TabType.Apifox" />
+        <ApifoxTem v-if="activeTab === TabType.ApifoxTem" />
         <BaiDuAppConfig v-if="activeTab === TabType.BaiDuAppConfig" />
       </div>
     </div>

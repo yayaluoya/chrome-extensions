@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="">
+  <head>
+    <meta charset="UTF-8" />
+  </head>
+  <script>
+    window.addEventListener("message", e => {
+      const { key, type, data } = e.data;
+      switch (type) {
+        case "evalFunction":
+          {
+            try {
+              const d = new Function(data.formParameter, data.content)(...data.arg);
+              event.source.postMessage(
+                {
+                  key,
+                  success: true,
+                  data: d
+                },
+                event.origin
+              );
+            } catch (e) {
+              event.source.postMessage(
+                {
+                  key,
+                  success: false,
+                  msg: "执行evalFunction错误: " + e.toString()
+                },
+                event.origin
+              );
+            }
+          }
+          break;
+      }
+    });
+  </script>
+</html>

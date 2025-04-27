@@ -3,6 +3,7 @@ import { requestApiDetails, requestDataSchemas } from "../../api/apifox";
 import { ApiMethod, ValueType, type ApiDetail, type Type } from "../../api/type";
 import { apiTemLocal } from "@yayaluoya-extensions/common/src/local/apiTem";
 import { ApifoxTemFields } from "@yayaluoya-extensions/common/src/constant/apifoxTemFields";
+import { evalFunction } from "@yayaluoya-extensions/common/src/eval/index";
 
 type DependencyInterfacesType = {
   id: number;
@@ -74,7 +75,7 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
       const { properties, interfaceId } = responsesType;
       const i = dependencyInterfaces.findIndex(item => item.id === interfaceId);
       if (i >= 0) {
-        dependencyInterfaces.splice(i, 0);
+        dependencyInterfaces.splice(i, 1);
       }
       responsesTypeStr = properties?.["data"]?.typeStr || responsesTypeStr;
     }
@@ -201,35 +202,33 @@ ${description
     );
   }
 
-  const apiTem = (await apiTemLocal.get())?.find(item => item.objectType === objectType)?.value || "";
+  const apiTems = ((await apiTemLocal.get())?.find(item => item.objectType === objectType)?.value || "").split(/\n+----\n+/);
 
-  return apiTem.split(/\n----\n/g).map(item => {
-    return item.replace(/\$\{(.*?)\}/g, (_, a: string) => {
-      return (
-        {
-          [ApifoxTemFields.projectId]: projectId,
-          [ApifoxTemFields.apiId]: apiId.toString(),
-          [ApifoxTemFields.apiName]: apiFunInfo.apiName,
-          [ApifoxTemFields.apiMethod]: apiFunInfo.apiMethod,
-          [ApifoxTemFields.apiMethodCapital]: apiFunInfo.apiMethod.toLocaleUpperCase(),
-          [ApifoxTemFields.apiPath]: apiFunInfo.apiPath,
-          [ApifoxTemFields.apiCallFunName]: apiFunInfo.apiCallFunName,
-          [ApifoxTemFields.funParamTypeStr]: apiFunInfo.funParamTypeStr ? `data: ${apiFunInfo.funParamTypeStr}` : "",
-          [ApifoxTemFields.apiData]: apiFunInfo.funParamTypeStr ? "data," : "",
-          [ApifoxTemFields.responsesTypeStr]: apiFunInfo.responsesTypeStr ? apiFunInfo.responsesTypeStr : "void",
-          [ApifoxTemFields.dependencyInterfacesTypeStr]: dependencyInterfaces
-            .map(item =>
-              `
+  const result: string[] = [];
+  const apiTemFields = {
+    [ApifoxTemFields.projectId]: projectId,
+    [ApifoxTemFields.apiId]: apiId.toString(),
+    [ApifoxTemFields.apiName]: apiFunInfo.apiName,
+    [ApifoxTemFields.apiMethod]: apiFunInfo.apiMethod,
+    [ApifoxTemFields.apiMethodCapital]: apiFunInfo.apiMethod.toLocaleUpperCase(),
+    [ApifoxTemFields.apiPath]: apiFunInfo.apiPath,
+    [ApifoxTemFields.apiCallFunName]: apiFunInfo.apiCallFunName,
+    [ApifoxTemFields.funParamTypeStr]: apiFunInfo.funParamTypeStr,
+    [ApifoxTemFields.responsesTypeStr]: apiFunInfo.responsesTypeStr ? apiFunInfo.responsesTypeStr : "void",
+    [ApifoxTemFields.dependencyInterfacesTypeStr]: dependencyInterfaces
+      .map(item =>
+        `
 /** 
 * ${item.description || item.name}
 * ID: ${item.id}
 */    
 export interface ${item.name} ${item.typeStr}
 `.trim()
-            )
-            .join("\n\n")
-        } as Record<ApifoxTemFields, string>
-      )[a.trim() as ApifoxTemFields];
-    });
-  });
+      )
+      .join("\n\n")
+  } as Record<ApifoxTemFields, string>;
+  for (let apiTem of apiTems) {
+    result.push(await evalFunction(`{${Object.keys(apiTemFields).join(",")}}`, `return \`${apiTem}\``, apiTemFields));
+  }
+  return result;
 }

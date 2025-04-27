@@ -24,9 +24,12 @@
   },
   "permissions": ["tabs", "scripting", "activeTab", "storage"],
   "host_permissions": ["<all_urls>"],
+  "sandbox": {
+    "pages": ["sandbox/index.html"]
+  },
   "web_accessible_resources": [
     {
-      "resources": ["inject/index.css"],
+      "resources": ["inject/index.css", "sandbox/index.html"],
       "matches": ["*://*/*"]
     }
   ]

@@ -11,6 +11,7 @@
         <ElInput v-model="item.objectType" />
       </ElFormItem>
       <ElFormItem label="模板内容">
+        <ElAlert type="info" :closable="false" style="margin-bottom: 6px">`` 语法，多个模板内容用\n----\n分隔</ElAlert>
         <ElInput v-model="item.value" type="textarea" :rows="10" />
       </ElFormItem>
       <ElFormItem label=" ">
@@ -23,7 +24,7 @@
             }
           "
         >
-          删除
+          删除项目
         </ElButton>
       </ElFormItem>
     </ElForm>
@@ -58,7 +59,17 @@
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
 import { apiTemLocal, type ApiTemLocalType } from "@yayaluoya-extensions/common/src/local/apiTem";
-import { ElInput, ElButton, ElForm, ElFormItem, ElDescriptions, ElDescriptionsItem, ElDivider, ElDialog } from "element-plus";
+import {
+  ElInput,
+  ElButton,
+  ElForm,
+  ElFormItem,
+  ElDescriptions,
+  ElDescriptionsItem,
+  ElDivider,
+  ElDialog,
+  ElAlert
+} from "element-plus";
 import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@yayaluoya-extensions/common/src/constant/apifoxTemFields";
 
 const tems = ref<ApiTemLocalType>([]);
