@@ -1,6 +1,6 @@
 {
-  "name": "yayaluoya-extensions",
-  "description": "yayaluoya的浏览器扩展工具",
+  "name": "taozi-extensions",
+  "description": "taozi的浏览器扩展工具",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
