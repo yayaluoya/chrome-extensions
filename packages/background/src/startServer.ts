@@ -1,5 +1,5 @@
-import { onMessage, type MessageReq } from "@yayaluoya-extensions/common/src/message";
-import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
+import { onMessage, type MessageReq } from "@taozi-chrome-extensions/common/src/message";
+import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
 import { requestBaiduTranslate } from "./api/baiduTranslate";
 
 export function startServer() {

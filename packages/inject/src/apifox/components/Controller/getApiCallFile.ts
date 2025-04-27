@@ -1,9 +1,9 @@
-import { handleVarName1 } from "@yayaluoya-extensions/common/src/utils/global";
+import { handleVarName1 } from "@taozi-chrome-extensions/common/src/utils/global";
 import { requestApiDetails, requestDataSchemas } from "../../api/apifox";
 import { ApiMethod, ValueType, type ApiDetail, type Type } from "../../api/type";
-import { apiTemLocal } from "@yayaluoya-extensions/common/src/local/apiTem";
-import { ApifoxTemFields } from "@yayaluoya-extensions/common/src/constant/apifoxTemFields";
-import { evalFunction } from "@yayaluoya-extensions/common/src/eval/index";
+import { apiTemLocal } from "@taozi-chrome-extensions/common/src/local/apiTem";
+import { ApifoxTemFields } from "@taozi-chrome-extensions/common/src/constant/apifoxTemFields";
+import { evalFunction } from "@taozi-chrome-extensions/common/src/eval/index";
 
 type DependencyInterfacesType = {
   id: number;

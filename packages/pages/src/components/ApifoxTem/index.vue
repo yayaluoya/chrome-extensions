@@ -58,7 +58,7 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
-import { apiTemLocal, type ApiTemLocalType } from "@yayaluoya-extensions/common/src/local/apiTem";
+import { apiTemLocal, type ApiTemLocalType } from "@taozi-chrome-extensions/common/src/local/apiTem";
 import {
   ElInput,
   ElButton,
@@ -70,7 +70,7 @@ import {
   ElDialog,
   ElAlert
 } from "element-plus";
-import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@yayaluoya-extensions/common/src/constant/apifoxTemFields";
+import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@taozi-chrome-extensions/common/src/constant/apifoxTemFields";
 
 const tems = ref<ApiTemLocalType>([]);
 

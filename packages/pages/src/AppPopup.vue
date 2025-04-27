@@ -5,7 +5,7 @@ import GenVarName from "./components/GenVarName/index.vue";
 import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
 import ApifoxTem from "./components/ApifoxTem/index.vue";
-import { storageLocal } from "@yayaluoya-extensions/common/src/local";
+import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
 
 const activeTabLocal = storageLocal<string, TabType>("popup-active-tab");
 

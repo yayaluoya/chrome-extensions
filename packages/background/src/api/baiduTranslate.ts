@@ -1,5 +1,5 @@
-import { md5 } from "@yayaluoya-extensions/common/src/md5";
-import { getConfig } from "@yayaluoya-extensions/common/src/local/config";
+import { md5 } from "@taozi-chrome-extensions/common/src/md5";
+import { getConfig } from "@taozi-chrome-extensions/common/src/local/config";
 
 /**
  * 请求百度翻译api

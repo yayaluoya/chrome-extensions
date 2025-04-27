@@ -1,5 +1,5 @@
 {
-  "name": "@yayaluoya-extensions/inject",
+  "name": "@taozi-chrome-extensions/inject",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -20,8 +20,8 @@
     "@types/node": "^22.14.0",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/tsconfig": "^0.7.0",
-    "@yayaluoya-extensions/common": "workspace:^",
-    "@yayaluoya-extensions/scripts": "workspace:^",
+    "@taozi-chrome-extensions/common": "workspace:^",
+    "@taozi-chrome-extensions/scripts": "workspace:^",
     "chrome-types": "^0.1.347",
     "npm-run-all2": "^7.0.2",
     "sass-embedded": "^1.86.3",

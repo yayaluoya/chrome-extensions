@@ -54,12 +54,12 @@
 <script setup lang="ts">
 import { parseCssRules, type cssPropType, type CssRulesType } from "./parseCssRules";
 import { computed, onMounted, ref, watch } from "vue";
-import { storageLocal } from "@yayaluoya-extensions/common/src/local";
-import { md5 } from "@yayaluoya-extensions/common/src/md5";
-import { sendMessage } from "@yayaluoya-extensions/common/src/message";
-import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
+import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
+import { md5 } from "@taozi-chrome-extensions/common/src/md5";
+import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
+import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
 import { ElButton, ElInput, ElCheckbox, ElRadioGroup, ElRadioButton, ElMessage } from "element-plus";
-import { handleVarName1, handleVarName2, strToVarName } from "@yayaluoya-extensions/common/src/utils/global";
+import { handleVarName1, handleVarName2, strToVarName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";
 
 type ItemType = "img" | "icon" | "text" | "div";

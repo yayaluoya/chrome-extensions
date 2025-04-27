@@ -17,8 +17,8 @@
 import { ElButton, ElDialog, ElMessage, ElRadioGroup, ElRadioButton } from "element-plus";
 import { onMounted, ref, watch } from "vue";
 import { getApiCallFile } from "./getApiCallFile";
-import { apiTemLocal, type ApiTemLocalType } from "@yayaluoya-extensions/common/src/local/apiTem";
-import { storageLocal } from "@yayaluoya-extensions/common/src/local";
+import { apiTemLocal, type ApiTemLocalType } from "@taozi-chrome-extensions/common/src/local/apiTem";
+import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
 
 const props = defineProps<{
   projectId: string;

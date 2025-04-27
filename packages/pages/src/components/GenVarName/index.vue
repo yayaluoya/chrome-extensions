@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { getConfig, setConfig } from "@yayaluoya-extensions/common/src/local/config";
+import { getConfig, setConfig } from "@taozi-chrome-extensions/common/src/local/config";
 import { ElInput, ElForm, ElFormItem, ElButton, ElMessage, ElDivider } from "element-plus";
-import { sendMessage } from "@yayaluoya-extensions/common/src/message";
-import { MessageType } from "@yayaluoya-extensions/common/src/constant/messageType";
-import { handleVarName1, handleVarName2, strToVarName } from "@yayaluoya-extensions/common/src/utils/global";
-import { storageLocal } from "@yayaluoya-extensions/common/src/local";
+import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
+import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
+import { handleVarName1, handleVarName2, strToVarName } from "@taozi-chrome-extensions/common/src/utils/global";
+import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
 
 const inputLocal = storageLocal("gen-var-name-input");
 const input = ref("");

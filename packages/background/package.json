@@ -1,5 +1,5 @@
 {
-  "name": "@yayaluoya-extensions/background",
+  "name": "@taozi-chrome-extensions/background",
   "version": "0.0.0",
   "private": true,
   "type": "module",
@@ -15,8 +15,8 @@
     "vue": "^3.5.13"
   },
   "devDependencies": {
-    "@yayaluoya-extensions/scripts": "workspace:^",
-    "@yayaluoya-extensions/common": "workspace:^",
+    "@taozi-chrome-extensions/scripts": "workspace:^",
+    "@taozi-chrome-extensions/common": "workspace:^",
     "@tsconfig/node22": "^22.0.1",
     "@types/node": "^22.14.0",
     "@vue/tsconfig": "^0.7.0",

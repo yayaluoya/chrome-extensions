@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { getConfig, setConfig } from "@yayaluoya-extensions/common/src/local/config";
+import { getConfig, setConfig } from "@taozi-chrome-extensions/common/src/local/config";
 import { ElInput, ElForm, ElFormItem } from "element-plus";
 
 const appIdInput = ref("");
