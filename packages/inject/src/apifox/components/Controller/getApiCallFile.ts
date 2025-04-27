@@ -147,6 +147,11 @@ export async function getApiCallFile(projectId: string, apiId: number, objectTyp
         key,
         t: getType(properties[key], dependencyInterfaces)
       }));
+      if (propertieTypes.length <= 0) {
+        return {
+          typeStr: "{ [key: string]: any }"
+        };
+      }
       return {
         typeStr: `{\n${propertieTypes
           .map(({ key, t }) => {
