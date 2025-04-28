@@ -47,10 +47,15 @@ async function trigger() {
   }
   const customElClass = "custom-el-class";
   buttonP.querySelector(`.${customElClass}`)?.remove();
-  const el = createAppEl(Controller, {
-    projectId,
-    apiId: parseInt(apiId)
+  await createAppEl({
+    handleEl: el => {
+      el.className = customElClass;
+      buttonP.insertBefore(el, buttonP.firstChild);
+    },
+    com: Controller,
+    props: {
+      projectId,
+      apiId: parseInt(apiId)
+    }
   });
-  el.className = customElClass;
-  buttonP.insertBefore(el, buttonP.firstChild);
 }

@@ -19,7 +19,7 @@ export function codesignInject() {
   );
 }
 
-function trigger() {
+async function trigger() {
   const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
   if (!screenInspectorEl) {
     return;
@@ -32,7 +32,11 @@ function trigger() {
 
   const customElClass = "custom-el-class";
   codeSectionNode.contentEl.querySelector(`.${customElClass}`)?.remove();
-  const el = createAppEl(Controller);
-  el.className = customElClass;
-  codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
+  await createAppEl({
+    com: Controller,
+    handleEl: el => {
+      el.className = customElClass;
+      codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
+    }
+  });
 }

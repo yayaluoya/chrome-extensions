@@ -1,14 +1,21 @@
 import "element-plus/dist/index.css";
 import { createApp, h, type DefineSetupFnComponent } from "vue";
 
-export function createAppEl<T extends DefineSetupFnComponent<any>>(
-  com: T,
-  props?: T extends DefineSetupFnComponent<infer P> ? P : never
-) {
+export async function createAppEl<T extends DefineSetupFnComponent<any>>({
+  handleEl,
+  com,
+  props
+}: {
+  handleEl: (el: HTMLDivElement) => void;
+  com: T;
+  props?: T extends DefineSetupFnComponent<infer P> ? P : never;
+}) {
   const el = document.createElement("div");
+  handleEl(el);
   const shadowRoot = el.attachShadow({ mode: "open" });
   const html = document.createElement("html");
   shadowRoot.appendChild(html);
+
   const head = document.createElement("head");
   html.appendChild(head);
   const body = document.createElement("body");
@@ -17,7 +24,10 @@ export function createAppEl<T extends DefineSetupFnComponent<any>>(
   const link = document.createElement("link");
   link.rel = "stylesheet";
   link.href = chrome.runtime.getURL("inject/index.css");
-  head.appendChild(link);
+  await new Promise<void>(resolve => {
+    link.addEventListener("load", () => resolve());
+    head.appendChild(link);
+  });
   const mountEl = document.createElement("div");
   body.appendChild(mountEl);
   createApp({
@@ -25,5 +35,4 @@ export function createAppEl<T extends DefineSetupFnComponent<any>>(
       return h(com, props);
     }
   }).mount(mountEl);
-  return el;
 }
