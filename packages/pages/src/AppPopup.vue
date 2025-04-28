@@ -5,6 +5,7 @@ import GenVarName from "./components/GenVarName/index.vue";
 import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
 import ApifoxTem from "./components/ApifoxTem/index.vue";
+import Tapd from "./components/Tapd/index.vue";
 import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
 
 const activeTabLocal = storageLocal<string, TabType>("popup-active-tab");
@@ -51,6 +52,9 @@ onMounted(() => {
     <div class="head">
       <Head />
     </div>
+    <div class="tapd">
+      <Tapd />
+    </div>
     <Tabs v-model:value="activeTab" :list="tabs" class="tabs" />
     <div class="content-container">
       <div class="content">
@@ -74,6 +78,12 @@ onMounted(() => {
     --on-background-color: #f7f7f7;
     --font-size: 14px;
     --padding: 5px 12px;
+  }
+  > .tapd {
+    padding: 12px;
+    box-sizing: border-box;
+    border-top: 1px solid #f4f4f5;
+    border-bottom: 1px solid #f4f4f5;
   }
   > .head {
     background-color: white;
