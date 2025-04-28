@@ -56,12 +56,13 @@ export async function getApiCallFile(
             })
             .join("\n")}\n}`.trim()
         : "";
+    const requestBodyType = requestBody.type;
     const requestBodyTypeStr =
-      requestBody.type === "application/json"
+      requestBodyType === "application/json"
         ? requestBody.jsonSchema
           ? getType(requestBody.jsonSchema, dependencyInterfaces)?.typeStr
           : ""
-        : requestBody.type === "application/x-www-form-urlencoded"
+        : requestBodyType === "application/x-www-form-urlencoded" || requestBodyType === "multipart/form-data"
         ? requestBody.parameters
           ? `{\n${requestBody.parameters
               .map(item => {
@@ -99,6 +100,7 @@ export async function getApiCallFile(
       apiPath,
       apiCallFunName,
       funParamTypeStr,
+      requestBodyType,
       responsesTypeStr
     };
   }
@@ -171,6 +173,8 @@ export async function getApiCallFile(
       const types = (Array.isArray(type.type) ? type.type : [type.type]).map(item => {
         if (item === ValueType.Integer) {
           return ValueType.Number;
+        } else if (item === ValueType.File) {
+          return "File";
         }
         return item;
       });
@@ -223,6 +227,7 @@ ${blankSpace} */`
     [ApifoxTemFields.apiPath]: apiFunInfo.apiPath,
     [ApifoxTemFields.apiCallFunName]: apiFunInfo.apiCallFunName,
     [ApifoxTemFields.funParamTypeStr]: apiFunInfo.funParamTypeStr,
+    [ApifoxTemFields.requestBodyType]: apiFunInfo.requestBodyType,
     [ApifoxTemFields.responsesTypeStr]: apiFunInfo.responsesTypeStr ? apiFunInfo.responsesTypeStr : "void",
     [ApifoxTemFields.dependencyInterfacesTypeStr]: dependencyInterfaces
       .map(item =>

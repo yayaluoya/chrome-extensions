@@ -7,7 +7,7 @@
           <ElTabPane v-for="(item, index) in codeTypes" :key="index" :label="item.objectType" :name="item.objectType" />
         </ElTabs>
         <div class="codes">
-          <Code v-for="(code, index) in codes?.filter(Boolean)" :key="index" :code="code" />
+          <Code v-for="(code, index) in codes?.filter(Boolean)" :key="index" :code="code" type="ts" />
         </div>
       </div>
     </ElDialog>

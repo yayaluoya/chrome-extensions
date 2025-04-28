@@ -21,6 +21,7 @@ export enum ValueType {
   Boolean = "boolean",
   Object = "object",
   Array = "array",
+  File = "file",
   None = "none"
 }
 
@@ -51,7 +52,7 @@ export interface ApiDetail {
     }[];
   };
   requestBody: {
-    type: "application/json" | "application/x-www-form-urlencoded" | "none";
+    type: "application/json" | "application/x-www-form-urlencoded" | "multipart/form-data" | "none";
     jsonSchema?: Type;
     parameters?: {
       id: string;
