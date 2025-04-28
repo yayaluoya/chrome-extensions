@@ -12,12 +12,17 @@ type DependencyInterfacesType = {
   typeStr: string;
 };
 
-export async function getApiCallFile(
-  projectId: string,
-  apiId: number,
-  objectType: string,
-  codeOp: { indent?: string } = { indent: "  " }
-) {
+export async function getApiCallFile({
+  projectId,
+  apiId,
+  objectType,
+  codeOp = { indent: "  " }
+}: {
+  projectId: string;
+  apiId: number;
+  objectType: string;
+  codeOp?: { indent?: string };
+}) {
   const ApiDetails = await requestApiDetails(projectId);
   const DataSchemas = await requestDataSchemas(projectId);
 
@@ -29,9 +34,15 @@ export async function getApiCallFile(
 
   const dependencyInterfaces: DependencyInterfacesType[] = [];
 
-  const apiFunInfo = await getApiFunInfo(apiDetail, dependencyInterfaces);
+  const apiFunInfo = await getApiFunInfo({ apiDetail, dependencyInterfaces });
 
-  async function getApiFunInfo(apiDetail: ApiDetail, dependencyInterfaces: DependencyInterfacesType[] = []) {
+  async function getApiFunInfo({
+    apiDetail,
+    dependencyInterfaces = []
+  }: {
+    apiDetail: ApiDetail;
+    dependencyInterfaces?: DependencyInterfacesType[];
+  }) {
     const {
       name: apiName,
       method: apiMethod,
@@ -46,13 +57,13 @@ export async function getApiCallFile(
       query.length > 0
         ? `{\n${query
             .map(item => {
-              return getTypeProp(
-                item.name,
-                getType({ type: item.type as ValueType }).typeStr,
-                item.description,
-                item.required,
-                "s"
-              );
+              return getTypeProp({
+                name: item.name,
+                type: getType({ type: { type: item.type as ValueType } }).typeStr,
+                description: item.description,
+                required: item.required,
+                descriptionType: "s"
+              });
             })
             .join("\n")}\n}`.trim()
         : "";
@@ -60,19 +71,24 @@ export async function getApiCallFile(
     const requestBodyTypeStr =
       requestBodyType === "application/json"
         ? requestBody.jsonSchema
-          ? getType(requestBody.jsonSchema, dependencyInterfaces)?.typeStr
+          ? getType({
+              type: requestBody.jsonSchema,
+              dependencyInterfaces
+            })?.typeStr
           : ""
         : requestBodyType === "application/x-www-form-urlencoded" || requestBodyType === "multipart/form-data"
         ? requestBody.parameters
           ? `{\n${requestBody.parameters
               .map(item => {
-                return getTypeProp(
-                  item.name,
-                  getType({ type: item.type as ValueType }).typeStr,
-                  item.description,
-                  item.required,
-                  "s"
-                );
+                return getTypeProp({
+                  name: item.name,
+                  type: getType({
+                    type: { type: item.type as ValueType }
+                  }).typeStr,
+                  description: item.description,
+                  required: item.required,
+                  descriptionType: "s"
+                });
               })
               .join("\n")}\n}`.trim()
           : ""
@@ -86,7 +102,11 @@ export async function getApiCallFile(
       }
       jsonSchema = jsonSchema?.properties?.["data"];
       if (jsonSchema) {
-        responsesTypeStr = getType(jsonSchema, dependencyInterfaces)?.typeStr || responsesTypeStr;
+        responsesTypeStr =
+          getType({
+            type: jsonSchema,
+            dependencyInterfaces
+          })?.typeStr || responsesTypeStr;
       }
     }
     const apiCallFunName = handleVarName1(
@@ -109,11 +129,15 @@ export async function getApiCallFile(
    * 获取类型
    * @param type
    */
-  function getType(
-    type: Type,
-    dependencyInterfaces: DependencyInterfacesType[] = [],
+  function getType({
+    type,
+    dependencyInterfaces = [],
     layer = 1
-  ): {
+  }: {
+    type: Type;
+    dependencyInterfaces?: DependencyInterfacesType[];
+    layer?: number;
+  }): {
     typeStr: string;
     interfaceId?: number;
     interfaceName?: string;
@@ -134,7 +158,10 @@ export async function getApiCallFile(
           typeStr: ""
         };
         dependencyInterfaces.push(dependencyInterface);
-        dependencyInterface.typeStr = getType(schema.jsonSchema, dependencyInterfaces).typeStr;
+        dependencyInterface.typeStr = getType({
+          type: schema.jsonSchema,
+          dependencyInterfaces
+        }).typeStr;
       }
       return {
         typeStr: schemaName,
@@ -147,7 +174,11 @@ export async function getApiCallFile(
       const properties = type.properties;
       const propertieTypes = Object.keys(properties).map(key => ({
         key,
-        t: getType(properties[key], dependencyInterfaces, layer + 1)
+        t: getType({
+          type: properties[key],
+          dependencyInterfaces,
+          layer: layer + 1
+        })
       }));
       if (propertieTypes.length <= 0) {
         return {
@@ -157,14 +188,25 @@ export async function getApiCallFile(
       return {
         typeStr: `{\n${propertieTypes
           .map(({ key, t }) => {
-            return getTypeProp(key, t.typeStr, properties[key].description, type.required?.includes(key), "m", layer);
+            return getTypeProp({
+              name: key,
+              type: t.typeStr,
+              description: properties[key].description,
+              required: type.required?.includes(key),
+              descriptionType: "m",
+              layer
+            });
           })
           .join("\n")}\n${new Array(layer - 1).fill(codeOp.indent).join("")}}`
       };
     }
     // 数组
     else if (type.items) {
-      const t = getType(type.items, dependencyInterfaces, layer + 1);
+      const t = getType({
+        type: type.items,
+        dependencyInterfaces,
+        layer: layer + 1
+      });
       t.typeStr = `${t.typeStr}[]`;
       return t;
     }
@@ -184,16 +226,23 @@ export async function getApiCallFile(
     }
   }
 
-  function getTypeProp(
-    name: string,
-    type: string,
-    description?: string,
-    required?: boolean,
-    descriptionType: "s" | "m" = "s",
+  function getTypeProp({
+    name,
+    type,
+    description,
+    required,
+    descriptionType = "s",
     layer = 1
-  ) {
+  }: {
+    name: string;
+    type: string;
+    description?: string;
+    required?: boolean;
+    descriptionType?: "s" | "m";
+    layer?: number;
+  }) {
     const blankSpace = new Array(layer).fill(codeOp.indent).join("");
-    description = getDescription(description, descriptionType, blankSpace);
+    description = getDescription({ description, descriptionType, blankSpace });
     return (
       description +
       (description ? "\n" : "") +
@@ -201,7 +250,15 @@ export async function getApiCallFile(
     );
   }
 
-  function getDescription(description?: string, descriptionType: "s" | "m" = "s", blankSpace = "") {
+  function getDescription({
+    description,
+    descriptionType = "s",
+    blankSpace = ""
+  }: {
+    description?: string;
+    descriptionType?: "s" | "m";
+    blankSpace?: string;
+  }) {
     return description
       ? descriptionType === "s"
         ? `${blankSpace}/** ${description} */`
@@ -232,7 +289,10 @@ ${blankSpace} */`
     [ApifoxTemFields.dependencyInterfacesTypeStr]: dependencyInterfaces
       .map(item =>
         `
-${getDescription(`${item.description || item.name}\nSchemaID: ${item.id}`, "m")}
+${getDescription({
+  description: `${item.description || item.name}\nSchemaID: ${item.id}`,
+  descriptionType: "m"
+})}
 export interface ${item.name} ${item.typeStr}
 `.trim()
       )

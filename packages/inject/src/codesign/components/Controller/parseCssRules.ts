@@ -10,18 +10,22 @@ export type cssPropType = {
 
 /**
  * 解析css规则
- * @param cssCode
- * @param includePropsName 包含的css属性
- * @param excludeProps 排除的css属性
- * @param supplementProps 补充的css属性
  * @returns
  */
-export function parseCssRules(
-  cssCode: string,
-  includePropsName: (string | RegExp)[] = [],
-  excludeProps: cssPropType[] = [],
-  supplementProps: cssPropType[] = []
-) {
+export function parseCssRules({
+  cssCode,
+  includePropsName = [],
+  excludeProps = [],
+  supplementProps = []
+}: {
+  cssCode: string;
+  /** 包含的css属性 */
+  includePropsName?: (string | RegExp)[];
+  /** 排除的css属性 */
+  excludeProps?: cssPropType[];
+  /** 补充的css属性 */
+  supplementProps?: cssPropType[];
+}) {
   const cssRules: CssRulesType[] = [];
 
   const rulesMatch = [...cssCode.matchAll(/\s*\.(.*?)\s*{([\s\S]*?)}/g)];

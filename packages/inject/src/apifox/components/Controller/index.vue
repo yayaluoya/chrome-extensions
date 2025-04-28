@@ -69,7 +69,12 @@ const genCode = async () => {
   if (!onCodeType.value) {
     return;
   }
-  codes.value = (await getApiCallFile(props.projectId, props.apiId, onCodeType.value)) || [];
+  codes.value =
+    (await getApiCallFile({
+      projectId: props.projectId,
+      apiId: props.apiId,
+      objectType: onCodeType.value
+    })) || [];
 };
 </script>
 <style lang="scss" scoped>

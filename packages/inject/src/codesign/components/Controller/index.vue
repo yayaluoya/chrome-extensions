@@ -16,9 +16,9 @@
           }[type]
         }}
       </ElFormItem>
-      <ElFormItem label-position="top" label="元素ID">
+      <!-- <ElFormItem label-position="top" label="元素ID">
         {{ identification }}
-      </ElFormItem>
+      </ElFormItem> -->
       <ElFormItem label-position="top" label="className">
         <div class="form-item-content">
           <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
@@ -76,46 +76,61 @@ const cssCode = ref("");
 const cssRules = computed<CssRulesType[]>(() => {
   switch (type.value) {
     case "text":
-      return parseCssRules(
-        cssCode.value,
-        ["color", "text-align", "font-family", "font-size", "font-style", "font-weight", "line-height", "letter-spacing"],
-        [
+      return parseCssRules({
+        cssCode: cssCode.value,
+        includePropsName: [
+          "color",
+          "text-align",
+          "font-family",
+          "font-size",
+          "font-style",
+          "font-weight",
+          "line-height",
+          "letter-spacing"
+        ],
+        excludeProps: [
           {
             name: "font-style",
             value: "normal"
           }
         ]
-      );
+      });
     case "icon":
-      return parseCssRules(cssCode.value, ["width", "height"]);
+      return parseCssRules({
+        cssCode: cssCode.value,
+        includePropsName: ["width", "height"]
+      });
     case "img":
-      return parseCssRules(
-        cssCode.value,
-        ["width", "height", "box-shadow", "border-radius"],
-        [],
-        [
+      return parseCssRules({
+        cssCode: cssCode.value,
+        includePropsName: ["width", "height", "box-shadow", "border-radius"],
+        excludeProps: [],
+        supplementProps: [
           {
             name: "overflow",
             value: "hidden"
           }
         ]
-      );
+      });
     case "div":
-      return parseCssRules(cssCode.value, [
-        "width",
-        "height",
-        "display",
-        /^flex-/,
-        "align-items",
-        "justify-content",
-        "overflow",
-        "box-sizing",
-        /^background-?/,
-        "box-shadow",
-        /^border-?/,
-        /^padding-?/,
-        ...(objectType.value === "pc" || objectType.value === "mp" ? ["gap"] : [])
-      ]);
+      return parseCssRules({
+        cssCode: cssCode.value,
+        includePropsName: [
+          "width",
+          "height",
+          "display",
+          /^flex-/,
+          "align-items",
+          "justify-content",
+          "overflow",
+          "box-sizing",
+          /^background-?/,
+          "box-shadow",
+          /^border-?/,
+          /^padding-?/,
+          ...(objectType.value === "pc" || objectType.value === "mp" ? ["gap"] : [])
+        ]
+      });
   }
 });
 
