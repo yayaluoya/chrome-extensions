@@ -10,9 +10,7 @@ export function evalFunction(formParameter: string, content: string, ...arg: any
 
     const handleRes = ({ data: { key: onKey, success, msg = "", data } }: any) => {
       if (onKey === key) {
-        t && clearTimeout(t);
-        window.removeEventListener("message", handleRes);
-        document.body.removeChild(sandboxIframe);
+        end();
         if (success) {
           resolve(data);
         } else {
@@ -22,10 +20,15 @@ export function evalFunction(formParameter: string, content: string, ...arg: any
     };
 
     const t = setTimeout(() => {
+      end();
+      reject(new Error("evalFunction 超时"));
+    }, 10 * 1000);
+
+    const end = () => {
+      t && clearTimeout(t);
       window.removeEventListener("message", handleRes);
       document.body.removeChild(sandboxIframe);
-      reject(new Error("evalFunction 超时"));
-    }, 3000);
+    };
 
     sandboxIframe.addEventListener("load", () => {
       sandboxIframe.contentWindow?.postMessage({ key, type: "evalFunction", data: { formParameter, content, arg } }, "*");
