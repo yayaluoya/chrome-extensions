@@ -1,53 +1,55 @@
 <template>
   <div class="controller">
-    <div class="type">
-      {{
-        {
-          img: "图片",
-          icon: "切图",
-          text: "文本",
-          div: "盒子"
-        }[type]
-      }}-{{ identification }}
-    </div>
-    <ElRadioGroup v-model="objectType" size="small">
-      <ElRadioButton v-for="item in objectTypeList" :key="item.value" :label="item.label" :value="item.value" />
-    </ElRadioGroup>
-    <span>className</span>
-    <div class="translate-input">
-      <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
-        <template #append>
-          <ElButton size="small" @click="handleTranslate" :loading="translateLoading">generate</ElButton>
-        </template>
-      </ElInput>
-    </div>
-    <ElInput v-model="nameInput" size="small" type="text">
-      <template #prepend> <ElButton size="small">className</ElButton> </template>
-    </ElInput>
-    <template v-if="htmls && htmls.length > 0">
-      <span>
-        html
-        <ElCheckbox v-if="type === 'text'" v-model="textVar" label="变量" size="large" />
-      </span>
-      <div v-for="(item, index) in htmls" :key="index" class="code-item" @click="handleCodeItem(item)">
-        <code>{{ item }}</code>
-      </div>
-    </template>
-    <template v-if="jss && jss.length > 0">
-      <span>js</span>
-      <ElInput v-if="type === 'icon'" size="small" v-model="iconUrlInput" type="text">
-        <template #prepend> <span>iconUrl</span> </template>
-      </ElInput>
-      <div v-for="(item, index) in jss" :key="index" class="code-item" @click="handleCodeItem(item)">
-        <code>{{ item }}</code>
-      </div>
-    </template>
-    <template v-if="csss && csss.length > 0">
-      <span>css</span>
-      <div v-for="(item, index) in csss" :key="index" class="code-item" @click="handleCodeItem(item)">
-        <code>{{ item }}</code>
-      </div>
-    </template>
+    <ElForm :model="{}" :rules="{}" label-width="auto" :show-message="false">
+      <ElFormItem label-position="left" label="项目类型">
+        <ElRadioGroup v-model="objectType" size="small">
+          <ElRadioButton v-for="item in objectTypeList" :key="item.value" :label="item.label" :value="item.value" />
+        </ElRadioGroup>
+      </ElFormItem>
+      <ElFormItem label-position="left" label="元素类型">
+        {{
+          {
+            img: "图片",
+            icon: "切图",
+            text: "文本",
+            div: "盒子"
+          }[type]
+        }}
+      </ElFormItem>
+      <ElFormItem label-position="top" label="元素ID">
+        {{ identification }}
+      </ElFormItem>
+      <ElFormItem label-position="top" label="className">
+        <div class="form-item-content">
+          <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
+            <template #append>
+              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">generate</ElButton>
+            </template>
+          </ElInput>
+          <ElInput v-model="nameInput" size="small" type="text">
+            <template #prepend> <ElButton size="small">className</ElButton> </template>
+          </ElInput>
+        </div>
+      </ElFormItem>
+      <ElFormItem label-position="top" label="vue-template" v-if="vueTemplates.length > 0">
+        <div class="form-item-content">
+          <Code v-for="(item, index) in vueTemplates" :key="index" :code="item" type="vue" />
+        </div>
+      </ElFormItem>
+      <ElFormItem label-position="top" label="js" v-if="jss.length > 0">
+        <div class="form-item-content">
+          <ElInput v-if="type === 'icon'" size="small" v-model="iconUrlInput" type="text">
+            <template #prepend> <span>iconUrl</span> </template>
+          </ElInput>
+          <Code v-for="(item, index) in jss" :key="index" :code="item" type="js" />
+        </div>
+      </ElFormItem>
+      <ElFormItem label-position="top" label="css" v-if="csss.length > 0">
+        <div class="form-item-content">
+          <Code v-for="(item, index) in csss" :key="index" :code="item" type="css" />
+        </div>
+      </ElFormItem>
+    </ElForm>
   </div>
 </template>
 
@@ -58,9 +60,10 @@ import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
 import { md5 } from "@taozi-chrome-extensions/common/src/md5";
 import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
-import { ElButton, ElInput, ElCheckbox, ElRadioGroup, ElRadioButton, ElMessage } from "element-plus";
+import { ElForm, ElFormItem, ElButton, ElInput, ElRadioGroup, ElRadioButton, ElMessage } from "element-plus";
 import { handleVarName1, handleVarName2, strToVarName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";
+import Code from "../../../components/Code/index.vue";
 
 type ItemType = "img" | "icon" | "text" | "div";
 type ObjectType = "app" | "mp" | "pc";
@@ -116,22 +119,18 @@ const cssRules = computed<CssRulesType[]>(() => {
   }
 });
 
+const objectTypeLocal = storageLocal<string, ObjectType>("object-type");
 const translateInputLocal = storageLocal(() => {
   return md5(`translate-input-${identification.value}`).toString();
 });
 const classNameLocal = storageLocal(() => {
   return md5(`class-name-${identification.value}`).toString();
 });
-const textVarLocal = storageLocal<string, "true">(() => {
-  return md5(`text-var-${identification.value}`).toString();
-});
-const objectTypeLocal = storageLocal<string, ObjectType>("object-type");
 
 const translateInput = ref("");
 const nameInput = ref("");
 const translateLoading = ref(false);
 const iconUrlInput = ref("");
-const textVar = ref(false);
 const objectType = ref<ObjectType>("pc");
 const objectTypeList = ref<
   {
@@ -144,10 +143,9 @@ const objectTypeList = ref<
   { value: "app", label: "app" }
 ]);
 
-watch([nameInput, translateInput, textVar, objectType], () => {
+watch([nameInput, translateInput, objectType], () => {
   classNameLocal.set(nameInput.value);
   translateInputLocal.set(translateInput.value);
-  textVarLocal.set(textVar.value ? "true" : undefined);
   objectTypeLocal.set(objectType.value);
 });
 
@@ -178,21 +176,31 @@ const handleTranslate = () => {
     });
 };
 
-const htmls = computed(() => {
+const vueTemplates = computed(() => {
   switch (type.value) {
     case "text": {
       if (objectType.value === "pc") {
-        return cssRules.value.map((item, i) => {
-          return `<span class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${
-            textVar.value ? `{{ "${item.query || ""}" }}` : item.query || ""
-          }</span>`;
-        });
+        return cssRules.value
+          .map((item, i) => {
+            return [
+              `<span class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</span>`,
+              `<span class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
+                item.query || ""
+              }" }} </span>`
+            ];
+          })
+          .flat();
       }
-      return cssRules.value.map((item, i) => {
-        return `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${
-          textVar.value ? `{{ "${item.query || ""}" }}` : item.query || ""
-        }</text>`;
-      });
+      return cssRules.value
+        .map((item, i) => {
+          return [
+            `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`,
+            `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
+              item.query || ""
+            } "}} </text>`
+          ];
+        })
+        .flat();
     }
     case "img": {
       const getSize = (name: string) => {
@@ -245,6 +253,7 @@ const jss = computed(() => {
       return [`const ${handleVarName1(`${nameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
     }
   }
+  return [];
 });
 
 const csss = computed(() => {
@@ -254,35 +263,26 @@ const csss = computed(() => {
   switch (type.value) {
     case "text": {
       return cssRules.value.map((item, i) => {
-        return `.${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "img": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(`${nameInput.value}-img`)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${nameInput.value}-img`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "icon": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(`${nameInput.value}-icon`)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${nameInput.value}-icon`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "div": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(nameInput.value)}{${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(nameInput.value)} {${getCssProps(item)}}`.trim();
       });
     }
   }
 });
-
-const handleCodeItem = (item: string) => {
-  navigator.clipboard.writeText(item).then(() => {
-    ElMessage({
-      message: "复制成功",
-      type: "success"
-    });
-  });
-};
 
 onMounted(() => {
   try {
@@ -338,9 +338,6 @@ onMounted(() => {
   translateInputLocal.get().then(value => {
     translateInput.value = value || textContent.value;
   });
-  textVarLocal.get().then(value => {
-    textVar.value = !!value;
-  });
   objectTypeLocal.get().then(value => {
     objectType.value = value || "pc";
   });
@@ -349,31 +346,19 @@ onMounted(() => {
 
 <style lang="scss" scoped>
 .controller {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 5px;
 
-  .type {
-    background-color: #252a34;
-    color: white;
-    text-align: center;
-    padding: 5px 0;
-    border-radius: 5px;
-    font-weight: bold;
+  ::v-deep(.el-form-item) {
+    margin-bottom: 6px;
   }
 
-  .code-item {
-    padding: 5px 12px;
-    border-radius: 4px;
-    cursor: text;
-    background: rgba(0, 0, 0, 0.04);
-    &:nth-last-child(1) {
-      margin-bottom: 0;
-    }
-    code {
-      white-space: pre-wrap;
-      font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-    }
+  .form-item-content {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
   }
 }
 </style>

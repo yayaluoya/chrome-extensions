@@ -3,22 +3,23 @@
     <ElButton type="primary" @click="handleGenCode" :loading="genCodeLoading">生成代码</ElButton>
     <ElDialog v-model="dialogVisible" width="800" title="api调用代码" append-to-body>
       <div class="controller-dialog">
-        <div class="top">
-          <ElRadioGroup v-model="onCodeType" @change="onCodeTypeChange">
-            <ElRadioButton v-for="(item, index) in codeTypes" :key="index" :label="item.objectType" :value="item.objectType" />
-          </ElRadioGroup>
+        <ElTabs v-model="onCodeType" @tab-change="onCodeTypeChange">
+          <ElTabPane v-for="(item, index) in codeTypes" :key="index" :label="item.objectType" :name="item.objectType" />
+        </ElTabs>
+        <div class="codes">
+          <Code v-for="(code, index) in codes?.filter(Boolean)" :key="index" :code="code" />
         </div>
-        <code v-for="(code, index) in codes?.filter(Boolean)" :key="index" @click="handleCopyCode(code)">{{ code }}</code>
       </div>
     </ElDialog>
   </div>
 </template>
 <script lang="ts" setup>
-import { ElButton, ElDialog, ElMessage, ElRadioGroup, ElRadioButton } from "element-plus";
-import { onMounted, ref, watch } from "vue";
+import { ElButton, ElDialog, ElMessage, ElTabs, ElTabPane } from "element-plus";
+import { ref } from "vue";
 import { getApiCallFile } from "./getApiCallFile";
 import { apiTemLocal, type ApiTemLocalType } from "@taozi-chrome-extensions/common/src/local/apiTem";
 import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
+import Code from "../../../components/Code/index.vue";
 
 const props = defineProps<{
   projectId: string;
@@ -70,38 +71,19 @@ const genCode = async () => {
   }
   codes.value = (await getApiCallFile(props.projectId, props.apiId, onCodeType.value)) || [];
 };
-
-const handleCopyCode = (code: string) => {
-  navigator.clipboard.writeText(code).then(() => {
-    ElMessage({
-      message: "复制成功",
-      type: "success"
-    });
-  });
-};
 </script>
 <style lang="scss" scoped>
 .controller {
   display: flex;
+  padding: 0 6px;
 }
 .controller-dialog {
   display: flex;
   flex-direction: column;
-
-  > .top {
-    margin-bottom: 12px;
-  }
-  > code {
-    padding: 5px 12px;
-    border-radius: 4px;
-    cursor: text;
-    background: rgba(0, 0, 0, 0.04);
-    white-space: pre-wrap;
-    font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
-    margin-bottom: 6px;
-    &:nth-last-child(1) {
-      margin-bottom: 0;
-    }
+  > .codes {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
   }
 }
 </style>

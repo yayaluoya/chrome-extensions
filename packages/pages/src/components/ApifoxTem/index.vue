@@ -6,7 +6,7 @@
       }}</ElDescriptionsItem>
     </ElDescriptions>
     <ElDivider />
-    <ElForm v-for="(item, index) in tems" :key="index" :model="{}" class="items" label-width="auto">
+    <ElForm v-for="(item, index) in tems" :key="index" :model="{}" class="items" label-width="auto" :show-message="false">
       <ElFormItem label="项目名">
         <ElInput v-model="item.objectType" />
       </ElFormItem>

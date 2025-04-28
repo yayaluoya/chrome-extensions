@@ -12,7 +12,7 @@ export function createAppEl<T extends DefineSetupFnComponent<any>>(
   const head = document.createElement("head");
   html.appendChild(head);
   const body = document.createElement("body");
-  body.style.margin = "none";
+  body.style.margin = "0";
   html.appendChild(body);
   const link = document.createElement("link");
   link.rel = "stylesheet";
