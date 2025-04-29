@@ -24,7 +24,7 @@ export function papdInject() {
       })
       .catch(err => {
         tapdLocalStorage.edit(v => {
-          v.errMsg = err;
+          v.errMsg = err + "";
         });
       })
       .finally(() => {
