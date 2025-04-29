@@ -33,5 +33,7 @@ export function strToVarName(str: string) {
   return str
     .replace(/[^0-9A-Za-z_$]/g, " ")
     .replace(/\s+([a-zA-Z])/g, (_, a) => a.toLocaleUpperCase())
-    .replace(/^[A-Z]/, _ => _.toLocaleLowerCase());
+    .replace(/^[A-Z]/, _ => _.toLocaleLowerCase())
+    .replace(/\s+/g, "_")
+    .replace(/^_|_$/g, "");
 }
