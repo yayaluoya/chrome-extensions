@@ -9,6 +9,12 @@ export interface TapdLocalStorage {
   viewConfig: {
     current_tab: string;
   };
+  bugList: {
+    title: string;
+    detail_url: string;
+    priority_name: string;
+    entity_type: string;
+  }[];
   errMsg?: string;
 }
 
@@ -20,5 +26,6 @@ export const tapdLocalStorage = useLocalStorage<string, TapdLocalStorage>("tapd-
   },
   viewConfig: {
     current_tab: ""
-  }
+  },
+  bugList: []
 });

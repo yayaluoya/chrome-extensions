@@ -1,38 +1,51 @@
 <template>
   <div class="tapd">
-    <ElAlert
-      v-if="tapdInfo?.errMsg"
-      title="获取tapd信息错误"
-      :description="tapdInfo.errMsg"
-      :closable="false"
-      type="error"
-      effect="dark"
-    />
-    <template v-else>
-      <ElStatistic
-        v-for="(item, index) in statistics"
-        :key="index"
-        :value="item.value"
-        :value-style="{
-          color: item.color,
-          fontSize: '20px',
-          fontWeight: 'bold'
-        }"
-      >
-        <template #title>
-          <span>
-            {{ current_tab }}:
-            <span
-              :style="{
-                color: item.color,
-                fontSize: '16px',
-                fontWeight: 'bold'
-              }"
-              >{{ item.title }}</span
-            ></span
-          >
-        </template>
-      </ElStatistic>
+    <div class="board">
+      <ElAlert
+        v-if="tapdInfo?.errMsg"
+        title="获取tapd信息错误"
+        :description="tapdInfo.errMsg"
+        :closable="false"
+        type="error"
+        effect="dark"
+      />
+      <template v-else>
+        <ElStatistic
+          v-for="(item, index) in statistics"
+          :key="index"
+          :value="item.value"
+          :value-style="{
+            color: item.color,
+            fontSize: '20px',
+            fontWeight: 'bold'
+          }"
+        >
+          <template #title>
+            <span>
+              {{ current_tab }}:
+              <span
+                :style="{
+                  color: item.color,
+                  fontSize: '16px',
+                  fontWeight: 'bold'
+                }"
+                >{{ item.title }}</span
+              ></span
+            >
+          </template>
+        </ElStatistic>
+      </template>
+    </div>
+    <template v-if="tapdInfo?.bugList && tapdInfo.bugList.length > 0">
+      <ElDivider style="margin: 6px 0" />
+      <ElTable class="bug-list" :data="tapdInfo?.bugList || []">
+        <ElTableColumn prop="title" label="标题">
+          <template #default="{ row }">
+            <a :href="row.detail_url" target="_blank">[{{ row.entity_type }}]{{ row.title }}</a>
+          </template>
+        </ElTableColumn>
+        <ElTableColumn prop="priority_name" width="120" label="优先级" />
+      </ElTable>
     </template>
   </div>
 </template>
@@ -40,7 +53,7 @@
 <script setup lang="ts">
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { ElAlert, ElStatistic } from "element-plus";
+import { ElAlert, ElStatistic, ElTable, ElTableColumn, ElDivider } from "element-plus";
 
 const tapdInfo = ref<TapdLocalStorage>();
 
@@ -94,8 +107,12 @@ onUnmounted(() => {
 <style lang="scss" scoped>
 .tapd {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-evenly;
+  flex-direction: column;
+  .board {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-evenly;
+  }
 }
 </style>
