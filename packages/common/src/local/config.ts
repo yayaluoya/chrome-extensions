@@ -13,7 +13,7 @@ export const getConfig = () => {
 
 export const setConfig = async (c: Config) => {
   return configStorage.set({
-    ...(await getConfig),
+    ...(await getConfig()),
     ...c
   });
 };
