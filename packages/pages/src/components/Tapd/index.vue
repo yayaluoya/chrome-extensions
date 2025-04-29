@@ -10,28 +10,28 @@
     />
     <template v-else>
       <ElStatistic
-        title="story"
-        :value="tapdInfo?.workitemCount.story || 0"
+        v-for="(item, index) in statistics"
+        :key="index"
+        :value="item.value"
         :value-style="{
-          color: '#409EFF'
+          color: item.color,
+          fontSize: '20px',
+          fontWeight: 'bold'
         }"
       >
-      </ElStatistic>
-      <ElStatistic
-        title="task"
-        :value="tapdInfo?.workitemCount.task || 0"
-        :value-style="{
-          color: '#303133'
-        }"
-      >
-      </ElStatistic>
-      <ElStatistic
-        title="bug"
-        :value="tapdInfo?.workitemCount.bug || 0"
-        :value-style="{
-          color: '#F56C6C'
-        }"
-      >
+        <template #title>
+          <span>
+            {{ current_tab }}:
+            <span
+              :style="{
+                color: item.color,
+                fontSize: '16px',
+                fontWeight: 'bold'
+              }"
+              >{{ item.title }}</span
+            ></span
+          >
+        </template>
       </ElStatistic>
     </template>
   </div>
@@ -39,7 +39,7 @@
 
 <script setup lang="ts">
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
-import { onMounted, onUnmounted, ref } from "vue";
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ElAlert, ElStatistic } from "element-plus";
 
 const tapdInfo = ref<TapdLocalStorage>();
@@ -49,6 +49,38 @@ let t: ReturnType<typeof setInterval>;
 const getTapdInfo = async () => {
   tapdInfo.value = await tapdLocalStorage.get();
 };
+
+const statistics = computed(() => {
+  return [
+    {
+      title: "story",
+      value: tapdInfo.value?.workitemCount.story || 0,
+      color: "#409EFF"
+    },
+    {
+      title: "task",
+      value: tapdInfo.value?.workitemCount.task || 0,
+      color: "#303133"
+    },
+    {
+      title: "bug",
+      value: tapdInfo.value?.workitemCount.bug || 0,
+      color: "#F56C6C"
+    }
+  ];
+});
+
+const current_tab = computed(() => {
+  return (
+    {
+      todo: "待办",
+      done: "已办",
+      created: "已创建"
+    }[tapdInfo.value?.viewConfig.current_tab || ""] ||
+    tapdInfo.value?.viewConfig.current_tab ||
+    ""
+  );
+});
 
 onMounted(() => {
   t = setInterval(getTapdInfo, 50);

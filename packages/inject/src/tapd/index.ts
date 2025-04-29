@@ -9,6 +9,7 @@ export function papdInject() {
           v.workitemCount.story = parseInt(data.workitem_count?.story || "0");
           v.workitemCount.task = parseInt(data.workitem_count?.task || "0");
           v.workitemCount.bug = parseInt(data.workitem_count?.bug || "0");
+          v.viewConfig.current_tab = data.view_config?.current_tab || "";
         });
       })
       .catch(err => {

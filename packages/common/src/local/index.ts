@@ -13,6 +13,11 @@ export function useLocalStorage<N extends string = string, V = string>(name: N |
   const set = (value: V | undefined) => setLocalStorage<N, V>(typeof name === "string" ? name : name(), value);
   const edit = async (e: (value: V) => void | Promise<void>) => {
     const value = (await get()) || defV;
+    if (typeof value === "object" && value && typeof defV === "object" && defV) {
+      for (let k in defV) {
+        value[k] ??= defV[k];
+      }
+    }
     await e(value);
     await set(value);
   };

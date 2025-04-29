@@ -6,6 +6,9 @@ export interface TapdLocalStorage {
     task: number;
     bug: number;
   };
+  viewConfig: {
+    current_tab: string;
+  };
   errMsg?: string;
 }
 
@@ -14,5 +17,8 @@ export const tapdLocalStorage = useLocalStorage<string, TapdLocalStorage>("tapd-
     story: 0,
     task: 0,
     bug: 0
+  },
+  viewConfig: {
+    current_tab: ""
   }
 });
