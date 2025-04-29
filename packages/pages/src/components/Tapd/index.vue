@@ -37,22 +37,19 @@
         </ElStatistic>
       </template>
     </div>
-    <template v-if="tapdInfo?.bugList && tapdInfo.bugList.length > 0">
-      <ElDivider style="margin: 6px 0" />
-      <ElTable class="bug-list" :data="tapdInfo?.bugList || []">
-        <ElTableColumn prop="title" label="标题">
-          <template #default="{ row }">
-            <div style="display: flex; align-items: center">
-              <ElTag style="margin-right: 6px" effect="dark" round :type="/^bug$/i.test(row.entity_type) ? 'danger' : 'info'">
-                {{ row.entity_type.toLocaleUpperCase() }}
-              </ElTag>
-              <span style="cursor: pointer" @click="openTab(row.detail_url)">{{ row.title }}</span>
-            </div>
-          </template>
-        </ElTableColumn>
-        <ElTableColumn prop="priority_name" width="120" label="优先级" />
-      </ElTable>
-    </template>
+    <ElTable class="bug-list" :data="tapdInfo?.bugList || []" v-if="tapdInfo?.bugList && tapdInfo.bugList.length > 0">
+      <ElTableColumn prop="title" label="标题">
+        <template #default="{ row }">
+          <div style="display: flex; align-items: center">
+            <ElTag style="margin-right: 6px" effect="dark" round :type="/^bug$/i.test(row.entity_type) ? 'danger' : 'info'">
+              {{ row.entity_type.toLocaleUpperCase() }}
+            </ElTag>
+            <span style="cursor: pointer" @click="openTab(row.detail_url)">{{ row.title }}</span>
+          </div>
+        </template>
+      </ElTableColumn>
+      <ElTableColumn prop="priority_name" width="120" label="优先级" />
+    </ElTable>
   </div>
 </template>
 
@@ -137,6 +134,11 @@ onUnmounted(() => {
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
+  }
+  .bug-list {
+    border: 1px solid #dcdfe6;
+    border-radius: 12px;
+    margin-top: 12px;
   }
 }
 </style>
