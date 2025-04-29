@@ -57,7 +57,6 @@
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ElAlert, ElStatistic, ElTable, ElTableColumn, ElDivider, ElTag, ElLoading } from "element-plus";
-import { tr } from "element-plus/es/locales.mjs";
 
 const tapdInfo = ref<TapdLocalStorage>();
 
@@ -119,6 +118,16 @@ const openTab = async (url: string) => {
 onMounted(() => {
   t = setInterval(getTapdInfo, 50);
   getTapdInfo();
+
+  chrome.tabs
+    .query({
+      url: "https://www.tapd.cn/*"
+    })
+    .then(tabs => {
+      if (tabs.length <= 0) {
+        chrome.tabs.create({ url: "https://www.tapd.cn/" });
+      }
+    });
 });
 onUnmounted(() => {
   t && clearInterval(t);
