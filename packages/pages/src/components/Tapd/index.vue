@@ -5,7 +5,9 @@
       <a href="https://www.tapd.cn/" target="_blank">tapd</a>
       并保持一个tapd的标签页处于活跃状态
     </div>
-    <div class="alert">最近更新时间: {{ tapdInfo?.dataUpdateTime }}</div>
+    <div class="alert">
+      最近数据更新时间: {{ tapdInfo?.dataUpdateTime }}，如果超过3秒未更新数据则可能是tapd页面被冻结了，需要手动刷新一下
+    </div>
     <div class="board">
       <ElAlert
         v-if="tapdInfo?.errMsg"
