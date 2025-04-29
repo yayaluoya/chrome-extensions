@@ -1,6 +1,7 @@
 import { tapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { get_my_worktable_common } from "./api/get_my_worktable_common";
 import { get_my_worktable_by_page } from "./api/get_my_worktable_by_page";
+import dayjs from "dayjs";
 
 export function papdInject() {
   const f = () => {
@@ -20,6 +21,7 @@ export function papdInject() {
               entity_type: item.entity_type
             };
           });
+          v.dataUpdateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
           v.errMsg = "";
         });
       })

@@ -1,5 +1,11 @@
 <template>
   <div class="tapd">
+    <div class="alert">
+      注意！必须登录
+      <a href="https://www.tapd.cn/" target="_blank">tapd</a>
+      并保持一个tapd的标签页处于活跃状态
+    </div>
+    <div class="alert">最近更新时间: {{ tapdInfo?.dataUpdateTime }}</div>
     <div class="board">
       <ElAlert
         v-if="tapdInfo?.errMsg"
@@ -118,16 +124,6 @@ const openTab = async (url: string) => {
 onMounted(() => {
   t = setInterval(getTapdInfo, 50);
   getTapdInfo();
-
-  chrome.tabs
-    .query({
-      url: "https://www.tapd.cn/*"
-    })
-    .then(tabs => {
-      if (tabs.length <= 0) {
-        chrome.tabs.create({ url: "https://www.tapd.cn/" });
-      }
-    });
 });
 onUnmounted(() => {
   t && clearInterval(t);
@@ -138,6 +134,9 @@ onUnmounted(() => {
 .tapd {
   display: flex;
   flex-direction: column;
+  .alert {
+    margin-bottom: 12px;
+  }
   .board {
     display: flex;
     flex-direction: row;
