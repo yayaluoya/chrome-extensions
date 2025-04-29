@@ -20,6 +20,7 @@ export function papdInject() {
               entity_type: item.entity_type
             };
           });
+          v.errMsg = "";
         });
       })
       .catch(err => {
