@@ -58,7 +58,6 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
-import { apiTemLocal, type ApiTemLocalType } from "@taozi-chrome-extensions/common/src/local/apiTem";
 import {
   ElInput,
   ElButton,
@@ -71,13 +70,16 @@ import {
   ElAlert
 } from "element-plus";
 import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@taozi-chrome-extensions/common/src/constant/apifoxTemFields";
+import { apifoxLocalStorage, type ApifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
 
-const tems = ref<ApiTemLocalType>([]);
+const tems = ref<ApifoxLocalStorage["tems"]>([]);
 
 watch(
   tems,
   () => {
-    apiTemLocal.set(JSON.parse(JSON.stringify(tems.value)));
+    apifoxLocalStorage.edit(v => {
+      v.tems = JSON.parse(JSON.stringify(tems.value));
+    });
   },
   {
     deep: true
@@ -90,7 +92,7 @@ const deleteItemDlalog = ref({
 });
 
 onMounted(async () => {
-  tems.value = (await apiTemLocal.get()) || [];
+  tems.value = (await apifoxLocalStorage.get())?.tems || [];
 });
 </script>
 <style lang="scss" scoped>

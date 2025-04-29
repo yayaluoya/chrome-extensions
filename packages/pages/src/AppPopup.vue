@@ -6,9 +6,7 @@ import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
 import ApifoxTem from "./components/ApifoxTem/index.vue";
 import Tapd from "./components/Tapd/index.vue";
-import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
-
-const activeTabLocal = storageLocal<string, TabType>("popup-active-tab");
+import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
 
 enum TabType {
   GenVarName = "GenVarName",
@@ -37,13 +35,13 @@ const tabs = ref<
 const activeTab = ref(TabType.GenVarName);
 
 watch(activeTab, () => {
-  activeTabLocal.set(activeTab.value);
+  configLocalStorage.edit(v => {
+    v.popupActiveTab = activeTab.value;
+  });
 });
 
-onMounted(() => {
-  activeTabLocal.get().then(v => {
-    activeTab.value = v || TabType.GenVarName;
-  });
+onMounted(async () => {
+  activeTab.value = ((await configLocalStorage.get())?.popupActiveTab as TabType) || TabType.GenVarName;
 });
 </script>
 

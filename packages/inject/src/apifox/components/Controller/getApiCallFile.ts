@@ -1,7 +1,7 @@
 import { handleVarName1 } from "@taozi-chrome-extensions/common/src/utils/global";
 import { requestApiDetails, requestDataSchemas } from "../../api/apifox";
 import { ApiMethod, ValueType, type ApiDetail, type Type } from "../../api/type";
-import { apiTemLocal } from "@taozi-chrome-extensions/common/src/local/apiTem";
+import { apifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
 import { ApifoxTemFields } from "@taozi-chrome-extensions/common/src/constant/apifoxTemFields";
 import { evalFunction } from "@taozi-chrome-extensions/common/src/eval/index";
 
@@ -272,7 +272,9 @@ ${blankSpace} */`
       : "";
   }
 
-  const apiTems = ((await apiTemLocal.get())?.find(item => item.objectType === objectType)?.value || "").split(/\n+----\n+/);
+  const apiTems = ((await apifoxLocalStorage.get())?.tems?.find(item => item.objectType === objectType)?.value || "").split(
+    /\n+----\n+/
+  );
 
   const result: string[] = [];
   const apiTemFields = {

@@ -17,8 +17,7 @@
 import { ElButton, ElDialog, ElMessage, ElTabs, ElTabPane } from "element-plus";
 import { ref } from "vue";
 import { getApiCallFile } from "./getApiCallFile";
-import { apiTemLocal, type ApiTemLocalType } from "@taozi-chrome-extensions/common/src/local/apiTem";
-import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
+import { apifoxLocalStorage, type ApifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
 import Code from "../../../components/Code/index.vue";
 
 const props = defineProps<{
@@ -26,25 +25,25 @@ const props = defineProps<{
   apiId: number;
 }>();
 
-const onCodeTypeLocal = storageLocal("on-code-type-local");
-
 const dialogVisible = ref(false);
 
 const genCodeLoading = ref(false);
-const codeTypes = ref<ApiTemLocalType>([]);
+const codeTypes = ref<ApifoxLocalStorage["tems"]>([]);
 const onCodeType = ref<string>("");
 const codes = ref<string[]>();
 
 const onCodeTypeChange = () => {
-  onCodeTypeLocal.set(onCodeType.value);
+  apifoxLocalStorage.edit(v => {
+    v.onObjectType = onCodeType.value;
+  });
   genCode();
 };
 
 const handleGenCode = async () => {
   genCodeLoading.value = true;
   try {
-    codeTypes.value = (await apiTemLocal.get()) || [];
-    onCodeType.value = (await onCodeTypeLocal.get()) || codeTypes.value[0]?.objectType || "";
+    codeTypes.value = (await apifoxLocalStorage.get())?.tems || [];
+    onCodeType.value = (await apifoxLocalStorage.get())?.onObjectType || codeTypes.value[0]?.objectType || "";
     if (codeTypes.value.length <= 0) {
       ElMessage({
         message: "请先配置api模板",

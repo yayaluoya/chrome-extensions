@@ -1,10 +1,18 @@
-import { storageLocal } from ".";
+import { useLocalStorage } from ".";
 
-export type TapdLocalInfo = {
-  story: number;
-  task: number;
-  bug: number;
+export interface TapdLocalStorage {
+  workitemCount: {
+    story: number;
+    task: number;
+    bug: number;
+  };
   errMsg?: string;
-};
+}
 
-export const tapdLocal = storageLocal<"tapd-local", TapdLocalInfo>("tapd-local");
+export const tapdLocalStorage = useLocalStorage<string, TapdLocalStorage>("tapd-local-storage", {
+  workitemCount: {
+    story: 0,
+    task: 0,
+    bug: 0
+  }
+});

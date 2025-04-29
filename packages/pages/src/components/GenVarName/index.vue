@@ -1,19 +1,19 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { getConfig, setConfig } from "@taozi-chrome-extensions/common/src/local/config";
 import { ElInput, ElForm, ElFormItem, ElButton, ElMessage, ElDivider } from "element-plus";
 import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
 import { handleVarName1, handleVarName2, strToVarName } from "@taozi-chrome-extensions/common/src/utils/global";
-import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
+import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
 
-const inputLocal = storageLocal("gen-var-name-input");
 const input = ref("");
 const loading = ref(false);
 const results = ref<string[]>([]);
 
 watch(input, () => {
-  inputLocal.set(input.value);
+  configLocalStorage.edit(v => {
+    v.genVarNameInput = input.value;
+  });
 });
 
 const handleClick = () => {
@@ -54,10 +54,8 @@ const handleCodeItem = (item: string) => {
   });
 };
 
-onMounted(() => {
-  inputLocal.get().then(v => {
-    input.value = v || "";
-  });
+onMounted(async () => {
+  input.value = (await configLocalStorage.get())?.genVarNameInput || "";
 });
 </script>
 

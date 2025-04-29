@@ -1,20 +1,20 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { getConfig, setConfig } from "@taozi-chrome-extensions/common/src/local/config";
 import { ElInput, ElForm, ElFormItem } from "element-plus";
+import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
 
 const appIdInput = ref("");
 const keyInput = ref("");
 
 watch([appIdInput, keyInput], () => {
-  setConfig({
-    baiduAppId: appIdInput.value,
-    baiduKey: keyInput.value
+  configLocalStorage.edit(v => {
+    v.baiduAppId = appIdInput.value;
+    v.baiduKey = keyInput.value;
   });
 });
 
 onMounted(async () => {
-  const { baiduAppId = "", baiduKey = "" } = await getConfig();
+  const { baiduAppId = "", baiduKey = "" } = (await configLocalStorage.get()) || {};
   appIdInput.value = baiduAppId;
   keyInput.value = baiduKey;
 });

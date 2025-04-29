@@ -2,7 +2,7 @@
   <div class="controller">
     <ElForm :model="{}" :rules="{}" label-width="auto" :show-message="false">
       <ElFormItem label-position="left" label="项目类型">
-        <ElRadioGroup v-model="objectType" size="small">
+        <ElRadioGroup v-model="objectTypeInput" size="small">
           <ElRadioButton v-for="item in objectTypeList" :key="item.value" :label="item.label" :value="item.value" />
         </ElRadioGroup>
       </ElFormItem>
@@ -26,7 +26,7 @@
               <ElButton size="small" @click="handleTranslate" :loading="translateLoading">generate</ElButton>
             </template>
           </ElInput>
-          <ElInput v-model="nameInput" size="small" type="text">
+          <ElInput v-model="classNameInput" size="small" type="text">
             <template #prepend> <ElButton size="small">className</ElButton> </template>
           </ElInput>
         </div>
@@ -56,7 +56,6 @@
 <script setup lang="ts">
 import { parseCssRules, type cssPropType, type CssRulesType } from "./parseCssRules";
 import { computed, onMounted, ref, watch } from "vue";
-import { storageLocal } from "@taozi-chrome-extensions/common/src/local";
 import { md5 } from "@taozi-chrome-extensions/common/src/md5";
 import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
@@ -64,6 +63,7 @@ import { ElForm, ElFormItem, ElButton, ElInput, ElRadioGroup, ElRadioButton, ElM
 import { handleVarName1, handleVarName2, strToVarName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";
 import Code from "../../../components/Code/index.vue";
+import { codesignLocalStorage } from "@taozi-chrome-extensions/common/src/local/codesign";
 
 type ItemType = "img" | "icon" | "text" | "div";
 type ObjectType = "app" | "mp" | "pc";
@@ -128,25 +128,17 @@ const cssRules = computed<CssRulesType[]>(() => {
           "box-shadow",
           /^border-?/,
           /^padding-?/,
-          ...(objectType.value === "pc" || objectType.value === "mp" ? ["gap"] : [])
+          ...(objectTypeInput.value === "pc" || objectTypeInput.value === "mp" ? ["gap"] : [])
         ]
       });
   }
 });
 
-const objectTypeLocal = storageLocal<string, ObjectType>("object-type");
-const translateInputLocal = storageLocal(() => {
-  return md5(`translate-input-${identification.value}`).toString();
-});
-const classNameLocal = storageLocal(() => {
-  return md5(`class-name-${identification.value}`).toString();
-});
-
 const translateInput = ref("");
-const nameInput = ref("");
+const classNameInput = ref("");
 const translateLoading = ref(false);
 const iconUrlInput = ref("");
-const objectType = ref<ObjectType>("pc");
+const objectTypeInput = ref<ObjectType>("pc");
 const objectTypeList = ref<
   {
     value: ObjectType;
@@ -158,17 +150,18 @@ const objectTypeList = ref<
   { value: "app", label: "app" }
 ]);
 
-watch([nameInput, translateInput, objectType], () => {
-  classNameLocal.set(nameInput.value);
-  translateInputLocal.set(translateInput.value);
-  objectTypeLocal.set(objectType.value);
+watch([classNameInput, translateInput, objectTypeInput], () => {
+  codesignLocalStorage.edit(v => {
+    v.objectType = objectTypeInput.value;
+    v.classNames[identification.value] = classNameInput.value;
+    v.translateInputs[identification.value] = translateInput.value;
+  });
 });
 
 const handleTranslate = () => {
   if (!translateInput.value || translateLoading.value) {
     return;
   }
-  translateInputLocal.set(translateInput.value);
   translateLoading.value = true;
   sendMessage<string>({
     type: MessageType.baiduTranslate,
@@ -176,7 +169,7 @@ const handleTranslate = () => {
   })
     .then(res => {
       if (res) {
-        nameInput.value = strToVarName(res);
+        classNameInput.value = strToVarName(res);
       }
     })
     .catch(err => {
@@ -194,12 +187,14 @@ const handleTranslate = () => {
 const vueTemplates = computed(() => {
   switch (type.value) {
     case "text": {
-      if (objectType.value === "pc") {
+      if (objectTypeInput.value === "pc") {
         return cssRules.value
           .map((item, i) => {
             return [
-              `<span class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</span>`,
-              `<span class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
+              `<span class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${
+                item.query || ""
+              }</span>`,
+              `<span class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
                 item.query || ""
               }" }} </span>`
             ];
@@ -209,8 +204,8 @@ const vueTemplates = computed(() => {
       return cssRules.value
         .map((item, i) => {
           return [
-            `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`,
-            `<text class="${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
+            `<text class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`,
+            `<text class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
               item.query || ""
             } "}} </text>`
           ];
@@ -228,36 +223,38 @@ const vueTemplates = computed(() => {
             .find(item => item.name === name)?.value || "500"
         );
       };
-      if (objectType.value === "pc") {
+      if (objectTypeInput.value === "pc") {
         return [
           `<img src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleVarName2(
-            `${nameInput.value}-img`
+            `${classNameInput.value}-img`
           )}" />`
         ];
       }
       return [
         `<image src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleVarName2(
-          `${nameInput.value}-img`
+          `${classNameInput.value}-img`
         )}" mode="aspectFit" />`
       ];
     }
     case "icon": {
-      if (objectType.value === "pc") {
+      if (objectTypeInput.value === "pc") {
         return [
-          `<img :src="${handleVarName1(`${nameInput.value}-icon`, true)}" class="${handleVarName2(`${nameInput.value}-icon`)}" />`
+          `<img :src="${handleVarName1(`${classNameInput.value}-icon`, true)}" class="${handleVarName2(
+            `${classNameInput.value}-icon`
+          )}" />`
         ];
       }
       return [
-        `<image :src="${handleVarName1(`${nameInput.value}-icon`, true)}" class="${handleVarName2(
-          `${nameInput.value}-icon`
+        `<image :src="${handleVarName1(`${classNameInput.value}-icon`, true)}" class="${handleVarName2(
+          `${classNameInput.value}-icon`
         )}" mode="scaleToFill" />`
       ];
     }
     case "div": {
-      if (objectType.value === "pc") {
-        return [`<div class="${handleVarName2(nameInput.value)}"></div>`];
+      if (objectTypeInput.value === "pc") {
+        return [`<div class="${handleVarName2(classNameInput.value)}"></div>`];
       }
-      return [`<view class="${handleVarName2(nameInput.value)}"></view>`];
+      return [`<view class="${handleVarName2(classNameInput.value)}"></view>`];
     }
   }
 });
@@ -265,7 +262,7 @@ const vueTemplates = computed(() => {
 const jss = computed(() => {
   switch (type.value) {
     case "icon": {
-      return [`const ${handleVarName1(`${nameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
+      return [`const ${handleVarName1(`${classNameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
     }
   }
   return [];
@@ -278,28 +275,28 @@ const csss = computed(() => {
   switch (type.value) {
     case "text": {
       return cssRules.value.map((item, i) => {
-        return `.${handleVarName2(`${nameInput.value}-text${i == 0 ? "" : `-${i}`}`)} {${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "img": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(`${nameInput.value}-img`)} {${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${classNameInput.value}-img`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "icon": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(`${nameInput.value}-icon`)} {${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(`${classNameInput.value}-icon`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "div": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(nameInput.value)} {${getCssProps(item)}}`.trim();
+        return `.${handleVarName2(classNameInput.value)} {${getCssProps(item)}}`.trim();
       });
     }
   }
 });
 
-onMounted(() => {
+onMounted(async () => {
   try {
     const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
     if (screenInspectorEl) {
@@ -347,15 +344,11 @@ onMounted(() => {
     console.log("出错了", e);
   }
 
-  classNameLocal.get().then(value => {
-    nameInput.value = value || "item";
-  });
-  translateInputLocal.get().then(value => {
-    translateInput.value = value || textContent.value;
-  });
-  objectTypeLocal.get().then(value => {
-    objectType.value = value || "pc";
-  });
+  const { objectType = "", translateInputs = {}, classNames = {} } = (await codesignLocalStorage.get()) || {};
+
+  classNameInput.value = classNames[identification.value] || "item";
+  translateInput.value = translateInputs[identification.value] || textContent.value;
+  objectTypeInput.value = (objectType as ObjectType) || "pc";
 });
 </script>
 

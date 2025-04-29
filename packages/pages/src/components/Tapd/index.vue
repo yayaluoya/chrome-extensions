@@ -11,7 +11,7 @@
     <template v-else>
       <ElStatistic
         title="story"
-        :value="tapdInfo?.story || 0"
+        :value="tapdInfo?.workitemCount.story || 0"
         :value-style="{
           color: '#409EFF'
         }"
@@ -19,7 +19,7 @@
       </ElStatistic>
       <ElStatistic
         title="task"
-        :value="tapdInfo?.task || 0"
+        :value="tapdInfo?.workitemCount.task || 0"
         :value-style="{
           color: '#303133'
         }"
@@ -27,7 +27,7 @@
       </ElStatistic>
       <ElStatistic
         title="bug"
-        :value="tapdInfo?.bug || 0"
+        :value="tapdInfo?.workitemCount.bug || 0"
         :value-style="{
           color: '#F56C6C'
         }"
@@ -38,16 +38,16 @@
 </template>
 
 <script setup lang="ts">
-import { tapdLocal, type TapdLocalInfo } from "@taozi-chrome-extensions/common/src/local/tapd";
+import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { onMounted, onUnmounted, ref } from "vue";
 import { ElAlert, ElStatistic } from "element-plus";
 
-const tapdInfo = ref<TapdLocalInfo>();
+const tapdInfo = ref<TapdLocalStorage>();
 
 let t: ReturnType<typeof setInterval>;
 
 const getTapdInfo = async () => {
-  tapdInfo.value = await tapdLocal.get();
+  tapdInfo.value = await tapdLocalStorage.get();
 };
 
 onMounted(() => {

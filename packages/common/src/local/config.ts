@@ -1,19 +1,15 @@
-import { storageLocal } from ".";
+import { useLocalStorage } from ".";
 
-export interface Config extends Record<string, string | undefined> {
-  baiduAppId?: string;
-  baiduKey?: string;
+export interface ConfigLocalStorage {
+  baiduAppId: string;
+  baiduKey: string;
+  popupActiveTab: string;
+  genVarNameInput: string;
 }
 
-const configStorage = storageLocal<"config", Config>("config");
-
-export const getConfig = () => {
-  return configStorage.get().then(v => v || ({} as Config));
-};
-
-export const setConfig = async (c: Config) => {
-  return configStorage.set({
-    ...(await getConfig()),
-    ...c
-  });
-};
+export const configLocalStorage = useLocalStorage<string, ConfigLocalStorage>("config-local-storage", {
+  popupActiveTab: "",
+  baiduAppId: "",
+  baiduKey: "",
+  genVarNameInput: ""
+});
