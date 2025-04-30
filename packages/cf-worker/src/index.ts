@@ -15,10 +15,11 @@ export default {
 				status: 500,
 			});
 		}
+		const cookie = request.headers.get('x-cookie') || '';
 		return fetch(new URL(`${url.pathname}${url.search}`, target), {
 			method: request.method,
 			body: request.body,
-			headers: [...request.headers, ['referer', target]].reduce<Record<string, string>>((a, [key, value]) => {
+			headers: [...request.headers, ['cookie', cookie], ['referer', target]].reduce<Record<string, string>>((a, [key, value]) => {
 				a[key] = value;
 				return a;
 			}, {}),
