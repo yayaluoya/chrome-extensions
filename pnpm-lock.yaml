@@ -14,6 +14,9 @@ importers:
 
   packages/background:
     dependencies:
+      dayjs:
+        specifier: ^1.11.13
+        version: 1.11.13
       vue:
         specifier: ^3.5.13
         version: 3.5.13(typescript@5.8.3)
