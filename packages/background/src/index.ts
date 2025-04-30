@@ -12,7 +12,9 @@ chrome.scripting.registerContentScripts([
   }
 ]);
 
-chrome.runtime.onInstalled.addListener(() => {
-  startServer();
+startServer();
+
+setInterval(() => {
   papdTask();
-});
+}, 1000 * 60);
+papdTask();
