@@ -19,10 +19,14 @@ export default {
 		return fetch(new URL(`${url.pathname}${url.search}`, target), {
 			method: request.method,
 			body: request.body,
-			headers: [...request.headers, ['cookie', cookie], ['referer', target]].reduce<Record<string, string>>((a, [key, value]) => {
-				a[key] = value;
-				return a;
-			}, {}),
+			headers: [...request.headers, ['cookie', cookie], ['referer', target]]
+				.filter(([key, value]) => {
+					return !/^origin$/i.test(key);
+				})
+				.reduce<Record<string, string>>((a, [key, value]) => {
+					a[key] = value;
+					return a;
+				}, {}),
 		});
 	},
 } satisfies ExportedHandler<Env>;
