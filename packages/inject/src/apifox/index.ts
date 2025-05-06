@@ -15,7 +15,7 @@ export async function apifoxInject() {
         const f = () => {
           setTimeout(() => {
             n++;
-            if (n > 10) {
+            if (n > 1000) {
               return;
             }
             trigger()
@@ -29,7 +29,7 @@ export async function apifoxInject() {
                   type: "error"
                 });
               });
-          }, 100);
+          }, 0);
         };
         f();
       }
@@ -73,6 +73,6 @@ async function trigger(): Promise<boolean> {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(!!buttonP.querySelector(`.${customElClass}`));
-    }, 100);
+    }, 0);
   });
 }

@@ -13,13 +13,13 @@ export function codesignInject() {
       const f = () => {
         setTimeout(() => {
           n++;
-          if (n > 10) {
+          if (n > 1000) {
             return;
           }
           trigger().then(res => {
             res || f();
           });
-        }, 100);
+        }, 0);
       };
       f();
     },
@@ -52,6 +52,6 @@ async function trigger(): Promise<boolean> {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(!!codeSectionNode.contentEl.querySelector(`.${customElClass}`));
-    }, 100);
+    }, 0);
   });
 }
