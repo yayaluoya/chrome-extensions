@@ -4,7 +4,7 @@ import { get_my_worktable_by_page } from "./api/get_my_worktable_by_page";
 import { getDscToken } from "./api/request";
 import { setIcon } from "@/utils/setIcon";
 
-export async function papdTask() {
+export async function tapdTask() {
   await tapdLocalStorage.edit(v => {
     v.dataUpdateTime = Date.now();
   });

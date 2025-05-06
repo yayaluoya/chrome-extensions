@@ -1,3 +1,5 @@
+import { MessageType } from "./constant/messageType";
+
 export interface MessageReq<T = any> {
   type: string;
   value?: T;
@@ -31,7 +33,7 @@ type handleFType = (
 ) => void;
 
 const listeners: {
-  type: string;
+  type: MessageType;
   handleF: handleFType;
 }[] = [];
 
@@ -81,8 +83,35 @@ chrome.runtime.onMessage.addListener((req: MessageReq, sender, sendResponse_: an
  * @param type
  * @param handleFs
  */
-export function addMessageServer(type: string, ...handleFs: handleFType[]) {
+export function addMessageServer(type: MessageType, ...handleFs: handleFType[]) {
   handleFs.forEach(handleF => {
     listeners.push({ type, handleF });
   });
+}
+
+/**
+ * 添加一次性消息服务
+ * @param type
+ * @param handleF
+ */
+export function addOnceMessageServer(type: MessageType, handleF: handleFType) {
+  listeners.push({
+    type,
+    handleF: (...args) => {
+      handleF(...args);
+      removeMessageServer(type, handleF);
+    }
+  });
+}
+
+/**
+ * 移除消息服务
+ * @param type
+ * @param handleF
+ */
+export function removeMessageServer(type: MessageType, handleF: handleFType) {
+  const index = listeners.findIndex(item => item.type === type && item.handleF === handleF);
+  if (index !== -1) {
+    listeners.splice(index, 1);
+  }
 }
