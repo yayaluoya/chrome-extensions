@@ -1,6 +1,6 @@
 <template>
   <div class="tapd">
-    <img class="logo" src="https://static-fe.tapd.cn/img/TAPD_Logo.179cbc93.svg" alt="" />
+    <img class="logo" src="../../assets/TAPD_Logo.svg" alt="" />
     <div class="alert">
       注意！必须登录
       <a href="https://www.tapd.cn/" target="_blank">tapd</a>
@@ -135,7 +135,7 @@ onUnmounted(() => {
 .tapd {
   display: flex;
   flex-direction: column;
-  background-image: url("https://www.tapd.cn/img_dist/my_dashboard/dashboard_bg-808ce1ad9d.png");
+  background-image: url("../../assets/dashboard_bg.png");
   position: relative;
   padding: 12px;
   box-sizing: border-box;
