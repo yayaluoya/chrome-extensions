@@ -29,7 +29,7 @@ export function codesignInject() {
   );
 }
 
-async function trigger() {
+async function trigger(): Promise<boolean> {
   const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
   if (!screenInspectorEl) {
     return false;
@@ -49,5 +49,9 @@ async function trigger() {
       codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
     }
   });
-  return true;
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(!!codeSectionNode.contentEl.querySelector(`.${customElClass}`));
+    }, 100);
+  });
 }

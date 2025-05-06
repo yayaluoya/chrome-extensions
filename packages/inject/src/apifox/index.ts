@@ -40,7 +40,7 @@ export async function apifoxInject() {
   );
 }
 
-async function trigger() {
+async function trigger(): Promise<boolean> {
   const projectId = location.pathname.match(/\/project\/([0-9]+)\/?/)?.[1];
   if (!projectId) {
     return false;
@@ -70,5 +70,9 @@ async function trigger() {
       apiId: parseInt(apiId)
     }
   });
-  return true;
+  return new Promise(resolve => {
+    setTimeout(() => {
+      resolve(!!buttonP.querySelector(`.${customElClass}`));
+    }, 100);
+  });
 }
