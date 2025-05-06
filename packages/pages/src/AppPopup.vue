@@ -97,7 +97,7 @@ onMounted(async () => {
     --background-color: #ffffff;
     --on-background-color: #f7f7f7;
     --font-size: 14px;
-    --padding: 5px 12px;
+    --padding: 8px 12px;
   }
   > .head {
     background-color: white;
