@@ -71,17 +71,11 @@ onMounted(async () => {
   width: 800px;
   > .tabs {
     --color: #666666;
-    --on-color: #666666;
+    --on-color: #409eff;
     --background-color: #ffffff;
     --on-background-color: #f7f7f7;
     --font-size: 14px;
     --padding: 5px 12px;
-  }
-  > .tapd {
-    padding: 12px;
-    box-sizing: border-box;
-    border-top: 1px solid #f4f4f5;
-    border-bottom: 1px solid #f4f4f5;
   }
   > .head {
     background-color: white;

@@ -57,7 +57,6 @@ const itemClick = (value: string) => {
   border-bottom: 1px solid var(--border-color);
   overflow: hidden;
   > .item {
-    margin-right: 5px;
     display: flex;
     flex-direction: row;
     justify-content: center;

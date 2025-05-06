@@ -1,11 +1,13 @@
 import { tapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { get_my_worktable_common } from "./api/get_my_worktable_common";
 import { get_my_worktable_by_page } from "./api/get_my_worktable_by_page";
-import dayjs from "dayjs";
 import { getDscToken } from "./api/request";
 import { setIcon } from "@/utils/setIcon";
 
 export async function papdTask() {
+  await tapdLocalStorage.edit(v => {
+    v.dataUpdateTime = Date.now();
+  });
   try {
     const dsc_token = await getDscToken();
     await get_my_worktable_common(dsc_token).then(async data => {
@@ -23,7 +25,6 @@ export async function papdTask() {
             entity_type: item.entity_type
           };
         });
-        v.dataUpdateTime = dayjs().format("YYYY-MM-DD HH:mm:ss");
         const { bug = 0 } = v?.workitemCount || {};
         setIcon(bug > 0);
         v.errMsg = "";

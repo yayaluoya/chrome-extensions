@@ -1,10 +1,11 @@
 <template>
   <div class="tapd">
+    <img class="logo" src="https://static-fe.tapd.cn/img/TAPD_Logo.179cbc93.svg" alt="" />
     <div class="alert">
       注意！必须登录
       <a href="https://www.tapd.cn/" target="_blank">tapd</a>
+      ，最近数据更新时间: {{ dayjs(tapdInfo?.dataUpdateTime).format("YYYY-MM-DD HH:mm:ss") }}
     </div>
-    <div class="alert">最近数据更新时间: {{ tapdInfo?.dataUpdateTime }}</div>
     <div class="board">
       <ElAlert
         v-if="tapdInfo?.errMsg"
@@ -62,6 +63,7 @@
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { computed, onMounted, onUnmounted, ref } from "vue";
 import { ElAlert, ElStatistic, ElTable, ElTableColumn, ElDivider, ElTag, ElLoading } from "element-plus";
+import dayjs from "dayjs";
 
 const tapdInfo = ref<TapdLocalStorage>();
 
@@ -133,6 +135,18 @@ onUnmounted(() => {
 .tapd {
   display: flex;
   flex-direction: column;
+  background-image: url("https://www.tapd.cn/img_dist/my_dashboard/dashboard_bg-808ce1ad9d.png");
+  position: relative;
+  padding: 12px;
+  box-sizing: border-box;
+
+  > .logo {
+    height: 27px;
+    position: absolute;
+    top: 12px;
+    right: 12px;
+  }
+
   .alert {
     margin-bottom: 12px;
   }
