@@ -7,14 +7,28 @@
         </ElRadioGroup>
       </ElFormItem>
       <ElFormItem label-position="left" label="元素类型">
-        {{
-          {
-            img: "图片",
-            icon: "切图",
-            text: "文本",
-            div: "盒子"
-          }[type]
-        }}
+        <div class="type-item">
+          <ElIcon :size="12" v-if="type === 'div'">
+            <Box />
+          </ElIcon>
+          <ElIcon :size="12" v-if="type === 'img'">
+            <Picture />
+          </ElIcon>
+          <ElIcon :size="12" v-if="type === 'icon'">
+            <PictureRounded />
+          </ElIcon>
+          <ElIcon :size="12" v-if="type === 'text'">
+            <Document />
+          </ElIcon>
+          {{
+            {
+              img: "图片",
+              icon: "切图",
+              text: "文本",
+              div: "盒子"
+            }[type]
+          }}
+        </div>
       </ElFormItem>
       <!-- <ElFormItem label-position="top" label="元素ID">
         {{ identification }}
@@ -31,22 +45,22 @@
           </ElInput>
         </div>
       </ElFormItem>
-      <ElFormItem label-position="top" label="vue-template" v-if="vueTemplates.length > 0">
+      <ElFormItem label-position="top" label="vue-template" v-if="vueTemplateList.length > 0">
         <div class="form-item-content">
-          <Code v-for="(item, index) in vueTemplates" :key="index" :code="item" type="vue" />
+          <Code v-for="(item, index) in vueTemplateList" :key="index" :code="item" type="vue" />
         </div>
       </ElFormItem>
-      <ElFormItem label-position="top" label="js" v-if="jss.length > 0">
+      <ElFormItem label-position="top" label="js" v-if="jsList.length > 0">
         <div class="form-item-content">
           <ElInput v-if="type === 'icon'" size="small" v-model="iconUrlInput" type="text">
             <template #prepend> <span>iconUrl</span> </template>
           </ElInput>
-          <Code v-for="(item, index) in jss" :key="index" :code="item" type="js" />
+          <Code v-for="(item, index) in jsList" :key="index" :code="item" type="js" />
         </div>
       </ElFormItem>
-      <ElFormItem label-position="top" label="css" v-if="csss.length > 0">
+      <ElFormItem label-position="top" label="css" v-if="cssList.length > 0">
         <div class="form-item-content">
-          <Code v-for="(item, index) in csss" :key="index" :code="item" type="css" />
+          <Code v-for="(item, index) in cssList" :key="index" :code="item" type="css" />
         </div>
       </ElFormItem>
     </ElForm>
@@ -57,10 +71,11 @@
 import { parseCssRules, type cssPropType, type CssRulesType } from "./parseCssRules";
 import { computed, onMounted, ref, watch } from "vue";
 import { md5 } from "@taozi-chrome-extensions/common/src/md5";
-import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
+import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
-import { ElForm, ElFormItem, ElButton, ElInput, ElRadioGroup, ElRadioButton, ElMessage } from "element-plus";
-import { handleVarName1, handleVarName2, strToVarName } from "@taozi-chrome-extensions/common/src/utils/global";
+import { ElForm, ElFormItem, ElButton, ElInput, ElRadioGroup, ElRadioButton, ElMessage, ElIcon } from "element-plus";
+import { Box, Picture, PictureRounded, Document } from "@element-plus/icons-vue";
+import { kebabToCamelCase, camelToKebabCase, toValidVariableName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";
 import Code from "../../../components/Code/index.vue";
 import { codesignLocalStorage } from "@taozi-chrome-extensions/common/src/local/codesign";
@@ -164,12 +179,12 @@ const handleTranslate = () => {
   }
   translateLoading.value = true;
   sendMessage<string>({
-    type: MessageType.baiduTranslate,
+    type: MessageType.BaiduTranslate,
     value: translateInput.value
   })
     .then(res => {
       if (res) {
-        classNameInput.value = strToVarName(res);
+        classNameInput.value = toValidVariableName(res);
       }
     })
     .catch(err => {
@@ -184,17 +199,17 @@ const handleTranslate = () => {
     });
 };
 
-const vueTemplates = computed(() => {
+const vueTemplateList = computed(() => {
   switch (type.value) {
     case "text": {
       if (objectTypeInput.value === "pc") {
         return cssRules.value
           .map((item, i) => {
             return [
-              `<span class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${
+              `<span class="${camelToKebabCase(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${
                 item.query || ""
               }</span>`,
-              `<span class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
+              `<span class="${camelToKebabCase(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
                 item.query || ""
               }" }} </span>`
             ];
@@ -204,8 +219,10 @@ const vueTemplates = computed(() => {
       return cssRules.value
         .map((item, i) => {
           return [
-            `<text class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${item.query || ""}</text>`,
-            `<text class="${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
+            `<text class="${camelToKebabCase(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}">${
+              item.query || ""
+            }</text>`,
+            `<text class="${camelToKebabCase(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)}"> {{" ${
               item.query || ""
             } "}} </text>`
           ];
@@ -225,72 +242,72 @@ const vueTemplates = computed(() => {
       };
       if (objectTypeInput.value === "pc") {
         return [
-          `<img src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleVarName2(
-            `${classNameInput.value}-img`
-          )}" />`
+          `<img src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(
+            getSize("height")
+          )}" class="${camelToKebabCase(`${classNameInput.value}-img`)}" />`
         ];
       }
       return [
-        `<image src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}" class="${handleVarName2(
-          `${classNameInput.value}-img`
-        )}" mode="aspectFit" />`
+        `<image src="https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(
+          getSize("height")
+        )}" class="${camelToKebabCase(`${classNameInput.value}-img`)}" mode="aspectFit" />`
       ];
     }
     case "icon": {
       if (objectTypeInput.value === "pc") {
         return [
-          `<img :src="${handleVarName1(`${classNameInput.value}-icon`, true)}" class="${handleVarName2(
+          `<img :src="${kebabToCamelCase(`${classNameInput.value}-icon`, true)}" class="${camelToKebabCase(
             `${classNameInput.value}-icon`
           )}" />`
         ];
       }
       return [
-        `<image :src="${handleVarName1(`${classNameInput.value}-icon`, true)}" class="${handleVarName2(
+        `<image :src="${kebabToCamelCase(`${classNameInput.value}-icon`, true)}" class="${camelToKebabCase(
           `${classNameInput.value}-icon`
         )}" mode="scaleToFill" />`
       ];
     }
     case "div": {
       if (objectTypeInput.value === "pc") {
-        return [`<div class="${handleVarName2(classNameInput.value)}"></div>`];
+        return [`<div class="${camelToKebabCase(classNameInput.value)}"></div>`];
       }
-      return [`<view class="${handleVarName2(classNameInput.value)}"></view>`];
+      return [`<view class="${camelToKebabCase(classNameInput.value)}"></view>`];
     }
   }
 });
 
-const jss = computed(() => {
+const jsList = computed(() => {
   switch (type.value) {
     case "icon": {
-      return [`const ${handleVarName1(`${classNameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
+      return [`const ${kebabToCamelCase(`${classNameInput.value}-icon`, true)} = "${iconUrlInput.value}";`];
     }
   }
   return [];
 });
 
-const csss = computed(() => {
+const cssList = computed(() => {
   const getCssProps = (item: CssRulesType) => {
     return "\n" + item.props.map(prop => `  ${prop.name}: ${prop.value};`).join("\n") + "\n";
   };
   switch (type.value) {
     case "text": {
       return cssRules.value.map((item, i) => {
-        return `.${handleVarName2(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)} {${getCssProps(item)}}`.trim();
+        return `.${camelToKebabCase(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "img": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(`${classNameInput.value}-img`)} {${getCssProps(item)}}`.trim();
+        return `.${camelToKebabCase(`${classNameInput.value}-img`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "icon": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(`${classNameInput.value}-icon`)} {${getCssProps(item)}}`.trim();
+        return `.${camelToKebabCase(`${classNameInput.value}-icon`)} {${getCssProps(item)}}`.trim();
       });
     }
     case "div": {
       return cssRules.value.map(item => {
-        return `.${handleVarName2(classNameInput.value)} {${getCssProps(item)}}`.trim();
+        return `.${camelToKebabCase(classNameInput.value)} {${getCssProps(item)}}`.trim();
       });
     }
   }
@@ -360,6 +377,12 @@ onMounted(async () => {
 
   ::v-deep(.el-form-item) {
     margin-bottom: 6px;
+  }
+
+  .type-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
   }
 
   .form-item-content {

@@ -77,11 +77,11 @@ chrome.runtime.onMessage.addListener((req: MessageReq, sender, sendResponse_: an
 });
 
 /**
- * 监听消息
+ * 添加消息服务
  * @param type
  * @param handleFs
  */
-export function onMessage(type: string, ...handleFs: handleFType[]) {
+export function addMessageServer(type: string, ...handleFs: handleFType[]) {
   handleFs.forEach(handleF => {
     listeners.push({ type, handleF });
   });

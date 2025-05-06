@@ -12,6 +12,7 @@
     "package": "node .node/cssHandle.js && package ./dist inject"
   },
   "dependencies": {
+    "@element-plus/icons-vue": "^2.3.1",
     "element-plus": "^2.9.7",
     "js-cookie": "^3.0.5",
     "vue": "^3.5.13"

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { ElInput, ElForm, ElFormItem, ElButton, ElMessage, ElDivider } from "element-plus";
-import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
+import { ElInput, ElButton, ElMessage } from "element-plus";
+import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
-import { handleVarName1, handleVarName2, strToVarName } from "@taozi-chrome-extensions/common/src/utils/global";
+import { kebabToCamelCase, camelToKebabCase, toValidVariableName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
 
 const input = ref("");
@@ -22,15 +22,15 @@ const handleClick = () => {
   }
   loading.value = true;
   sendMessage<string>({
-    type: MessageType.baiduTranslate,
+    type: MessageType.BaiduTranslate,
     value: input.value
   })
     .then(res => {
       if (res) {
         results.value = [
-          handleVarName1(strToVarName(res), true),
-          handleVarName1(strToVarName(res)),
-          handleVarName2(strToVarName(res))
+          kebabToCamelCase(toValidVariableName(res), true),
+          kebabToCamelCase(toValidVariableName(res)),
+          camelToKebabCase(toValidVariableName(res))
         ];
       }
     })

@@ -29,5 +29,6 @@
   },
   "[less]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "cSpell.words": ["taozi", "apifox", "tems", "codesign", "tapd", "workitem", "tabpane", "boxs", "dlalog"]
 }

@@ -1,4 +1,4 @@
-import { handleVarName1 } from "@taozi-chrome-extensions/common/src/utils/global";
+import { kebabToCamelCase, toValidVariableName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { requestApiDetails, requestDataSchemas } from "../../api/apifox";
 import { ApiMethod, ValueType, type ApiDetail, type Type } from "../../api/type";
 import { apifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
@@ -49,9 +49,9 @@ export async function getApiCallFile({
       path: apiPath,
       parameters: { query = [] },
       requestBody,
-      responses: responsess
+      responses: responsesList
     } = apiDetail;
-    const responses = responsess.find(item => [200, 201, 204].includes(item.code));
+    const responses = responsesList.find(item => [200, 201, 204].includes(item.code));
 
     const queryTypeStr =
       query.length > 0
@@ -109,8 +109,8 @@ export async function getApiCallFile({
           })?.typeStr || responsesTypeStr;
       }
     }
-    const apiCallFunName = handleVarName1(
-      `request${(apiPath.match(/(\w+)$/)?.[1] || "").replace(/^[a-z]/, _ => _.toLocaleUpperCase())}`
+    const apiCallFunName = kebabToCamelCase(
+      `request${kebabToCamelCase(toValidVariableName(apiPath.match(/(\w+)$/)?.[1] || ""), true)}`
     );
     const funParamTypeStr = apiMethod === ApiMethod.Get ? queryTypeStr : requestBodyTypeStr;
 
@@ -172,7 +172,7 @@ export async function getApiCallFile({
     // 对象
     else if (type.properties) {
       const properties = type.properties;
-      const propertieTypes = Object.keys(properties).map(key => ({
+      const propertiesTypes = Object.keys(properties).map(key => ({
         key,
         t: getType({
           type: properties[key],
@@ -180,13 +180,13 @@ export async function getApiCallFile({
           layer: layer + 1
         })
       }));
-      if (propertieTypes.length <= 0) {
+      if (propertiesTypes.length <= 0) {
         return {
           typeStr: "{ [key: string]: any }"
         };
       }
       return {
-        typeStr: `{\n${propertieTypes
+        typeStr: `{\n${propertiesTypes
           .map(({ key, t }) => {
             return getTypeProp({
               name: key,
