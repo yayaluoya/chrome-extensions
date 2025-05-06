@@ -5,7 +5,7 @@ export function evalFunction(formParameter: string, content: string, ...arg: any
     const key = md5("sandbox-iframe" + Date.now() + Math.random()).toString();
     const sandboxIframe = document.createElement("iframe");
     sandboxIframe.src = chrome.runtime.getURL("sandbox/index.html");
-    sandboxIframe.sandbox = "allow-scripts allow-same-origin";
+    sandboxIframe.style.display = "none";
     document.body.appendChild(sandboxIframe);
 
     const handleRes = ({ data: { key: onKey, success, msg = "", data } }: any) => {
