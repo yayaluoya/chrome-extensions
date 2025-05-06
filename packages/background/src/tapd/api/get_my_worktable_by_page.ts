@@ -1,9 +1,9 @@
-import { getDscToken, request } from "./request";
+import { request } from "./request";
 import type { MyWorktableByPage } from "./type";
 
-export function get_my_worktable_by_page(group_id: string, select_workspace_ids: string[], tab: string) {
+export function get_my_worktable_by_page(group_id: string, select_workspace_ids: string[], dsc_token: string) {
   return request<MyWorktableByPage>(
-    "https://www.tapd.cn/api/my_worktable/my_worktable/get_my_worktable_by_page?needRepeatInterceptors=false",
+    "https://taozi-chrome-extensions-cf-worker.yayaluoya.sbs/api/my_worktable/my_worktable/get_my_worktable_by_page?needRepeatInterceptors=false",
     {
       method: "post",
       body: JSON.stringify({
@@ -19,7 +19,8 @@ export function get_my_worktable_by_page(group_id: string, select_workspace_ids:
         page: 1,
         setting_view: "tree",
         exclude_workspace_configs: [],
-        dsc_token: getDscToken()
+        tab: "todo",
+        dsc_token
       })
     }
   );

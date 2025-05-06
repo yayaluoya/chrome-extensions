@@ -18,7 +18,7 @@
     "service_worker": "background/index.iife.js",
     "type": "module"
   },
-  "permissions": ["tabs", "scripting", "activeTab", "storage"],
+  "permissions": ["tabs", "scripting", "activeTab", "storage", "cookies"],
   "host_permissions": ["<all_urls>"],
   "sandbox": {
     "pages": ["sandbox/index.html"]
