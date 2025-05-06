@@ -11,15 +11,27 @@ export async function apifoxInject() {
         document.querySelector(".ui-tree-list")?.contains(e.target) &&
         e.target.className === "truncate"
       ) {
-        setTimeout(() => {
-          trigger().catch(err => {
-            console.log(err);
-            ElMessage({
-              message: err,
-              type: "error"
-            });
-          });
-        }, 0);
+        let n = 0;
+        const f = () => {
+          setTimeout(() => {
+            n++;
+            if (n > 10) {
+              return;
+            }
+            trigger()
+              .then(res => {
+                res || f();
+              })
+              .catch(err => {
+                console.log(err);
+                ElMessage({
+                  message: err,
+                  type: "error"
+                });
+              });
+          }, 100);
+        };
+        f();
       }
     },
     {
@@ -31,19 +43,19 @@ export async function apifoxInject() {
 async function trigger() {
   const projectId = location.pathname.match(/\/project\/([0-9]+)\/?/)?.[1];
   if (!projectId) {
-    return;
+    return false;
   }
   const onPane = document.querySelector(".ui-tabs-tabpane.ui-tabs-tabpane-active.main-tabs-pane");
   if (!onPane) {
-    return;
+    return false;
   }
   const apiId = onPane.id.match(/\.([0-9]+)$/)?.[1];
   if (!apiId) {
-    return;
+    return false;
   }
   const buttonP = onPane.querySelector(".actions-wrap");
   if (!buttonP) {
-    return;
+    return false;
   }
   const customElClass = "custom-el-class";
   buttonP.querySelector(`.${customElClass}`)?.remove();
@@ -58,4 +70,5 @@ async function trigger() {
       apiId: parseInt(apiId)
     }
   });
+  return true;
 }

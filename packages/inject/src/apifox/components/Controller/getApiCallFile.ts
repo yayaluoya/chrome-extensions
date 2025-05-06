@@ -100,7 +100,8 @@ export async function getApiCallFile({
         const schemaId = jsonSchema.$ref.match(/^#\/definitions\/([0-9]+)$/)?.[1] || "";
         jsonSchema = DataSchemas.find(item => item.id === parseInt(schemaId))?.jsonSchema;
       }
-      jsonSchema = jsonSchema?.properties?.["data"];
+      const responseDataName = (await apifoxLocalStorage.get())?.responseDataName || "";
+      jsonSchema = responseDataName ? jsonSchema?.properties?.[responseDataName] : jsonSchema;
       if (jsonSchema) {
         responsesTypeStr =
           getType({

@@ -9,9 +9,19 @@ export function codesignInject() {
       if (e.target instanceof Node && document.querySelector(".screen-inspector.inspector.expanded")?.contains(e.target)) {
         return;
       }
-      setTimeout(() => {
-        trigger();
-      }, 0);
+      let n = 0;
+      const f = () => {
+        setTimeout(() => {
+          n++;
+          if (n > 10) {
+            return;
+          }
+          trigger().then(res => {
+            res || f();
+          });
+        }, 100);
+      };
+      f();
     },
     {
       capture: true
@@ -22,12 +32,12 @@ export function codesignInject() {
 async function trigger() {
   const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
   if (!screenInspectorEl) {
-    return;
+    return false;
   }
   const sectionNodeBoxs = getAllSectionNodeBox(screenInspectorEl);
   const codeSectionNode = sectionNodeBoxs.find(item => item.title === "代码");
   if (!codeSectionNode) {
-    return;
+    return false;
   }
 
   const customElClass = "custom-el-class";
@@ -39,4 +49,5 @@ async function trigger() {
       codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
     }
   });
+  return true;
 }

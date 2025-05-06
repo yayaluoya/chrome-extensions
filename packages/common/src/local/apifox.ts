@@ -5,9 +5,12 @@ export interface ApifoxLocalStorage {
   onObjectType: string;
   /** 模板列表 */
   tems: { objectType: string; value: string }[];
+  /** 响应data字段名 */
+  responseDataName: string;
 }
 
 export const apifoxLocalStorage = useLocalStorage<string, ApifoxLocalStorage>("apifox-local-storage", {
   onObjectType: "",
-  tems: []
+  tems: [],
+  responseDataName: "data"
 });
