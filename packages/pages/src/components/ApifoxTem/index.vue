@@ -28,6 +28,7 @@
         </ElButton>
       </ElFormItem>
     </ElForm>
+    <ElEmpty v-if="tems.length === 0" description="暂无模板" />
     <ElButton
       type="primary"
       @click="
@@ -67,7 +68,8 @@ import {
   ElDescriptionsItem,
   ElDivider,
   ElDialog,
-  ElAlert
+  ElAlert,
+  ElEmpty
 } from "element-plus";
 import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@taozi-chrome-extensions/common/src/constant/apifoxTemFields";
 import { apifoxLocalStorage, type ApifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
