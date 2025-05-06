@@ -3,7 +3,7 @@
     <ElForm :model="{}" :rules="{}" label-width="auto" :show-message="false">
       <ElFormItem label-position="left" label="项目类型">
         <ElRadioGroup v-model="objectTypeInput" size="small">
-          <ElRadioButton v-for="item in objectTypeList" :key="item.value" :label="item.label" :value="item.value" />
+          <ElRadioButton v-for="item in OBJECT_TYPE_LIST" :key="item.value" :label="item.label" :value="item.value" />
         </ElRadioGroup>
       </ElFormItem>
       <ElFormItem label-position="left" label="元素类型">
@@ -20,14 +20,7 @@
           <ElIcon :size="12" v-if="type === 'text'">
             <Document />
           </ElIcon>
-          {{
-            {
-              img: "图片",
-              icon: "切图",
-              text: "文本",
-              div: "盒子"
-            }[type]
-          }}
+          {{ ITEM_TYPE_MAP[type] }}
         </div>
       </ElFormItem>
       <!-- <ElFormItem label-position="top" label="元素ID">
@@ -37,7 +30,7 @@
         <div class="form-item-content">
           <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
             <template #append>
-              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">generate</ElButton>
+              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">生成类名</ElButton>
             </template>
           </ElInput>
           <ElInput v-model="classNameInput" size="small" type="text">
@@ -79,91 +72,35 @@ import { kebabToCamelCase, camelToKebabCase, toValidVariableName } from "@taozi-
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";
 import Code from "../../../components/Code/index.vue";
 import { codesignLocalStorage } from "@taozi-chrome-extensions/common/src/local/codesign";
+import { ITEM_TYPE_MAP, OBJECT_TYPE_LIST, CSS_PROP_INCLUDES } from "./constants";
 
-type ItemType = "img" | "icon" | "text" | "div";
-type ObjectType = "app" | "mp" | "pc";
+// Types
+type ItemType = keyof typeof ITEM_TYPE_MAP;
+type ObjectType = (typeof OBJECT_TYPE_LIST)[number]["value"];
 
+// State
 const identification = ref("");
 const type = ref<ItemType>("div");
 const textContent = ref("");
 const cssCode = ref("");
-
-const cssRules = computed<CssRulesType[]>(() => {
-  switch (type.value) {
-    case "text":
-      return parseCssRules({
-        cssCode: cssCode.value,
-        includePropsName: [
-          "color",
-          "text-align",
-          "font-family",
-          "font-size",
-          "font-style",
-          "font-weight",
-          "line-height",
-          "letter-spacing"
-        ],
-        excludeProps: [
-          {
-            name: "font-style",
-            value: "normal"
-          }
-        ]
-      });
-    case "icon":
-      return parseCssRules({
-        cssCode: cssCode.value,
-        includePropsName: ["width", "height"]
-      });
-    case "img":
-      return parseCssRules({
-        cssCode: cssCode.value,
-        includePropsName: ["width", "height", "box-shadow", "border-radius"],
-        excludeProps: [],
-        supplementProps: [
-          {
-            name: "overflow",
-            value: "hidden"
-          }
-        ]
-      });
-    case "div":
-      return parseCssRules({
-        cssCode: cssCode.value,
-        includePropsName: [
-          "width",
-          "height",
-          "display",
-          /^flex-/,
-          "align-items",
-          "justify-content",
-          "overflow",
-          "box-sizing",
-          /^background-?/,
-          "box-shadow",
-          /^border-?/,
-          /^padding-?/,
-          ...(objectTypeInput.value === "pc" || objectTypeInput.value === "mp" ? ["gap"] : [])
-        ]
-      });
-  }
-});
-
 const translateInput = ref("");
 const classNameInput = ref("");
 const translateLoading = ref(false);
 const iconUrlInput = ref("");
 const objectTypeInput = ref<ObjectType>("pc");
-const objectTypeList = ref<
-  {
-    value: ObjectType;
-    label: string;
-  }[]
->([
-  { value: "pc", label: "pc" },
-  { value: "mp", label: "mp" },
-  { value: "app", label: "app" }
-]);
+
+// Computed
+const cssRules = computed<CssRulesType[]>(() => {
+  const baseProps = CSS_PROP_INCLUDES[type.value];
+  const props = objectTypeInput.value === "pc" || objectTypeInput.value === "mp" ? [...baseProps, "gap"] : baseProps;
+
+  return parseCssRules({
+    cssCode: cssCode.value,
+    includePropsName: props,
+    excludeProps: type.value === "text" ? [{ name: "font-style", value: "normal" }] : [],
+    supplementProps: type.value === "img" ? [{ name: "overflow", value: "hidden" }] : []
+  });
+});
 
 watch([classNameInput, translateInput, objectTypeInput], () => {
   codesignLocalStorage.edit(v => {
@@ -173,34 +110,32 @@ watch([classNameInput, translateInput, objectTypeInput], () => {
   });
 });
 
-const handleTranslate = () => {
-  if (!translateInput.value || translateLoading.value) {
-    return;
-  }
+const handleTranslate = async () => {
+  if (!translateInput.value || translateLoading.value) return;
+
   translateLoading.value = true;
-  sendMessage<string>({
-    type: MessageType.BaiduTranslate,
-    value: translateInput.value
-  })
-    .then(res => {
-      if (res) {
-        classNameInput.value = toValidVariableName(res);
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      ElMessage({
-        message: err,
-        type: "error"
-      });
-    })
-    .finally(() => {
-      translateLoading.value = false;
+  try {
+    const res = await sendMessage<string>({
+      type: MessageType.BaiduTranslate,
+      value: translateInput.value
     });
+    if (res) {
+      classNameInput.value = toValidVariableName(res);
+    }
+  } catch (err) {
+    console.error(err);
+    ElMessage({
+      message: String(err),
+      type: "error"
+    });
+  } finally {
+    translateLoading.value = false;
+  }
 };
 
 const vueTemplateList = computed(() => {
   switch (type.value) {
+    /** 文本 */
     case "text": {
       if (objectTypeInput.value === "pc") {
         return cssRules.value
@@ -229,6 +164,7 @@ const vueTemplateList = computed(() => {
         })
         .flat();
     }
+    /** 图片 */
     case "img": {
       const getSize = (name: string) => {
         return (
@@ -253,6 +189,7 @@ const vueTemplateList = computed(() => {
         )}" class="${camelToKebabCase(`${classNameInput.value}-img`)}" mode="aspectFit" />`
       ];
     }
+    /** 切图 */
     case "icon": {
       if (objectTypeInput.value === "pc") {
         return [
@@ -267,6 +204,7 @@ const vueTemplateList = computed(() => {
         )}" mode="scaleToFill" />`
       ];
     }
+    /** 盒子 */
     case "div": {
       if (objectTypeInput.value === "pc") {
         return [`<div class="${camelToKebabCase(classNameInput.value)}"></div>`];
@@ -316,56 +254,53 @@ const cssList = computed(() => {
 onMounted(async () => {
   try {
     const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
-    if (screenInspectorEl) {
-      const sectionNodeBoxs = getAllSectionNodeBox(screenInspectorEl);
-      const codeSectionNode = sectionNodeBoxs.find(item => item.title === "代码");
-      if (codeSectionNode) {
-        cssCode.value = codeSectionNode.contentEl.querySelectorAll(".css-node__code--item")[0]?.textContent || "";
-        const topTitle = sectionNodeBoxs[0].title;
-        // 文本
-        if (sectionNodeBoxs.some(item => item.title === "文本")) {
-          type.value = "text";
-          textContent.value =
-            sectionNodeBoxs
-              .find(item => item.title === "内容")
-              ?.contentEl.querySelector<HTMLImageElement>(".textarea__node.node-item__input span")?.textContent || "";
-          identification.value = md5(textContent.value + cssCode.value).toString();
-        }
-        // 切图
-        else if (sectionNodeBoxs.some(item => item.title === "切图")) {
-          type.value = "icon";
-          identification.value = md5(
-            (sectionNodeBoxs.find(item => item.title === "切图")?.contentEl.querySelector<HTMLImageElement>(".thumb img")?.src ||
-              "") + cssCode.value
-          ).toString();
-        }
-        // 图片
-        else if (
-          sectionNodeBoxs.some(
-            item =>
-              item.title === "填充" &&
-              [...item.contentEl.querySelectorAll("span.node-item__text")].some(item2 => item2.textContent?.trim() === "图片填充")
-          )
-        ) {
-          type.value = "img";
-          identification.value = md5(topTitle + cssCode.value).toString();
-        }
-        // 盒子
-        else {
-          type.value = "div";
-          identification.value = md5(topTitle + cssCode.value).toString();
-        }
-      }
+    if (!screenInspectorEl) return;
+
+    const sectionNodeBoxs = getAllSectionNodeBox(screenInspectorEl);
+    const codeSectionNode = sectionNodeBoxs.find(item => item.title === "代码");
+    if (!codeSectionNode) return;
+
+    cssCode.value = codeSectionNode.contentEl.querySelectorAll(".css-node__code--item")[0]?.textContent || "";
+    const topTitle = sectionNodeBoxs[0].title;
+
+    // Determine element type and set identification
+    if (sectionNodeBoxs.some(item => item.title === "文本")) {
+      type.value = "text";
+      textContent.value =
+        sectionNodeBoxs
+          .find(item => item.title === "内容")
+          ?.contentEl.querySelector<HTMLImageElement>(".textarea__node.node-item__input span")?.textContent || "";
+    } else if (sectionNodeBoxs.some(item => item.title === "切图")) {
+      type.value = "icon";
+      const iconSrc =
+        sectionNodeBoxs.find(item => item.title === "切图")?.contentEl.querySelector<HTMLImageElement>(".thumb img")?.src || "";
+      identification.value = md5(iconSrc + cssCode.value).toString();
+    } else if (
+      sectionNodeBoxs.some(
+        item =>
+          item.title === "填充" &&
+          [...item.contentEl.querySelectorAll("span.node-item__text")].some(item2 => item2.textContent?.trim() === "图片填充")
+      )
+    ) {
+      type.value = "img";
+    } else {
+      type.value = "div";
     }
+
+    if (type.value === "text") {
+      identification.value = md5(textContent.value + cssCode.value).toString();
+    } else {
+      identification.value = md5(topTitle + cssCode.value).toString();
+    }
+
+    // Load saved state
+    const { objectType = "", translateInputs = {}, classNames = {} } = (await codesignLocalStorage.get()) || {};
+    classNameInput.value = classNames[identification.value] || "item";
+    translateInput.value = translateInputs[identification.value] || textContent.value;
+    objectTypeInput.value = (objectType as ObjectType) || "pc";
   } catch (e) {
-    console.log("出错了", e);
+    console.error("Error in onMounted:", e);
   }
-
-  const { objectType = "", translateInputs = {}, classNames = {} } = (await codesignLocalStorage.get()) || {};
-
-  classNameInput.value = classNames[identification.value] || "item";
-  translateInput.value = translateInputs[identification.value] || textContent.value;
-  objectTypeInput.value = (objectType as ObjectType) || "pc";
 });
 </script>
 
