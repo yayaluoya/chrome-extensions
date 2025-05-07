@@ -1,7 +1,6 @@
 import { tapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { get_my_worktable_common } from "./api/get_my_worktable_common";
 import { get_my_worktable_by_page } from "./api/get_my_worktable_by_page";
-import { getDscToken } from "./api/request";
 import { setIcon } from "@/utils/setIcon";
 
 export async function tapdTask() {
@@ -9,9 +8,8 @@ export async function tapdTask() {
     v.dataUpdateTime = Date.now();
   });
   try {
-    const dsc_token = await getDscToken();
-    await get_my_worktable_common(dsc_token).then(async data => {
-      const d = await get_my_worktable_by_page(data.group_list[0]?.group_id, data.select_workspace_ids, dsc_token);
+    await get_my_worktable_common().then(async data => {
+      const d = await get_my_worktable_by_page(data.group_list[0]?.group_id, data.select_workspace_ids);
       await tapdLocalStorage.edit(v => {
         v.workitemCount.story = parseInt(data.workitem_count?.story || "0");
         v.workitemCount.task = parseInt(data.workitem_count?.task || "0");

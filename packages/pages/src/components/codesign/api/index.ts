@@ -1,14 +1,21 @@
 import { request } from "./request";
 import type { User, RecentViewed } from "./type";
 
-/** 获取用户信息 */
+/**
+ * 获取用户信息
+ * @returns
+ */
 export const requestUser = () => {
   return request<User>("/api/user", {
     method: "GET"
   });
 };
 
-/** 获取最近浏览 */
+/**
+ * 获取最近浏览
+ * @param teamId
+ * @returns
+ */
 export const requestRecentViewed = (teamId: number) => {
   return request<RecentViewed>(
     "/api/designs?" +

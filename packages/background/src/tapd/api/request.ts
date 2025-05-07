@@ -1,4 +1,5 @@
 const tapdOrigin = "https://www.tapd.cn";
+const tapdProxyOrigin = "https://taozi-chrome-extensions-cf-worker.yayaluoya.sbs";
 
 /**
  * 发送请求
@@ -8,6 +9,7 @@ export async function request<T>(url: string, op: RequestInit): Promise<T> {
   if (!op.headers) {
     op.headers = {};
   }
+  url = `${tapdProxyOrigin}${url}`;
   Object.assign(op.headers, {
     "x-target": tapdOrigin,
     "x-cookie": (
@@ -29,7 +31,11 @@ export async function request<T>(url: string, op: RequestInit): Promise<T> {
     });
 }
 
-export function getDscToken() {
+/**
+ * 获取dsc-token
+ * @returns
+ */
+export const getDscToken = () => {
   return chrome.cookies
     .get({
       url: tapdOrigin,
@@ -38,4 +44,4 @@ export function getDscToken() {
     .then(c => {
       return c?.value || "";
     });
-}
+};
