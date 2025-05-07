@@ -8,6 +8,7 @@ export const requestUser = () => {
   });
 };
 
+/** 获取最近浏览 */
 export const requestRecentViewed = (teamId: number) => {
   return request<RecentViewed>(
     "/api/designs?" +

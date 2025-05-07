@@ -1,14 +1,16 @@
 <template>
   <div class="codesign-recent-viewed">
-    <ElSkeleton v-if="loading" :rows="5" animated />
+    <template v-if="loading">
+      <ElSkeleton v-for="i in 4" :key="i" :rows="4" animated />
+    </template>
     <template v-else-if="list.length > 0">
       <div class="recent-viewed-item" v-for="item in list" :key="item.id" @click="handleClick(item)">
         <div class="recent-viewed-item-cover">
           <img :src="item.cover_url || item.fallback_cover_url" alt="" />
+          <span class="model">{{ item.model === "design" ? "设计图" : "原型图" }}</span>
         </div>
         <div class="recent-viewed-item-info">
           <span class="name">{{ item.name }}</span>
-          <span class="model">{{ item.model === "design" ? "设计" : "原型" }}</span>
           <span class="update-time"
             >{{ dayjs(item.updated_at).format("YYYY-MM-DD HH:mm:ss") }} 由 {{ item.updater.nickname }} 更新</span
           >
@@ -61,47 +63,54 @@ const handleClick = async (item: RecentViewedItem) => {
 </script>
 <style lang="scss" scoped>
 .codesign-recent-viewed {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   .recent-viewed-item {
     display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1px solid #f0f0f0;
-    padding-bottom: 10px;
-    margin-bottom: 10px;
+    flex-direction: column;
     cursor: pointer;
-    &:last-child {
-      border-bottom: none;
-      padding-bottom: 0;
-      margin-bottom: 0;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    &:hover {
+      filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.08));
     }
     .recent-viewed-item-cover {
-      width: 100px;
+      width: 100%;
       height: 100px;
       overflow: hidden;
+      position: relative;
+      background: url("data:img/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAAA8AAAAPAgMAAABGuH3ZAAAACVBMVEX3+fvv8vTz9vhtSfzXAAAAGklEQVQI12MIDWNgIECsWrVqBQMDU2gIfgIAwnIMASbGc5UAAAAASUVORK5CYII=");
       img {
         width: 100%;
+      }
+      .model {
+        position: absolute;
+        z-index: 10;
+        background: rgba(34, 35, 36, 0.8);
+        border-radius: 2px;
+        color: hsla(0, 0%, 100%, 0.9);
+        line-height: 20px;
+        padding: 0 4px;
+        font-weight: 500;
+        font-size: 10px;
+        right: 8px;
+        bottom: 8px;
       }
     }
     .recent-viewed-item-info {
       display: flex;
       flex-direction: column;
-      flex: 1;
-      align-items: start;
       gap: 10px;
-      height: 100px;
-      padding: 10px 0;
       box-sizing: border-box;
+      background-color: #f6f9fb;
+      padding: 8px 16px;
       .name {
         font-size: 14px;
         font-weight: bold;
       }
-      .model {
-        font-size: 12px;
-        color: #999;
-      }
+
       .update-time {
         font-size: 12px;
         color: #999;
