@@ -1,57 +1,60 @@
 import Controller from "./components/Controller/index.vue";
 import { createAppEl } from "../createAppEl";
 import { getAllSectionNodeBox } from "./getAllSectionNodeBox";
-
+import { debounce, wait } from "@taozi-chrome-extensions/common/src/utils/global";
+import { ElMessage } from "element-plus";
+import { RETRY_COUNT, RETRY_DELAY, MOUNT_CHECK_DELAY, CUSTOM_EL_CLASS_CODESIGN } from "@/constant";
 export function codesignInject() {
   document.addEventListener(
     "click",
-    e => {
+    debounce((e: MouseEvent) => {
       if (e.target instanceof Node && document.querySelector(".screen-inspector.inspector.expanded")?.contains(e.target)) {
         return;
       }
-      let n = 0;
-      const f = () => {
-        setTimeout(() => {
-          n++;
-          if (n > 1000) {
-            return;
-          }
-          trigger().then(res => {
-            res || f();
-          });
-        }, 0);
-      };
-      f();
-    },
+      trigger().catch(err => {
+        console.log(err);
+        ElMessage({
+          message: err + "",
+          type: "error"
+        });
+      });
+    }, 100),
     {
       capture: true
     }
   );
 }
 
-async function trigger(): Promise<boolean> {
-  const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
-  if (!screenInspectorEl) {
-    return false;
-  }
-  const sectionNodeBoxs = getAllSectionNodeBox(screenInspectorEl);
-  const codeSectionNode = sectionNodeBoxs.find(item => item.title === "代码");
-  if (!codeSectionNode) {
-    return false;
-  }
-
-  const customElClass = "custom-el-class";
-  codeSectionNode.contentEl.querySelector(`.${customElClass}`)?.remove();
-  await createAppEl({
-    com: Controller,
-    handleEl: el => {
-      el.className = customElClass;
-      codeSectionNode.contentEl.insertBefore(el, codeSectionNode.contentEl.firstChild);
+async function trigger() {
+  for (let i = 0; i < RETRY_COUNT; i++) {
+    await wait(RETRY_DELAY);
+    const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
+    if (!screenInspectorEl) {
+      continue;
     }
-  });
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve(!!codeSectionNode.contentEl.querySelector(`.${customElClass}`));
-    }, 0);
-  });
+    const sectionNodeBoxs = getAllSectionNodeBox(screenInspectorEl);
+    const codeSectionNode = sectionNodeBoxs.find(item => item.title === "代码");
+    if (!codeSectionNode) {
+      continue;
+    }
+    codeSectionNode.contentEl.querySelector(`.${CUSTOM_EL_CLASS_CODESIGN}`)?.remove();
+    const mountEl = document.createElement("div");
+    mountEl.className = CUSTOM_EL_CLASS_CODESIGN;
+    codeSectionNode.contentEl.insertBefore(mountEl, codeSectionNode.contentEl.firstChild);
+    // 等待100ms后，如果存在customElClass，则创建app
+    const res = await new Promise<boolean>(resolve => {
+      setTimeout(() => {
+        resolve(!!codeSectionNode.contentEl.querySelector(`.${CUSTOM_EL_CLASS_CODESIGN}`));
+      }, MOUNT_CHECK_DELAY);
+    });
+    if (res) {
+      await createAppEl({
+        mountElFunc: el => {
+          mountEl.appendChild(el);
+        },
+        com: Controller
+      });
+      break;
+    }
+  }
 }

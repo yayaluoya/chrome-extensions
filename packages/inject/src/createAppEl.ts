@@ -2,16 +2,16 @@ import "element-plus/dist/index.css";
 import { createApp, h, type DefineSetupFnComponent } from "vue";
 
 export async function createAppEl<T extends DefineSetupFnComponent<any>>({
-  handleEl,
+  mountElFunc,
   com,
   props
 }: {
-  handleEl: (el: HTMLDivElement) => void;
+  mountElFunc: (el: HTMLDivElement) => void;
   com: T;
   props?: T extends DefineSetupFnComponent<infer P> ? P : never;
 }) {
   const el = document.createElement("div");
-  handleEl(el);
+  mountElFunc(el);
   const shadowRoot = el.attachShadow({ mode: "open" });
   const html = document.createElement("html");
   shadowRoot.appendChild(html);
