@@ -4,13 +4,15 @@ import BaiDuAppConfig from "./components/BaiDuAppConfig/index.vue";
 import GenVarName from "./components/GenVarName/index.vue";
 import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
-import ApifoxTem from "./components/ApifoxTem/index.vue";
-import ApifoxConfig from "./components/ApifoxConfig/index.vue";
+import ApifoxConfig from "./components/apifox/ApifoxConfig/index.vue";
+import ApifoxTem from "./components/apifox/ApifoxTem/index.vue";
 import Tapd from "./components/Tapd/index.vue";
 import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
+import CodesignRecentViewed from "./components/codesign/CodesignRecentViewed/index.vue";
 
 enum TabType {
   GenVarName = "GenVarName",
+  Codesign = "Codesign",
   Apifox = "Apifox",
   BaiDuAppConfig = "BaiDuAppConfig"
 }
@@ -23,6 +25,10 @@ const tabs = ref<
   {
     label: "生成变量名",
     value: TabType.GenVarName
+  },
+  {
+    label: "Codesign",
+    value: TabType.Codesign
   },
   {
     label: "Apifox",
@@ -59,6 +65,15 @@ onMounted(async () => {
       <template v-if="activeTab === TabType.GenVarName">
         <div class="content">
           <GenVarName />
+        </div>
+      </template>
+      <template v-else-if="activeTab === TabType.Codesign">
+        <div class="title">
+          <div class="left"></div>
+          <span>最近浏览</span>
+        </div>
+        <div class="content">
+          <CodesignRecentViewed />
         </div>
       </template>
       <template v-else-if="activeTab === TabType.Apifox">
