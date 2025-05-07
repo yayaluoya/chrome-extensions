@@ -8,11 +8,7 @@ export async function apifoxInject() {
   document.addEventListener(
     "click",
     debounce((e: MouseEvent) => {
-      if (
-        e.target instanceof HTMLDivElement &&
-        document.querySelector(".ui-tree-list")?.contains(e.target) &&
-        e.target.className === "truncate"
-      ) {
+      if (e.target instanceof HTMLDivElement && document.querySelector(".ui-tree-list")?.contains(e.target)) {
         trigger().catch(err => {
           console.log(err);
           ElMessage({
@@ -51,13 +47,9 @@ async function trigger() {
     const mountEl = document.createElement("div");
     mountEl.className = CUSTOM_EL_CLASS_APIFOX;
     buttonP.insertBefore(mountEl, buttonP.firstChild);
-    // 等待100ms后，如果存在customElClass，则创建app
-    const res = await new Promise<boolean>(resolve => {
-      setTimeout(() => {
-        resolve(!!buttonP.querySelector(`.${CUSTOM_EL_CLASS_APIFOX}`));
-      }, MOUNT_CHECK_DELAY);
-    });
-    if (res) {
+    await wait(MOUNT_CHECK_DELAY);
+    const hasMountEl = !!buttonP.querySelector(`.${CUSTOM_EL_CLASS_APIFOX}`);
+    if (hasMountEl) {
       await createAppEl({
         mountElFunc: el => {
           mountEl.appendChild(el);

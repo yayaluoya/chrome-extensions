@@ -8,6 +8,7 @@ export function codesignInject() {
   document.addEventListener(
     "click",
     debounce((e: MouseEvent) => {
+      // 点击非操作面板的地方
       if (e.target instanceof Node && document.querySelector(".screen-inspector.inspector.expanded")?.contains(e.target)) {
         return;
       }
@@ -41,13 +42,9 @@ async function trigger() {
     const mountEl = document.createElement("div");
     mountEl.className = CUSTOM_EL_CLASS_CODESIGN;
     codeSectionNode.contentEl.insertBefore(mountEl, codeSectionNode.contentEl.firstChild);
-    // 等待100ms后，如果存在customElClass，则创建app
-    const res = await new Promise<boolean>(resolve => {
-      setTimeout(() => {
-        resolve(!!codeSectionNode.contentEl.querySelector(`.${CUSTOM_EL_CLASS_CODESIGN}`));
-      }, MOUNT_CHECK_DELAY);
-    });
-    if (res) {
+    await wait(MOUNT_CHECK_DELAY);
+    const hasMountEl = !!codeSectionNode.contentEl.querySelector(`.${CUSTOM_EL_CLASS_CODESIGN}`);
+    if (hasMountEl) {
       await createAppEl({
         mountElFunc: el => {
           mountEl.appendChild(el);
