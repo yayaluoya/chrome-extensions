@@ -7,9 +7,9 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const cssFilePath = join(__dirname, "../dist/index.css");
 
 /**
- * 处理:root选择器在虚拟dom下不管用的问题
+ * 处理:root选择器在影子dom下不管用的问题
  */
 
 writeFileSync(cssFilePath, readFileSync(cssFilePath).toString().replace(/:root/g, "html"));
 
-console.log("样式处理完成");
+console.log("inject包index.css文件修改完成");

@@ -1,7 +1,7 @@
 {
   "name": "taozi-chrome-extensions",
   "version": "1.0.0",
-  "description": "一个浏览器插件",
+  "description": "taozi科技的谷歌浏览器扩展工具",
   "scripts": {
     "build-package": "turbo run build package"
   },
