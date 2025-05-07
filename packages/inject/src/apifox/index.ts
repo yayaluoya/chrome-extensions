@@ -2,15 +2,19 @@ import { ElMessage } from "element-plus";
 import Controller from "./components/Controller/index.vue";
 import { createAppEl } from "../createAppEl";
 import { debounce, wait } from "@taozi-chrome-extensions/common/src/utils/global";
-import { RETRY_COUNT, RETRY_DELAY, MOUNT_CHECK_DELAY, CUSTOM_EL_CLASS_APIFOX } from "@/constant";
+import { RETRY_COUNT, RETRY_DELAY, CUSTOM_EL_CLASS_APIFOX } from "@/constant";
+import { insertEl } from "../insertEl";
 
+/**
+ * apifox 注入
+ */
 export async function apifoxInject() {
   document.addEventListener(
     "click",
     debounce((e: MouseEvent) => {
       if (e.target instanceof HTMLDivElement && document.querySelector(".ui-tree-list")?.contains(e.target)) {
         trigger().catch(err => {
-          console.log(err);
+          console.error(err);
           ElMessage({
             message: err + "",
             type: "error"
@@ -43,13 +47,8 @@ async function trigger() {
     if (!buttonP) {
       continue;
     }
-    buttonP.querySelector(`.${CUSTOM_EL_CLASS_APIFOX}`)?.remove();
-    const mountEl = document.createElement("div");
-    mountEl.className = CUSTOM_EL_CLASS_APIFOX;
-    buttonP.insertBefore(mountEl, buttonP.firstChild);
-    await wait(MOUNT_CHECK_DELAY);
-    const hasMountEl = !!buttonP.querySelector(`.${CUSTOM_EL_CLASS_APIFOX}`);
-    if (hasMountEl) {
+    const mountEl = await insertEl(buttonP, () => buttonP.firstChild as HTMLElement, CUSTOM_EL_CLASS_APIFOX);
+    if (mountEl) {
       await createAppEl({
         mountElFunc: el => {
           mountEl.appendChild(el);

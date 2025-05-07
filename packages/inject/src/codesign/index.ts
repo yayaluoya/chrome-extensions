@@ -3,7 +3,12 @@ import { createAppEl } from "../createAppEl";
 import { getAllSectionNodeBox } from "./getAllSectionNodeBox";
 import { debounce, wait } from "@taozi-chrome-extensions/common/src/utils/global";
 import { ElMessage } from "element-plus";
-import { RETRY_COUNT, RETRY_DELAY, MOUNT_CHECK_DELAY, CUSTOM_EL_CLASS_CODESIGN } from "@/constant";
+import { RETRY_COUNT, RETRY_DELAY, CUSTOM_EL_CLASS_CODESIGN } from "@/constant";
+import { insertEl } from "../insertEl";
+
+/**
+ * 代码设计注入
+ */
 export function codesignInject() {
   document.addEventListener(
     "click",
@@ -13,7 +18,7 @@ export function codesignInject() {
         return;
       }
       trigger().catch(err => {
-        console.log(err);
+        console.error(err);
         ElMessage({
           message: err + "",
           type: "error"
@@ -38,13 +43,12 @@ async function trigger() {
     if (!codeSectionNode) {
       continue;
     }
-    codeSectionNode.contentEl.querySelector(`.${CUSTOM_EL_CLASS_CODESIGN}`)?.remove();
-    const mountEl = document.createElement("div");
-    mountEl.className = CUSTOM_EL_CLASS_CODESIGN;
-    codeSectionNode.contentEl.insertBefore(mountEl, codeSectionNode.contentEl.firstChild);
-    await wait(MOUNT_CHECK_DELAY);
-    const hasMountEl = !!codeSectionNode.contentEl.querySelector(`.${CUSTOM_EL_CLASS_CODESIGN}`);
-    if (hasMountEl) {
+    const mountEl = await insertEl(
+      codeSectionNode.contentEl,
+      () => codeSectionNode.contentEl.firstChild as HTMLElement,
+      CUSTOM_EL_CLASS_CODESIGN
+    );
+    if (mountEl) {
       await createAppEl({
         mountElFunc: el => {
           mountEl.appendChild(el);

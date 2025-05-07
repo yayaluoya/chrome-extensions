@@ -69,7 +69,7 @@ const handleCopyCode = (code: string) => {
   }
   > pre {
     line-height: 1.5;
-    font-size: 14px;
+    font-size: 12px;
     margin: 0;
     display: flex;
     flex-direction: column;
