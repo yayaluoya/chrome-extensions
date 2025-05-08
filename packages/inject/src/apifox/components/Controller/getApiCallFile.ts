@@ -222,7 +222,7 @@ export async function getApiCallFile({
         return item;
       });
       return {
-        typeStr: types.join("|")
+        typeStr: types.join(" | ")
       };
     }
   }
