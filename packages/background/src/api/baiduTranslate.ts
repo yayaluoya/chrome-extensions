@@ -1,4 +1,4 @@
-import { md5 } from "@taozi-chrome-extensions/common/src/md5";
+import { md5 } from "@taozi-chrome-extensions/common/src/utils/md5";
 import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
 
 /**

@@ -63,7 +63,7 @@
 <script setup lang="ts">
 import { parseCssRules, type cssPropType, type CssRulesType } from "./parseCssRules";
 import { computed, onMounted, ref, watch } from "vue";
-import { md5 } from "@taozi-chrome-extensions/common/src/md5";
+import { md5 } from "@taozi-chrome-extensions/common/src/utils/md5";
 import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
 import { ElForm, ElFormItem, ElButton, ElInput, ElRadioGroup, ElRadioButton, ElMessage, ElIcon } from "element-plus";

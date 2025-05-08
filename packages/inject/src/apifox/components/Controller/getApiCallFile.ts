@@ -15,12 +15,12 @@ type DependencyInterfacesType = {
 export async function getApiCallFile({
   projectId,
   apiId,
-  objectType,
+  codeTems,
   codeOp = { indent: "  " }
 }: {
   projectId: string;
   apiId: number;
-  objectType: string;
+  codeTems: string[];
   codeOp?: { indent?: string };
 }) {
   const ApiDetails = await requestApiDetails(projectId);
@@ -273,10 +273,6 @@ ${blankSpace} */`
       : "";
   }
 
-  const apiTems = ((await apifoxLocalStorage.get())?.tems?.find(item => item.objectType === objectType)?.value || "").split(
-    /\n+----\n+/
-  );
-
   const result: string[] = [];
   const apiTemFields = {
     [ApifoxTemFields.projectId]: projectId,
@@ -301,7 +297,7 @@ export interface ${item.name} ${item.typeStr}
       )
       .join("\n\n")
   } as Record<ApifoxTemFields, string>;
-  for (let apiTem of apiTems) {
+  for (let apiTem of codeTems) {
     result.push(await evalFunction(`{${Object.keys(apiTemFields).join(",")}}`, `return \`${apiTem}\``, apiTemFields));
   }
   return result;
