@@ -293,6 +293,9 @@ onMounted(async () => {
       identification.value = md5(topTitle + cssCode.value).toString();
     }
 
+    // 缩短一下identification
+    identification.value = identification.value.slice(0, 10);
+
     // Load saved state
     const { objectType = "", translateInputs = {}, classNames = {} } = (await codesignLocalStorage.get()) || {};
     classNameInput.value = classNames[identification.value] || "item";
