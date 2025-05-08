@@ -1,9 +1,9 @@
 import { ElMessage } from "element-plus";
 import Controller from "./components/Controller/index.vue";
-import { createAppEl } from "../createAppEl";
+import { createAppEl } from "../utils/createAppEl";
 import { debounce, wait } from "@taozi-chrome-extensions/common/src/utils/global";
-import { RETRY_COUNT, RETRY_DELAY, CUSTOM_EL_CLASS_APIFOX } from "@/constant";
-import { insertEl } from "../insertEl";
+import { TRIGGER_RETRY_COUNT, TRIGGER_RETRY_DELAY } from "@/constant";
+import { insertMountEl } from "../utils/insertMountEl";
 
 /**
  * apifox 注入
@@ -12,6 +12,7 @@ export async function apifoxInject() {
   document.addEventListener(
     "click",
     debounce((e: MouseEvent) => {
+      // 点击api列表
       if (e.target instanceof HTMLDivElement && document.querySelector(".ui-tree-list")?.contains(e.target)) {
         trigger().catch(err => {
           console.error(err);
@@ -29,8 +30,8 @@ export async function apifoxInject() {
 }
 
 async function trigger() {
-  for (let i = 0; i < RETRY_COUNT; i++) {
-    await wait(RETRY_DELAY);
+  for (let i = 0; i < TRIGGER_RETRY_COUNT; i++) {
+    await wait(TRIGGER_RETRY_DELAY);
     const projectId = location.pathname.match(/\/project\/([0-9]+)\/?/)?.[1];
     if (!projectId) {
       continue;
@@ -43,16 +44,18 @@ async function trigger() {
     if (!apiId) {
       continue;
     }
-    const buttonP = onPane.querySelector(".actions-wrap");
-    if (!buttonP) {
+    const actionsWrapEl = onPane.querySelector(".actions-wrap");
+    if (!actionsWrapEl) {
       continue;
     }
-    const mountEl = await insertEl(buttonP, () => buttonP.firstChild as HTMLElement, CUSTOM_EL_CLASS_APIFOX);
+    const mountEl = await insertMountEl(
+      actionsWrapEl,
+      () => actionsWrapEl.firstChild as HTMLElement,
+      "taozi-chrome-extensions-apifox-custom-el-class"
+    );
     if (mountEl) {
       await createAppEl({
-        mountElFunc: el => {
-          mountEl.appendChild(el);
-        },
+        mountEl,
         com: Controller,
         props: {
           projectId,

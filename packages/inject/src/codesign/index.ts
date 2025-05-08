@@ -1,10 +1,10 @@
 import Controller from "./components/Controller/index.vue";
-import { createAppEl } from "../createAppEl";
+import { createAppEl } from "../utils/createAppEl";
 import { getAllSectionNodeBox } from "./getAllSectionNodeBox";
 import { debounce, wait } from "@taozi-chrome-extensions/common/src/utils/global";
 import { ElMessage } from "element-plus";
-import { RETRY_COUNT, RETRY_DELAY, CUSTOM_EL_CLASS_CODESIGN } from "@/constant";
-import { insertEl } from "../insertEl";
+import { TRIGGER_RETRY_COUNT, TRIGGER_RETRY_DELAY } from "@/constant";
+import { insertMountEl } from "../utils/insertMountEl";
 
 /**
  * 代码设计注入
@@ -32,8 +32,8 @@ export function codesignInject() {
 }
 
 async function trigger() {
-  for (let i = 0; i < RETRY_COUNT; i++) {
-    await wait(RETRY_DELAY);
+  for (let i = 0; i < TRIGGER_RETRY_COUNT; i++) {
+    await wait(TRIGGER_RETRY_DELAY);
     const screenInspectorEl = document.querySelector<HTMLDivElement>(".screen-inspector.inspector.expanded");
     if (!screenInspectorEl) {
       continue;
@@ -43,16 +43,14 @@ async function trigger() {
     if (!codeSectionNode) {
       continue;
     }
-    const mountEl = await insertEl(
+    const mountEl = await insertMountEl(
       codeSectionNode.contentEl,
-      () => codeSectionNode.contentEl.firstChild as HTMLElement,
-      CUSTOM_EL_CLASS_CODESIGN
+      () => codeSectionNode.contentEl.firstChild as Element,
+      "taozi-chrome-extensions-codesign-custom-el-class"
     );
     if (mountEl) {
       await createAppEl({
-        mountElFunc: el => {
-          mountEl.appendChild(el);
-        },
+        mountEl,
         com: Controller
       });
       break;
