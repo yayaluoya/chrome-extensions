@@ -1,13 +1,13 @@
 <template>
   <div class="controller">
-    <ElForm :model="{}" :rules="{}" label-width="auto" :show-message="false">
+    <ElForm :model="{}" :rules="{}" label-width="auto" :show-message="false" label-suffix=":">
       <ElFormItem label-position="left" label="项目类型">
         <ElRadioGroup v-model="objectTypeInput" size="small">
           <ElRadioButton v-for="item in OBJECT_TYPE_LIST" :key="item.value" :label="item.label" :value="item.value" />
         </ElRadioGroup>
       </ElFormItem>
       <ElFormItem label-position="left" label="元素类型">
-        <div class="type-item">
+        <ElTag class="type-item" effect="dark" round>
           <ElIcon :size="12" v-if="type === 'div'">
             <Box />
           </ElIcon>
@@ -21,7 +21,7 @@
             <Document />
           </ElIcon>
           {{ ITEM_TYPE_MAP[type] }}
-        </div>
+        </ElTag>
       </ElFormItem>
       <!-- <ElFormItem label-position="top" label="元素ID">
         {{ identification }}
@@ -30,11 +30,11 @@
         <div class="form-item-content">
           <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
             <template #append>
-              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">生成类名</ElButton>
+              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">生成css类名</ElButton>
             </template>
           </ElInput>
           <ElInput v-model="classNameInput" size="small" type="text">
-            <template #prepend> <ElButton size="small">className</ElButton> </template>
+            <template #prepend> <ElButton size="small">css类名</ElButton> </template>
           </ElInput>
         </div>
       </ElFormItem>
@@ -66,7 +66,7 @@ import { computed, onMounted, ref, watch } from "vue";
 import { md5 } from "@taozi-chrome-extensions/common/src/utils/md5";
 import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
-import { ElForm, ElFormItem, ElButton, ElInput, ElRadioGroup, ElRadioButton, ElMessage, ElIcon } from "element-plus";
+import { ElForm, ElFormItem, ElButton, ElInput, ElRadioGroup, ElRadioButton, ElMessage, ElIcon, ElTag } from "element-plus";
 import { Box, Picture, PictureRounded, Document } from "@element-plus/icons-vue";
 import { kebabToCamelCase, camelToKebabCase, toValidVariableName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";

@@ -12,10 +12,21 @@ export const OBJECT_TYPE_LIST = [
 ];
 
 export const CSS_PROP_INCLUDES = {
-  text: ["color", "text-align", "font-family", "font-size", "font-style", "font-weight", "line-height", "letter-spacing"] as (
-    | string
-    | RegExp
-  )[],
+  text: [
+    "color",
+    "text-align",
+    "font-family",
+    "font-size",
+    "font-style",
+    "font-weight",
+    "line-height",
+    "letter-spacing",
+    // 多行省略
+    "display",
+    /^-webkit-/,
+    "overflow",
+    "text-overflow"
+  ] as (string | RegExp)[],
   icon: ["width", "height"] as (string | RegExp)[],
   img: ["width", "height", "box-shadow", "border-radius"] as (string | RegExp)[],
   div: [

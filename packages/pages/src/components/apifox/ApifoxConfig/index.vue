@@ -1,6 +1,6 @@
 <template>
   <div class="apifox-config">
-    <ElForm :model="{}" label-width="auto" :show-message="false">
+    <ElForm :model="{}" label-width="auto" :show-message="false" label-suffix=":">
       <ElFormItem label="响应data字段名">
         <ElInput v-model="responseDataName" clearable />
       </ElFormItem>

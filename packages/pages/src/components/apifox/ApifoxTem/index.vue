@@ -2,7 +2,7 @@
   <div class="apifox">
     <ElTabs v-model="onCodeTemplateId" type="card" editable class="demo-tabs" @edit="handleTabsEdit">
       <ElTabPane v-for="item in codeTemplates" :key="item.id" :label="item.name || '--'" :name="item.id">
-        <ElForm :model="{}" class="items" label-width="auto" :show-message="false">
+        <ElForm :model="{}" class="items" label-width="auto" :show-message="false" label-suffix=":">
           <ElFormItem label="模板名">
             <ElInput v-model="item.name" />
           </ElFormItem>

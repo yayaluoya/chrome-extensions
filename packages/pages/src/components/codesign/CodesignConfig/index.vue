@@ -25,8 +25,8 @@ onMounted(async () => {
 
 <template>
   <div class="baidu-app-config">
-    <ElForm :model="{}" :rules="{}" label-width="auto">
-      <ElFormItem label="去除css字体样式">
+    <ElForm :model="{}" :rules="{}" label-width="auto" label-suffix=":">
+      <ElFormItem label="生成文本css样式时去除字体样式">
         <ElSwitch v-model="config.removeCssFontFamily" />
       </ElFormItem>
     </ElForm>

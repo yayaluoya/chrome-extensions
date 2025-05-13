@@ -20,7 +20,7 @@ onMounted(async () => {
 <template>
   <div class="baidu-app-config">
     <a target="_blank" href="https://dash.cloudflare.com/">cloudflare</a>
-    <ElForm :model="{}" :rules="{}" label-width="auto">
+    <ElForm :model="{}" :rules="{}" label-width="auto" label-suffix=":">
       <ElFormItem label="CFWorker代理地址">
         <ElInput type="text" v-model="proxyUrlInput" />
       </ElFormItem>

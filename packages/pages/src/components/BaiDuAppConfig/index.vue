@@ -23,7 +23,7 @@ onMounted(async () => {
 <template>
   <div class="baidu-app-config">
     <a target="_blank" href="https://fanyi-api.baidu.com/manage/developer">百度翻译开发者中心</a>
-    <ElForm :model="{}" :rules="{}" label-width="auto">
+    <ElForm :model="{}" :rules="{}" label-width="auto" label-suffix=":">
       <ElFormItem label="appId">
         <ElInput type="text" v-model="appIdInput" />
       </ElFormItem>
