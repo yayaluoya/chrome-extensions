@@ -9,7 +9,7 @@ on:
       - "v*"
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
 
     strategy:
@@ -32,12 +32,6 @@ jobs:
       - name: build-package
         run: pnpm run build-package
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
       - name: Package extensions
         run: zip -r taozi-chrome-extensions.zip ./extensions
 
