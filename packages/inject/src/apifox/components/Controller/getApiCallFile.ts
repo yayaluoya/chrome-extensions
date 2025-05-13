@@ -1,4 +1,4 @@
-import { handleVarName1 } from "@taozi-chrome-extensions/common/src/utils/global";
+import { kebabToCamelCase, toValidVariableName } from "@taozi-chrome-extensions/common/src/utils/global";
 import { requestApiDetails, requestDataSchemas } from "../../api/apifox";
 import { ApiMethod, ValueType, type ApiDetail, type Type } from "../../api/type";
 import { apifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
@@ -15,12 +15,12 @@ type DependencyInterfacesType = {
 export async function getApiCallFile({
   projectId,
   apiId,
-  objectType,
+  codeTems,
   codeOp = { indent: "  " }
 }: {
   projectId: string;
   apiId: number;
-  objectType: string;
+  codeTems: string[];
   codeOp?: { indent?: string };
 }) {
   const ApiDetails = await requestApiDetails(projectId);
@@ -49,9 +49,9 @@ export async function getApiCallFile({
       path: apiPath,
       parameters: { query = [] },
       requestBody,
-      responses: responsess
+      responses: responsesList
     } = apiDetail;
-    const responses = responsess.find(item => [200, 201, 204].includes(item.code));
+    const responses = responsesList.find(item => [200, 201, 204].includes(item.code));
 
     const queryTypeStr =
       query.length > 0
@@ -100,7 +100,8 @@ export async function getApiCallFile({
         const schemaId = jsonSchema.$ref.match(/^#\/definitions\/([0-9]+)$/)?.[1] || "";
         jsonSchema = DataSchemas.find(item => item.id === parseInt(schemaId))?.jsonSchema;
       }
-      jsonSchema = jsonSchema?.properties?.["data"];
+      const responseDataName = (await apifoxLocalStorage.get())?.responseDataName || "";
+      jsonSchema = responseDataName ? jsonSchema?.properties?.[responseDataName] : jsonSchema;
       if (jsonSchema) {
         responsesTypeStr =
           getType({
@@ -109,8 +110,8 @@ export async function getApiCallFile({
           })?.typeStr || responsesTypeStr;
       }
     }
-    const apiCallFunName = handleVarName1(
-      `request${(apiPath.match(/(\w+)$/)?.[1] || "").replace(/^[a-z]/, _ => _.toLocaleUpperCase())}`
+    const apiCallFunName = kebabToCamelCase(
+      `request${kebabToCamelCase(toValidVariableName(apiPath.match(/(\w+)$/)?.[1] || ""), true)}`
     );
     const funParamTypeStr = apiMethod === ApiMethod.Get ? queryTypeStr : requestBodyTypeStr;
 
@@ -172,7 +173,7 @@ export async function getApiCallFile({
     // 对象
     else if (type.properties) {
       const properties = type.properties;
-      const propertieTypes = Object.keys(properties).map(key => ({
+      const propertiesTypes = Object.keys(properties).map(key => ({
         key,
         t: getType({
           type: properties[key],
@@ -180,13 +181,13 @@ export async function getApiCallFile({
           layer: layer + 1
         })
       }));
-      if (propertieTypes.length <= 0) {
+      if (propertiesTypes.length <= 0) {
         return {
           typeStr: "{ [key: string]: any }"
         };
       }
       return {
-        typeStr: `{\n${propertieTypes
+        typeStr: `{\n${propertiesTypes
           .map(({ key, t }) => {
             return getTypeProp({
               name: key,
@@ -221,7 +222,7 @@ export async function getApiCallFile({
         return item;
       });
       return {
-        typeStr: types.join("|")
+        typeStr: types.join(" | ")
       };
     }
   }
@@ -272,10 +273,6 @@ ${blankSpace} */`
       : "";
   }
 
-  const apiTems = ((await apifoxLocalStorage.get())?.tems?.find(item => item.objectType === objectType)?.value || "").split(
-    /\n+----\n+/
-  );
-
   const result: string[] = [];
   const apiTemFields = {
     [ApifoxTemFields.projectId]: projectId,
@@ -300,7 +297,7 @@ export interface ${item.name} ${item.typeStr}
       )
       .join("\n\n")
   } as Record<ApifoxTemFields, string>;
-  for (let apiTem of apiTems) {
+  for (let apiTem of codeTems) {
     result.push(await evalFunction(`{${Object.keys(apiTemFields).join(",")}}`, `return \`${apiTem}\``, apiTemFields));
   }
   return result;

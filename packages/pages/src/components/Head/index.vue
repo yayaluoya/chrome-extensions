@@ -20,7 +20,7 @@
     color: #1a1a1a;
     text-align: center;
     font-size: 14px;
-    font-weight: 500;
+    font-weight: bold;
     line-height: normal;
   }
 }

@@ -4,10 +4,17 @@ export interface CodesignLocalStorage {
   objectType: string;
   translateInputs: Record<string, string>;
   classNames: Record<string, string>;
+  iconUrls: Record<string, string>;
+  config: {
+    /** 是否去除css的字体 */
+    removeCssFontFamily?: boolean;
+  };
 }
 
 export const codesignLocalStorage = useLocalStorage<string, CodesignLocalStorage>("codesign-local-storage", {
   objectType: "",
   translateInputs: {},
-  classNames: {}
+  classNames: {},
+  iconUrls: {},
+  config: {}
 });

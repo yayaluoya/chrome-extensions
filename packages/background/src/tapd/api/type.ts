@@ -16,6 +16,7 @@ export interface MyWorktableCommonRes {
 
 export interface MyWorktableByPage {
   workitem_list: {
+    name: string;
     title: string;
     owner: string;
     project_name: string;

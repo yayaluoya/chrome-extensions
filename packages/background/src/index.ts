@@ -1,6 +1,6 @@
 import { AllUrlsMatches } from "./constant/const";
 import { startServer } from "./startServer";
-import { papdTask } from "./tapd";
+import { tapdTask } from "./tapd";
 
 chrome.scripting.registerContentScripts([
   {
@@ -15,6 +15,6 @@ chrome.scripting.registerContentScripts([
 startServer();
 
 setInterval(() => {
-  papdTask();
-}, 1000 * 60);
-papdTask();
+  tapdTask();
+}, 1000 * 10);
+tapdTask();

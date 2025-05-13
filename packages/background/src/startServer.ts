@@ -1,13 +1,13 @@
-import { onMessage, type MessageReq } from "@taozi-chrome-extensions/common/src/message";
+import { addMessageServer, type MessageReq } from "@taozi-chrome-extensions/common/src/messageServer";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
 import { requestBaiduTranslate } from "./api/baiduTranslate";
-import { papdTask } from "./tapd";
+import { tapdTask } from "./tapd";
 
 export function startServer() {
-  onMessage(MessageType.baiduTranslate, (req: MessageReq<string>, sender, sendResponse) => {
+  addMessageServer(MessageType.BaiduTranslate, (req: MessageReq<string>, sender, sendResponse) => {
     sendResponse(requestBaiduTranslate(req.value || ""));
   });
-  onMessage(MessageType.popupOpen, (req, sender, sendResponse) => {
-    sendResponse(papdTask());
+  addMessageServer(MessageType.PopupOpen, (req, sender, sendResponse) => {
+    sendResponse(tapdTask());
   });
 }

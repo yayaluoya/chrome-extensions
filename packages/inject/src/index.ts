@@ -1,6 +1,6 @@
 import { apifoxInject } from "./apifox";
 import { codesignInject } from "./codesign/index";
-import { papdInject } from "./tapd";
+import { tapdInject } from "./tapd";
 
 switch (location.hostname) {
   case "codesign.qq.com":
@@ -10,6 +10,6 @@ switch (location.hostname) {
     apifoxInject();
     break;
   case "www.tapd.cn":
-    papdInject();
+    tapdInject();
     break;
 }

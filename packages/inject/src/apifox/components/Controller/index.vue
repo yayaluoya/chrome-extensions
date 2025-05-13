@@ -3,12 +3,13 @@
     <ElButton type="primary" @click="handleGenCode" :loading="genCodeLoading">生成代码</ElButton>
     <ElDialog v-model="dialogVisible" width="800" title="api调用代码" append-to-body>
       <div class="controller-dialog">
-        <ElTabs v-model="onCodeType" @tab-change="onCodeTypeChange">
-          <ElTabPane v-for="(item, index) in codeTypes" :key="index" :label="item.objectType" :name="item.objectType" />
+        <ElTabs v-model="onCodeTemplateId" type="card" @tab-change="onCodeTemplateIdChange">
+          <ElTabPane v-for="(item, index) in codeTemplates" :key="index" :label="item.name || '--'" :name="item.id">
+            <div class="codes">
+              <Code v-for="(code, index) in codes?.filter(Boolean)" :key="index" :code="code" type="ts" />
+            </div>
+          </ElTabPane>
         </ElTabs>
-        <div class="codes">
-          <Code v-for="(code, index) in codes?.filter(Boolean)" :key="index" :code="code" type="ts" />
-        </div>
       </div>
     </ElDialog>
   </div>
@@ -28,13 +29,13 @@ const props = defineProps<{
 const dialogVisible = ref(false);
 
 const genCodeLoading = ref(false);
-const codeTypes = ref<ApifoxLocalStorage["tems"]>([]);
-const onCodeType = ref<string>("");
+const codeTemplates = ref<ApifoxLocalStorage["codeTemplates"]>([]);
+const onCodeTemplateId = ref<string>("");
 const codes = ref<string[]>();
 
-const onCodeTypeChange = () => {
+const onCodeTemplateIdChange = () => {
   apifoxLocalStorage.edit(v => {
-    v.onObjectType = onCodeType.value;
+    v.onCodeTemplateId = onCodeTemplateId.value;
   });
   genCode();
 };
@@ -42,9 +43,9 @@ const onCodeTypeChange = () => {
 const handleGenCode = async () => {
   genCodeLoading.value = true;
   try {
-    codeTypes.value = (await apifoxLocalStorage.get())?.tems || [];
-    onCodeType.value = (await apifoxLocalStorage.get())?.onObjectType || codeTypes.value[0]?.objectType || "";
-    if (codeTypes.value.length <= 0) {
+    codeTemplates.value = (await apifoxLocalStorage.get())?.codeTemplates || [];
+    onCodeTemplateId.value = (await apifoxLocalStorage.get())?.onCodeTemplateId || codeTemplates.value[0]?.id || "";
+    if (codeTemplates.value.length <= 0) {
       ElMessage({
         message: "请先配置api模板",
         type: "error"
@@ -65,14 +66,17 @@ const handleGenCode = async () => {
 };
 
 const genCode = async () => {
-  if (!onCodeType.value) {
+  if (!onCodeTemplateId.value) {
     return;
   }
   codes.value =
     (await getApiCallFile({
       projectId: props.projectId,
       apiId: props.apiId,
-      objectType: onCodeType.value
+      codeTems: ((await apifoxLocalStorage.get())?.codeTemplates?.find(item => item.id === onCodeTemplateId.value)?.value || "")
+        .split(/\n+----\n+/)
+        .map(item => item.trim())
+        .filter(Boolean)
     })) || [];
 };
 </script>
@@ -84,7 +88,7 @@ const genCode = async () => {
 .controller-dialog {
   display: flex;
   flex-direction: column;
-  > .codes {
+  .codes {
     display: flex;
     flex-direction: column;
     gap: 6px;

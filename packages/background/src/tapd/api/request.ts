@@ -1,3 +1,5 @@
+import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
+
 const tapdOrigin = "https://www.tapd.cn";
 
 /**
@@ -8,6 +10,11 @@ export async function request<T>(url: string, op: RequestInit): Promise<T> {
   if (!op.headers) {
     op.headers = {};
   }
+  const cfWorkerUrl = (await configLocalStorage.get())?.cfWorkerUrl;
+  if (!cfWorkerUrl) {
+    throw new Error("cfWorkerUrl is not set");
+  }
+  url = `${cfWorkerUrl}${url}`;
   Object.assign(op.headers, {
     "x-target": tapdOrigin,
     "x-cookie": (
@@ -29,7 +36,11 @@ export async function request<T>(url: string, op: RequestInit): Promise<T> {
     });
 }
 
-export function getDscToken() {
+/**
+ * 获取dsc-token
+ * @returns
+ */
+export const getDscToken = () => {
   return chrome.cookies
     .get({
       url: tapdOrigin,
@@ -38,4 +49,4 @@ export function getDscToken() {
     .then(c => {
       return c?.value || "";
     });
-}
+};

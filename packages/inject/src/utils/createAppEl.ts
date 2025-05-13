@@ -2,16 +2,19 @@ import "element-plus/dist/index.css";
 import { createApp, h, type DefineSetupFnComponent } from "vue";
 
 export async function createAppEl<T extends DefineSetupFnComponent<any>>({
-  handleEl,
+  mountEl,
   com,
   props
 }: {
-  handleEl: (el: HTMLDivElement) => void;
+  mountEl: HTMLElement;
   com: T;
   props?: T extends DefineSetupFnComponent<infer P> ? P : never;
 }) {
+  if (!document.body.contains(mountEl)) {
+    throw new Error("mountEl is not in the body");
+  }
   const el = document.createElement("div");
-  handleEl(el);
+  mountEl.appendChild(el);
   const shadowRoot = el.attachShadow({ mode: "open" });
   const html = document.createElement("html");
   shadowRoot.appendChild(html);
@@ -28,11 +31,11 @@ export async function createAppEl<T extends DefineSetupFnComponent<any>>({
     link.addEventListener("load", () => resolve());
     head.appendChild(link);
   });
-  const mountEl = document.createElement("div");
-  body.appendChild(mountEl);
+  const vueMountEl = document.createElement("div");
+  body.appendChild(vueMountEl);
   createApp({
     render() {
       return h(com, props);
     }
-  }).mount(mountEl);
+  }).mount(vueMountEl);
 }

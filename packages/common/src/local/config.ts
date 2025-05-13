@@ -5,11 +5,14 @@ export interface ConfigLocalStorage {
   baiduKey: string;
   popupActiveTab: string;
   genVarNameInput: string;
+  /** cf worker 地址 */
+  cfWorkerUrl: string;
 }
 
 export const configLocalStorage = useLocalStorage<string, ConfigLocalStorage>("config-local-storage", {
   popupActiveTab: "",
   baiduAppId: "",
   baiduKey: "",
-  genVarNameInput: ""
+  genVarNameInput: "",
+  cfWorkerUrl: ""
 });

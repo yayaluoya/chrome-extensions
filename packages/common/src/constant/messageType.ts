@@ -1,5 +1,6 @@
 export enum MessageType {
   /** 百度翻译 */
-  baiduTranslate = "baidu-translate",
-  popupOpen = "actionOpen"
+  BaiduTranslate = "baidu-translate",
+  /** popup打开 */
+  PopupOpen = "popup-open"
 }

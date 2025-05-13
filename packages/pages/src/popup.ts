@@ -1,4 +1,4 @@
-import { sendMessage } from "@taozi-chrome-extensions/common/src/message";
+import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
 import App from "./AppPopup.vue";
 import { createApp } from "./createApp";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
@@ -6,5 +6,5 @@ import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messag
 createApp(App);
 
 sendMessage({
-  type: MessageType.popupOpen
+  type: MessageType.PopupOpen
 });

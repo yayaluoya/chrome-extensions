@@ -17,7 +17,15 @@
 
 ## 功能
 
+### 快速生成变量名
+
+因为用到了百度翻译的 api 所以需要配置百度翻译 api 的一些东西
+
+![](./assets/Snipaste_2025-05-13_16-57-49.png)
+
 ### 根据 codesign.qq.com 里面的样式快速生成需要的代码，并过滤掉多余的 css 样式
+
+这个功能也要配置百度翻译 api
 
 ![](./assets/Snipaste_2025-04-27_13-36-43.png)
 
@@ -34,3 +42,11 @@
 就能生成 api 调用代码了
 
 ![](./assets/Snipaste_2025-04-27_13-51-53.png)
+
+### 实时显示 tapd 代办的事项
+
+这个功能需要自己去部署 cloudflare worker，代码在 packages/cf-worker
+
+然后把访问地址配置到 CFWorker 代理地址中才行
+
+![](./assets/Snipaste_2025-05-13_16-54-32.png)

@@ -1,4 +1,4 @@
-import { md5 } from "../md5";
+import { md5 } from "../utils/md5";
 
 export function evalFunction(formParameter: string, content: string, ...arg: any[]) {
   return new Promise<string>((resolve, reject) => {
