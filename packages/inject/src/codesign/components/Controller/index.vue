@@ -26,21 +26,24 @@
       <!-- <ElFormItem label-position="top" label="元素ID">
         {{ identification }}
       </ElFormItem> -->
-      <ElFormItem label-position="top" label="className">
+      <ElFormItem label-position="top" label="注释">
+        <ElInput v-model="annotationInput" size="small" type="text" />
+      </ElFormItem>
+      <ElFormItem label-position="top" label="元素类名">
         <div class="form-item-content">
           <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
             <template #append>
-              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">生成css类名</ElButton>
+              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">生成类名</ElButton>
             </template>
           </ElInput>
           <ElInput v-model="classNameInput" size="small" type="text">
-            <template #prepend> <ElButton size="small">css类名</ElButton> </template>
+            <template #prepend> <ElButton size="small">类名</ElButton> </template>
           </ElInput>
         </div>
       </ElFormItem>
       <ElFormItem label-position="top" label="vue-template" v-if="vueTemplateList.length > 0">
         <div class="form-item-content">
-          <Code v-for="(item, index) in vueTemplateList" :key="index" :code="item" type="vue" />
+          <Code v-for="(item, index) in vueTemplateList" :key="index" :code="getAnnotation('template') + item" type="vue" />
         </div>
       </ElFormItem>
       <ElFormItem label-position="top" label="js" v-if="jsList.length > 0">
@@ -48,12 +51,12 @@
           <ElInput v-if="type === 'icon'" size="small" v-model="iconUrlInput" type="text">
             <template #prepend> <span>iconUrl</span> </template>
           </ElInput>
-          <Code v-for="(item, index) in jsList" :key="index" :code="item" type="js" />
+          <Code v-for="(item, index) in jsList" :key="index" :code="getAnnotation('js') + item" type="js" />
         </div>
       </ElFormItem>
       <ElFormItem label-position="top" label="css" v-if="cssList.length > 0">
         <div class="form-item-content">
-          <Code v-for="(item, index) in cssList" :key="index" :code="item" type="css" />
+          <Code v-for="(item, index) in cssList" :key="index" :code="getAnnotation('css') + item" type="css" />
         </div>
       </ElFormItem>
     </ElForm>
@@ -88,6 +91,7 @@ const classNameInput = ref("");
 const translateLoading = ref(false);
 const iconUrlInput = ref("");
 const objectTypeInput = ref<ObjectType>("pc");
+const annotationInput = ref("");
 
 const config = ref<CodesignLocalStorage["config"]>({
   removeCssFontFamily: false
@@ -110,12 +114,13 @@ const cssRules = computed<CssRulesType[]>(() => {
   });
 });
 
-watch([classNameInput, translateInput, objectTypeInput, iconUrlInput], () => {
+watch([classNameInput, translateInput, objectTypeInput, iconUrlInput, annotationInput], () => {
   codesignLocalStorage.edit(v => {
     v.objectType = objectTypeInput.value;
     v.classNames[identification.value] = classNameInput.value;
     v.translateInputs[identification.value] = translateInput.value;
     v.iconUrls[identification.value] = iconUrlInput.value;
+    v.annotations[identification.value] = annotationInput.value;
   });
 });
 
@@ -139,6 +144,24 @@ const handleTranslate = async () => {
     });
   } finally {
     translateLoading.value = false;
+  }
+};
+
+const getAnnotation = (type: "template" | "js" | "css") => {
+  if (!annotationInput.value) return "";
+  switch (type) {
+    case "template": {
+      return `<!-- ${annotationInput.value} -->\n`;
+    }
+    case "js": {
+      return `/** ${annotationInput.value} */\n`;
+    }
+    case "css": {
+      return `// ${annotationInput.value}\n`;
+    }
+    default: {
+      return "";
+    }
   }
 };
 
@@ -288,12 +311,14 @@ onMounted(async () => {
       translateInputs = {},
       classNames = {},
       iconUrls = {},
+      annotations = {},
       config: config2 = {}
     } = (await codesignLocalStorage.get()) || {};
     classNameInput.value = classNames[identification.value] || "item";
     translateInput.value = translateInputs[identification.value] || textContent.value;
     objectTypeInput.value = (objectType as ObjectType) || "pc";
     iconUrlInput.value = iconUrls[identification.value] || "";
+    annotationInput.value = annotations[identification.value] || "";
     config.value = config2 || {};
   } catch (e) {
     console.error("Error in onMounted:", e);
