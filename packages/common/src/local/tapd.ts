@@ -9,7 +9,7 @@ export interface TapdLocalStorage {
   viewConfig: {
     current_tab: string;
   };
-  bugList: {
+  todoList: {
     title: string;
     detail_url: string;
     priority_name: string;
@@ -28,5 +28,5 @@ export const tapdLocalStorage = useLocalStorage<string, TapdLocalStorage>("tapd-
   viewConfig: {
     current_tab: ""
   },
-  bugList: []
+  todoList: []
 });

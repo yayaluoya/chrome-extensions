@@ -15,7 +15,7 @@ export async function tapdTask() {
         v.workitemCount.task = parseInt(data.workitem_count?.task || "0");
         v.workitemCount.bug = parseInt(data.workitem_count?.bug || "0");
         v.viewConfig.current_tab = data.view_config?.current_tab || "";
-        v.bugList = d.workitem_list.map(item => {
+        v.todoList = d.workitem_list.map(item => {
           return {
             title: item.title || item.name,
             detail_url: item.detail_url,

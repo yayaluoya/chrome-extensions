@@ -43,26 +43,13 @@
         </ElStatistic>
       </template>
     </div>
-    <ElTable class="bug-list" :data="tapdInfo?.bugList || []" v-if="tapdInfo?.bugList && tapdInfo.bugList.length > 0">
-      <ElTableColumn prop="title" label="标题">
-        <template #default="{ row }">
-          <div style="display: flex; align-items: center">
-            <ElTag style="margin-right: 6px" effect="dark" round :type="/^bug$/i.test(row.entity_type) ? 'danger' : 'info'">
-              {{ row.entity_type.toLocaleUpperCase() }}
-            </ElTag>
-            <span style="cursor: pointer" @click="openTab(row.detail_url)">{{ row.title }}</span>
-          </div>
-        </template>
-      </ElTableColumn>
-      <ElTableColumn prop="priority_name" width="120" label="优先级" />
-    </ElTable>
   </div>
 </template>
 
 <script setup lang="ts">
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { computed, onMounted, onUnmounted, ref } from "vue";
-import { ElAlert, ElStatistic, ElTable, ElTableColumn, ElDivider, ElTag, ElLoading } from "element-plus";
+import { ElAlert, ElStatistic } from "element-plus";
 import dayjs from "dayjs";
 
 const tapdInfo = ref<TapdLocalStorage>();
@@ -105,27 +92,11 @@ const current_tab = computed(() => {
   );
 });
 
-const openTab = async (url: string) => {
-  const loadingInstance = ElLoading.service({ fullscreen: true });
-  try {
-    url = await fetch(url).then(res => res.url);
-    const [targetTab] = await chrome.tabs.query({
-      url
-    });
-    if (targetTab) {
-      chrome.tabs.update(targetTab.id!, { active: true });
-    } else {
-      chrome.tabs.create({ url });
-    }
-  } finally {
-    loadingInstance.close();
-  }
-};
-
 onMounted(() => {
   t = setInterval(getTapdInfo, 50);
   getTapdInfo();
 });
+
 onUnmounted(() => {
   t && clearInterval(t);
 });
@@ -155,11 +126,6 @@ onUnmounted(() => {
     flex-direction: row;
     align-items: center;
     justify-content: space-evenly;
-  }
-  .bug-list {
-    border: 1px solid #dcdfe6;
-    border-radius: 12px;
-    margin-top: 12px;
   }
 }
 </style>

@@ -6,14 +6,16 @@ import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
 import ApifoxConfig from "./components/apifox/ApifoxConfig/index.vue";
 import ApifoxTem from "./components/apifox/ApifoxTem/index.vue";
-import Tapd from "./components/Tapd/index.vue";
+import TapdBoard from "./components/Tapd/board.vue";
 import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
-import CodesignRecentViewed from "./components/codesign/CodesignRecentViewed/index.vue";
+import CodesignRecentViewed from "./components/codesign/recentViewed.vue";
 import CFWorkerConfig from "./components/CFWorkerConfig/index.vue";
-import CodesignConfig from "./components/codesign/CodesignConfig/index.vue";
+import CodesignConfig from "./components/codesign/config.vue";
+import TapdTodo from "./components/Tapd/todo.vue";
 
 enum TabType {
   GenVarName = "GenVarName",
+  Tapd = "Tapd",
   Codesign = "Codesign",
   Apifox = "Apifox",
   Config = "Config"
@@ -27,6 +29,10 @@ const tabs = ref<
   {
     label: "生成变量名",
     value: TabType.GenVarName
+  },
+  {
+    label: "Tapd",
+    value: TabType.Tapd
   },
   {
     label: "Codesign",
@@ -60,13 +66,22 @@ onMounted(async () => {
       <Head />
     </div>
     <div class="tapd">
-      <Tapd />
+      <TapdBoard />
     </div>
     <Tabs v-model:value="activeTab" :list="tabs" class="tabs" />
     <div class="content-container">
       <template v-if="activeTab === TabType.GenVarName">
         <div class="content">
           <GenVarName />
+        </div>
+      </template>
+      <template v-if="activeTab === TabType.Tapd">
+        <div class="title">
+          <div class="left"></div>
+          <span>代办</span>
+        </div>
+        <div class="content">
+          <TapdTodo />
         </div>
       </template>
       <template v-else-if="activeTab === TabType.Codesign">
