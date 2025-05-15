@@ -110,6 +110,7 @@ onUnmounted(() => {
   position: relative;
   padding: 12px;
   box-sizing: border-box;
+  gap: 12px;
 
   > .logo {
     height: 27px;
@@ -118,9 +119,6 @@ onUnmounted(() => {
     right: 12px;
   }
 
-  .alert {
-    margin-bottom: 12px;
-  }
   .board {
     display: flex;
     flex-direction: row;

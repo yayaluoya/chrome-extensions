@@ -13,13 +13,14 @@
       </ElTableColumn>
       <ElTableColumn prop="priority_name" width="120" label="优先级" />
     </ElTable>
+    <ElEmpty v-else description="暂无代办" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { onMounted, onUnmounted, ref } from "vue";
-import { ElTable, ElTableColumn, ElTag, ElLoading } from "element-plus";
+import { ElTable, ElTableColumn, ElTag, ElLoading, ElEmpty } from "element-plus";
 
 const tapdInfo = ref<TapdLocalStorage>();
 
@@ -60,10 +61,5 @@ onUnmounted(() => {
 .tapd-todo {
   display: flex;
   flex-direction: column;
-  .bug-list {
-    border: 1px solid #dcdfe6;
-    border-radius: 12px;
-    margin-top: 12px;
-  }
 }
 </style>

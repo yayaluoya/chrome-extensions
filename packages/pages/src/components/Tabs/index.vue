@@ -1,3 +1,22 @@
+<template>
+  <div class="tabs_" ref="tabsRef">
+    <div
+      v-for="item in list"
+      :key="item.value"
+      class="item"
+      :class="{
+        on: value === item.value
+      }"
+      @click="itemClick(item.value)"
+    >
+      <span class="label" v-if="!item.slot">
+        {{ item.label }}
+      </span>
+      <slot v-if="item.slot" :name="item.slot" :item="item" :on="value === item.value"> 插槽内容 </slot>
+    </div>
+  </div>
+</template>
+
 <script lang="ts" setup>
 const props = defineProps<{
   list: {
@@ -21,25 +40,6 @@ const itemClick = (value: string) => {
   emit("change", value);
 };
 </script>
-
-<template>
-  <div class="tabs_" ref="tabsRef">
-    <div
-      v-for="item in list"
-      :key="item.value"
-      class="item"
-      :class="{
-        on: value === item.value
-      }"
-      @click="itemClick(item.value)"
-    >
-      <span class="label" v-if="!item.slot">
-        {{ item.label }}
-      </span>
-      <slot v-if="item.slot" :name="item.slot" :item="item" :on="value === item.value"> 插槽内容 </slot>
-    </div>
-  </div>
-</template>
 
 <style scoped lang="scss">
 .tabs_ {

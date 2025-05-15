@@ -1,6 +1,21 @@
+<template>
+  <div class="baidu-app-config">
+    <ElAlert title="可以快速通过cloudflare部署一个代理服务" type="info" :closable="false" />
+    <a target="_blank" href="https://dash.cloudflare.com/">cloudflare官网</a>
+    <a target="_blank" href="https://github.com/yayaluoya/taozi-chrome-extensions/tree/master/packages/cf-worker">
+      cloudflare worker代码
+    </a>
+    <ElForm :model="{}" :rules="{}" label-width="auto" label-suffix=":">
+      <ElFormItem label="Api代理地址">
+        <ElInput type="text" v-model="proxyUrlInput" />
+      </ElFormItem>
+    </ElForm>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { ElInput, ElForm, ElFormItem } from "element-plus";
+import { ElInput, ElForm, ElFormItem, ElAlert } from "element-plus";
 import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
 
 const proxyUrlInput = ref("");
@@ -17,23 +32,10 @@ onMounted(async () => {
 });
 </script>
 
-<template>
-  <div class="baidu-app-config">
-    <a target="_blank" href="https://dash.cloudflare.com/">cloudflare</a>
-    <ElForm :model="{}" :rules="{}" label-width="auto" label-suffix=":">
-      <ElFormItem label="CFWorker代理地址">
-        <ElInput type="text" v-model="proxyUrlInput" />
-      </ElFormItem>
-    </ElForm>
-  </div>
-</template>
-
 <style lang="scss" scoped>
 .baidu-app-config {
   display: flex;
   flex-direction: column;
-  > a {
-    margin-bottom: 12px;
-  }
+  gap: 12px;
 }
 </style>

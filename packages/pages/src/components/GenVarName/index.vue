@@ -1,6 +1,27 @@
+<template>
+  <div class="gen-var-name">
+    <ElInput type="text" v-model="input" @keydown.enter="handleClick" placeholder="请输入...">
+      <template #append>
+        <ElButton @click="handleClick" :loading="loading">确定</ElButton>
+      </template>
+    </ElInput>
+    <ElSkeleton v-if="loading" :rows="3" animated />
+    <template v-else-if="results.length > 0">
+      <div class="results-container">
+        <div v-for="(result, index) in results" :key="index" class="result-group">
+          <span v-for="(value, key) in result" :key="key" class="try-result" @click="handleCodeItem(value)">
+            {{ value }}
+          </span>
+        </div>
+      </div>
+    </template>
+    <ElEmpty v-else description="暂无数据" />
+  </div>
+</template>
+
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
-import { ElInput, ElButton, ElMessage } from "element-plus";
+import { ElInput, ElButton, ElMessage, ElEmpty, ElSkeleton } from "element-plus";
 import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
 import { kebabToCamelCase, camelToKebabCase, toValidVariableName } from "@taozi-chrome-extensions/common/src/utils/global";
@@ -28,7 +49,7 @@ watch(input, () => {
 // Methods
 const handleClick = async () => {
   if (loading.value || !input.value.trim()) return;
-
+  results.value = [];
   loading.value = true;
   try {
     const res = await sendMessage<string>({
@@ -83,25 +104,6 @@ onMounted(async () => {
   }
 });
 </script>
-
-<template>
-  <div class="gen-var-name">
-    <ElInput type="text" v-model="input" @keydown.enter="handleClick" placeholder="请输入...">
-      <template #append>
-        <ElButton @click="handleClick" :loading="loading">确定</ElButton>
-      </template>
-    </ElInput>
-    <template v-if="results.length > 0">
-      <div class="results-container">
-        <div v-for="(result, index) in results" :key="index" class="result-group">
-          <span v-for="(value, key) in result" :key="key" class="try-result" @click="handleCodeItem(value)">
-            {{ value }}
-          </span>
-        </div>
-      </div>
-    </template>
-  </div>
-</template>
 
 <style lang="scss" scoped>
 .gen-var-name {

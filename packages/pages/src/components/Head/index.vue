@@ -11,10 +11,10 @@
   display: flex;
   flex-direction: row;
   align-items: center;
+  gap: 6px;
   > img {
     width: 20px;
     height: 20px;
-    margin-right: 4px;
   }
   > span {
     color: #1a1a1a;

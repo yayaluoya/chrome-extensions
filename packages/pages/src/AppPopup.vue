@@ -66,7 +66,13 @@ onMounted(async () => {
       <Head />
     </div>
     <div class="tapd">
-      <TapdBoard />
+      <TapdBoard
+        @click="
+          () => {
+            activeTab = TabType.Tapd;
+          }
+        "
+      />
     </div>
     <Tabs v-model:value="activeTab" :list="tabs" class="tabs" />
     <div class="content-container">
@@ -78,7 +84,7 @@ onMounted(async () => {
       <template v-if="activeTab === TabType.Tapd">
         <div class="title">
           <div class="left"></div>
-          <span>代办</span>
+          <span>待办</span>
         </div>
         <div class="content">
           <TapdTodo />
@@ -119,7 +125,7 @@ onMounted(async () => {
       <template v-else-if="activeTab === TabType.Config">
         <div class="title">
           <div class="left"></div>
-          <span>CFWorker配置</span>
+          <span>代理服务配置</span>
         </div>
         <div class="content">
           <CFWorkerConfig />
@@ -140,7 +146,7 @@ onMounted(async () => {
 .popup {
   display: flex;
   flex-direction: column;
-  width: 800px;
+  width: 750px;
   > .tabs {
     --color: #666666;
     --on-color: #409eff;

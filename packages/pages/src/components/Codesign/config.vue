@@ -1,3 +1,13 @@
+<template>
+  <div class="baidu-app-config">
+    <ElForm :model="{}" :rules="{}" label-width="auto" label-suffix=":">
+      <ElFormItem label="生成文本css样式时去除字体样式">
+        <ElSwitch v-model="config.removeCssFontFamily" />
+      </ElFormItem>
+    </ElForm>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { onMounted, ref, watch } from "vue";
 import { ElForm, ElFormItem, ElSwitch } from "element-plus";
@@ -22,16 +32,6 @@ onMounted(async () => {
   config.value = config2 || {};
 });
 </script>
-
-<template>
-  <div class="baidu-app-config">
-    <ElForm :model="{}" :rules="{}" label-width="auto" label-suffix=":">
-      <ElFormItem label="生成文本css样式时去除字体样式">
-        <ElSwitch v-model="config.removeCssFontFamily" />
-      </ElFormItem>
-    </ElForm>
-  </div>
-</template>
 
 <style lang="scss" scoped>
 .baidu-app-config {

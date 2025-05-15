@@ -1,7 +1,7 @@
 <template>
   <div class="apifox">
     <ElTabs v-model="onCodeTemplateId" type="card" editable class="demo-tabs" @edit="handleTabsEdit">
-      <ElTabPane v-for="item in codeTemplates" :key="item.id" :label="item.name || '--'" :name="item.id">
+      <ElTabPane v-for="item in codeTemplates" :key="item.id" :label="item.name" :name="item.id">
         <ElForm :model="{}" class="items" label-width="auto" :show-message="false" label-suffix=":">
           <ElFormItem label="模板名">
             <ElInput v-model="item.name" />
@@ -86,7 +86,7 @@ const handleDeleteTemplate = () => {
 
 const handleTabsEdit = (templateId: TabPaneName | undefined, action: "remove" | "add") => {
   if (action === "add") {
-    codeTemplates.value.push({ id: md5(Date.now() + Math.random()), name: "", value: "" });
+    codeTemplates.value.push({ id: md5(Date.now() + Math.random()), name: "模板" + codeTemplates.value.length + 1, value: "" });
     if (!onCodeTemplateId.value) {
       onCodeTemplateId.value = codeTemplates.value[0].id;
     }
@@ -113,12 +113,12 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 12px;
   > span {
     color: #1f2024;
     font-size: 14px;
     font-weight: 700;
     line-height: 22px;
-    margin-bottom: 12px;
   }
 }
 </style>

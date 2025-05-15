@@ -22,6 +22,7 @@
     <ElEmpty v-if="!loading && list.length <= 0" description="暂无最近浏览" />
   </div>
 </template>
+
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
 import { requestUser, requestRecentViewed } from "./api";
@@ -63,6 +64,7 @@ const handleClick = async (item: RecentViewedItem) => {
   }
 };
 </script>
+
 <style lang="scss" scoped>
 .codesign-recent-viewed {
   display: flex;
