@@ -4,13 +4,13 @@ import BaiDuAppConfig from "./components/BaiDuAppConfig/index.vue";
 import GenVarName from "./components/GenVarName/index.vue";
 import Head from "./components/Head/index.vue";
 import Tabs from "./components/Tabs/index.vue";
-import ApifoxConfig from "./components/apifox/ApifoxConfig/index.vue";
-import ApifoxTem from "./components/apifox/ApifoxTem/index.vue";
+import ApifoxConfig from "./components/Apifox/config.vue";
+import ApifoxTem from "./components/Apifox/tem.vue";
 import TapdBoard from "./components/Tapd/board.vue";
 import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
-import CodesignRecentViewed from "./components/codesign/recentViewed.vue";
+import CodesignRecentViewed from "./components/Codesign/recentViewed.vue";
 import CFWorkerConfig from "./components/CFWorkerConfig/index.vue";
-import CodesignConfig from "./components/codesign/config.vue";
+import CodesignConfig from "./components/Codesign/config.vue";
 import TapdTodo from "./components/Tapd/todo.vue";
 
 enum TabType {
