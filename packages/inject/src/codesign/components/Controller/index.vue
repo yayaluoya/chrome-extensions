@@ -2,7 +2,7 @@
   <div class="controller">
     <ElForm :model="{}" :rules="{}" label-width="auto" :show-message="false" label-suffix=":">
       <ElFormItem label-position="left" label="项目类型">
-        <ElRadioGroup v-model="objectTypeInput" size="small">
+        <ElRadioGroup v-model="objectTypeInput">
           <ElRadioButton v-for="item in OBJECT_TYPE_LIST" :key="item.value" :label="item.label" :value="item.value" />
         </ElRadioGroup>
       </ElFormItem>
@@ -27,17 +27,17 @@
         {{ identification }}
       </ElFormItem> -->
       <ElFormItem label-position="top" label="注释">
-        <ElInput v-model="annotationInput" size="small" type="text" />
+        <ElInput v-model="annotationInput" type="text" clearable />
       </ElFormItem>
       <ElFormItem label-position="top" label="元素类名">
         <div class="form-item-content">
-          <ElInput v-model="translateInput" size="small" type="text" @keyup.enter="handleTranslate">
+          <ElInput v-model="translateInput" type="text" @keyup.enter="handleTranslate">
             <template #append>
-              <ElButton size="small" @click="handleTranslate" :loading="translateLoading">生成类名</ElButton>
+              <ElButton @click="handleTranslate" :loading="translateLoading">快速生成</ElButton>
             </template>
           </ElInput>
-          <ElInput v-model="classNameInput" size="small" type="text">
-            <template #prepend> <ElButton size="small">类名</ElButton> </template>
+          <ElInput v-model="classNameInput" type="text">
+            <template #prepend> <ElButton>类名</ElButton> </template>
           </ElInput>
         </div>
       </ElFormItem>
@@ -48,7 +48,7 @@
       </ElFormItem>
       <ElFormItem label-position="top" label="js" v-if="jsList.length > 0">
         <div class="form-item-content">
-          <ElInput v-if="type === 'icon'" size="small" v-model="iconUrlInput" type="text">
+          <ElInput v-if="type === 'icon'" v-model="iconUrlInput" type="text">
             <template #prepend> <span>iconUrl</span> </template>
           </ElInput>
           <Code v-for="(item, index) in jsList" :key="index" :code="getAnnotation('js') + item" type="js" />

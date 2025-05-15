@@ -86,7 +86,7 @@ onMounted(async () => {
 
 <template>
   <div class="gen-var-name">
-    <ElInput type="text" v-model="input" @keydown.enter="handleClick" placeholder="输入要转换的文本">
+    <ElInput type="text" v-model="input" @keydown.enter="handleClick" placeholder="请输入...">
       <template #append>
         <ElButton @click="handleClick" :loading="loading">确定</ElButton>
       </template>

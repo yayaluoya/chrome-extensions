@@ -6,9 +6,9 @@ export const ITEM_TYPE_MAP = {
 } as const;
 
 export const OBJECT_TYPE_LIST = [
-  { value: "pc" as const, label: "pc" },
-  { value: "mp" as const, label: "mp" },
-  { value: "app" as const, label: "app" }
+  { value: "pc" as const, label: "PC" },
+  { value: "mp" as const, label: "小程序" },
+  { value: "app" as const, label: "APP" }
 ];
 
 export const CSS_PROP_INCLUDES = {
