@@ -32,10 +32,10 @@ export const OBJECT_TYPE_OPTIONS: { value: ObjectType; label: string }[] = [
 export const getCssPropConfig = (
   objectType: ObjectType,
   {
-    removeCssFontFamily = false
+    ignoreCssFontFamily = false
   }: {
-    /** 是否移除 font-family 属性 */
-    removeCssFontFamily?: boolean;
+    /** 是否忽略 font-family 属性 */
+    ignoreCssFontFamily?: boolean;
   } = {}
 ) => {
   /** 包含的css属性 */
@@ -43,7 +43,7 @@ export const getCssPropConfig = (
     [ElType.Text]: [
       "color",
       "text-align",
-      removeCssFontFamily ? "font-family" : "",
+      ignoreCssFontFamily ? "" : "font-family",
       "font-size",
       "font-style",
       "font-weight",

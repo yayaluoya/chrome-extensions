@@ -87,7 +87,7 @@ const objectTypeInput = ref<ObjectType>(ObjectType.PC);
 const annotationInput = ref("");
 
 const config = ref<CodesignLocalStorage["config"]>({
-  removeCssFontFamily: false
+  ignoreCssFontFamily: false
 });
 
 watch([classNameInput, translateInput, objectTypeInput, iconUrlInput, annotationInput], () => {
@@ -124,12 +124,14 @@ const handleTranslate = async () => {
 };
 
 const getCssRules = () => {
-  const config = getCssPropConfig(objectTypeInput.value);
+  const cssPropConfig = getCssPropConfig(objectTypeInput.value, {
+    ignoreCssFontFamily: config.value.ignoreCssFontFamily
+  });
   return parseCssRules({
     cssCode: cssCode.value,
-    includePropNames: config.includePropNames[elType.value],
-    excludeProps: config.excludeProps[elType.value],
-    supplementProps: config.supplementProps[elType.value]
+    includePropNames: cssPropConfig.includePropNames[elType.value],
+    excludeProps: cssPropConfig.excludeProps[elType.value],
+    supplementProps: cssPropConfig.supplementProps[elType.value]
   });
 };
 

@@ -7,8 +7,8 @@ export interface CodesignLocalStorage {
   classNames: Record<string, string>;
   iconUrls: Record<string, string>;
   config: {
-    /** 是否去除css的字体 */
-    removeCssFontFamily?: boolean;
+    /** 是否忽略css的字体 */
+    ignoreCssFontFamily?: boolean;
   };
 }
 
