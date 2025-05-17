@@ -1,11 +1,11 @@
-export type CssRulesType = {
-  query?: string;
-  props: cssPropType[];
+export type CssRule = {
+  query: string;
+  props: CssProp[];
 };
 
-export type cssPropType = {
-  name: string;
-  value: string;
+export type CssProp<N extends string | RegExp = string, V extends string | RegExp = string> = {
+  name: N;
+  value: V;
 };
 
 /**
@@ -14,40 +14,44 @@ export type cssPropType = {
  */
 export function parseCssRules({
   cssCode,
-  includePropsName = [],
+  includePropNames = [],
   excludeProps = [],
   supplementProps = []
 }: {
   cssCode: string;
-  /** 包含的css属性 */
-  includePropsName?: (string | RegExp)[];
-  /** 排除的css属性 */
-  excludeProps?: cssPropType[];
+  /** 包含的css属性名 */
+  includePropNames?: (string | RegExp)[];
+  /** 排除的css属性*/
+  excludeProps?: CssProp<string | RegExp, string | RegExp>[];
   /** 补充的css属性 */
-  supplementProps?: cssPropType[];
+  supplementProps?: CssProp[];
 }) {
-  const cssRules: CssRulesType[] = [];
+  const cssRules: CssRule[] = [];
 
   const rulesMatch = [...cssCode.matchAll(/\s*\.(.*?)\s*{([\s\S]*?)}/g)];
 
   const getProps = (css: string) => {
     const cssPropsRegexp = /\s*([a-zA-Z-]+)\s*:\s*([^;]+)\s*;/g;
-    return [...css.matchAll(cssPropsRegexp)].reduce<cssPropType[]>((a, b) => {
-      const name = b[1].trim();
-      let value = b[2].trim();
+    return [...css.matchAll(cssPropsRegexp)].reduce<CssProp[]>((a, b) => {
+      const propName = b[1].trim();
+      let propValue = b[2].trim();
 
       // 处理一些特殊值
-      value = value.replace(/var\(--.*?,\s*#(.*?)\)/, (_, a) => {
+      propValue = propValue.replace(/var\(--.*?,\s*#(.*?)\)/, (_, a) => {
         return "#" + a;
       });
 
       if (
-        includePropsName.some(item => (typeof item === "string" ? item === name : item.test(name))) &&
-        !excludeProps.some(item => item.name === name && item.value === value)
+        includePropNames.some(item => (typeof item === "string" ? item === propName : item.test(propName))) &&
+        !excludeProps.some(
+          item =>
+            (typeof item.name === "string" ? item.name === propName : item.name.test(propName)) &&
+            (typeof item.value === "string" ? item.value === propValue : item.value.test(propValue))
+        )
       ) {
         a.push({
-          name,
-          value
+          name: propName,
+          value: propValue
         });
       }
       return a;
@@ -56,6 +60,7 @@ export function parseCssRules({
 
   if (rulesMatch.length === 0) {
     cssRules.push({
+      query: "",
       props: getProps(cssCode)
     });
   } else {

@@ -2,41 +2,38 @@
   <div class="controller">
     <ElForm :model="{}" :rules="{}" label-width="auto" :show-message="false" label-suffix=":">
       <ElFormItem label-position="left" label="项目类型">
-        <ElRadioGroup v-model="objectTypeInput">
-          <ElRadioButton v-for="item in OBJECT_TYPE_LIST" :key="item.value" :label="item.label" :value="item.value" />
+        <ElRadioGroup v-model="objectTypeInput" size="small">
+          <ElRadioButton v-for="item in OBJECT_TYPE_OPTIONS" :key="item.value" :label="item.label" :value="item.value" />
         </ElRadioGroup>
       </ElFormItem>
       <ElFormItem label-position="left" label="元素类型">
         <ElTag class="type-item" effect="dark" round>
-          <ElIcon :size="12" v-if="type === 'div'">
+          <ElIcon :size="12" v-if="elType === ElType.Div">
             <Box />
           </ElIcon>
-          <ElIcon :size="12" v-if="type === 'img'">
+          <ElIcon :size="12" v-if="elType === ElType.Img">
             <Picture />
           </ElIcon>
-          <ElIcon :size="12" v-if="type === 'icon'">
+          <ElIcon :size="12" v-if="elType === ElType.Icon">
             <PictureRounded />
           </ElIcon>
-          <ElIcon :size="12" v-if="type === 'text'">
+          <ElIcon :size="12" v-if="elType === ElType.Text">
             <Document />
           </ElIcon>
-          {{ ITEM_TYPE_MAP[type] }}
+          {{ ElTypeDesc[elType] }}
         </ElTag>
       </ElFormItem>
-      <!-- <ElFormItem label-position="top" label="元素ID">
-        {{ identification }}
-      </ElFormItem> -->
-      <ElFormItem label-position="top" label="注释">
+      <ElFormItem label-position="left" label="代码注释">
         <ElInput v-model="annotationInput" type="text" clearable />
       </ElFormItem>
       <ElFormItem label-position="top" label="元素类名">
         <div class="form-item-content">
-          <ElInput v-model="translateInput" type="text" @keyup.enter="handleTranslate">
+          <ElInput v-model="translateInput" type="text" clearable @keyup.enter="handleTranslate">
             <template #append>
               <ElButton @click="handleTranslate" :loading="translateLoading">快速生成</ElButton>
             </template>
           </ElInput>
-          <ElInput v-model="classNameInput" type="text">
+          <ElInput v-model="classNameInput" type="text" clearable>
             <template #prepend> <ElButton>类名</ElButton> </template>
           </ElInput>
         </div>
@@ -48,7 +45,7 @@
       </ElFormItem>
       <ElFormItem label-position="top" label="js" v-if="jsList.length > 0">
         <div class="form-item-content">
-          <ElInput v-if="type === 'icon'" v-model="iconUrlInput" type="text">
+          <ElInput v-if="elType === ElType.Icon" v-model="iconUrlInput" type="text">
             <template #prepend> <span>iconUrl</span> </template>
           </ElInput>
           <Code v-for="(item, index) in jsList" :key="index" :code="getAnnotation('js') + item" type="js" />
@@ -64,7 +61,6 @@
 </template>
 
 <script setup lang="ts">
-import { parseCssRules, type cssPropType, type CssRulesType } from "./parseCssRules";
 import { computed, onMounted, ref, watch } from "vue";
 import { md5 } from "@taozi-chrome-extensions/common/src/utils/md5";
 import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
@@ -75,43 +71,23 @@ import { kebabToCamelCase, camelToKebabCase, toValidVariableName } from "@taozi-
 import { getAllSectionNodeBox } from "../../getAllSectionNodeBox";
 import Code from "../../../components/Code/index.vue";
 import { codesignLocalStorage, type CodesignLocalStorage } from "@taozi-chrome-extensions/common/src/local/codesign";
-import { ITEM_TYPE_MAP, OBJECT_TYPE_LIST, CSS_PROP_INCLUDES } from "./constants";
-
-// Types
-type ItemType = keyof typeof ITEM_TYPE_MAP;
-type ObjectType = (typeof OBJECT_TYPE_LIST)[number]["value"];
+import { getCssPropConfig, ElType, ObjectType, OBJECT_TYPE_OPTIONS, ElTypeDesc } from "./index";
+import { parseCssRules, type CssProp, type CssRule } from "./parseCssRules";
 
 // State
 const identification = ref("");
-const type = ref<ItemType>("div");
+const elType = ref<ElType>(ElType.Div);
 const textContent = ref("");
 const cssCode = ref("");
 const translateInput = ref("");
 const classNameInput = ref("");
 const translateLoading = ref(false);
 const iconUrlInput = ref("");
-const objectTypeInput = ref<ObjectType>("pc");
+const objectTypeInput = ref<ObjectType>(ObjectType.PC);
 const annotationInput = ref("");
 
 const config = ref<CodesignLocalStorage["config"]>({
   removeCssFontFamily: false
-});
-
-// Computed
-const cssRules = computed<CssRulesType[]>(() => {
-  const baseProps = CSS_PROP_INCLUDES[type.value];
-  let props = objectTypeInput.value === "pc" || objectTypeInput.value === "mp" ? [...baseProps, "gap"] : baseProps;
-
-  // 去除css字体样式
-  if (config.value.removeCssFontFamily && type.value === "text") {
-    props = props.filter(item => item !== "font-family");
-  }
-  return parseCssRules({
-    cssCode: cssCode.value,
-    includePropsName: props,
-    excludeProps: type.value === "text" ? [{ name: "font-style", value: "normal" }] : [],
-    supplementProps: type.value === "img" ? [{ name: "overflow", value: "hidden" }] : []
-  });
 });
 
 watch([classNameInput, translateInput, objectTypeInput, iconUrlInput, annotationInput], () => {
@@ -147,6 +123,33 @@ const handleTranslate = async () => {
   }
 };
 
+const getCssRules = () => {
+  const config = getCssPropConfig(objectTypeInput.value);
+  return parseCssRules({
+    cssCode: cssCode.value,
+    includePropNames: config.includePropNames[elType.value],
+    excludeProps: config.excludeProps[elType.value],
+    supplementProps: config.supplementProps[elType.value]
+  });
+};
+
+const getClassName = (type: ElType, index: number = 0) => {
+  switch (type) {
+    case ElType.Text: {
+      return camelToKebabCase(toValidVariableName(`${classNameInput.value}-text${index == 0 ? "" : `-${index}`}`));
+    }
+    case ElType.Img: {
+      return camelToKebabCase(toValidVariableName(`${classNameInput.value}-img${index == 0 ? "" : `-${index}`}`));
+    }
+    case ElType.Icon: {
+      return camelToKebabCase(toValidVariableName(`${classNameInput.value}-icon${index == 0 ? "" : `-${index}`}`));
+    }
+    case ElType.Div: {
+      return camelToKebabCase(toValidVariableName(`${classNameInput.value}${index == 0 ? "" : `-${index}`}`));
+    }
+  }
+};
+
 const getAnnotation = (type: "template" | "js" | "css") => {
   if (!annotationInput.value) return "";
   switch (type) {
@@ -166,14 +169,14 @@ const getAnnotation = (type: "template" | "js" | "css") => {
 };
 
 const vueTemplateList = computed(() => {
-  switch (type.value) {
+  switch (elType.value) {
     /** 文本 */
-    case "text": {
-      return cssRules.value
+    case ElType.Text: {
+      return getCssRules()
         .map((item, i) => {
-          const className = camelToKebabCase(toValidVariableName(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`));
+          const className = getClassName(ElType.Text, i);
           const text = (item.query || "").trim();
-          if (objectTypeInput.value === "pc") {
+          if (objectTypeInput.value === ObjectType.PC) {
             return [`<span class="${className}">${text}</span>`, `<span class="${className}"> {{ "${text}" }} </span>`];
           }
           return [`<text class="${className}">${text}</text>`, `<text class="${className}"> {{ "${text}" }} </text>`];
@@ -181,37 +184,37 @@ const vueTemplateList = computed(() => {
         .flat();
     }
     /** 图片 */
-    case "img": {
+    case ElType.Img: {
       const getSize = (name: string) => {
         return (
-          cssRules.value
-            .reduce<cssPropType[]>((a, b) => {
+          getCssRules()
+            .reduce<CssProp[]>((a, b) => {
               a.push(...b.props);
               return a;
             }, [])
             .find(item => item.name === name)?.value || "500"
         );
       };
+      const className = getClassName(ElType.Img);
       const imageSrc = `https://picsum.photos/${parseInt(getSize("width"))}/${parseInt(getSize("height"))}`;
-      const className = camelToKebabCase(toValidVariableName(`${classNameInput.value}-img`));
-      if (objectTypeInput.value === "pc") {
+      if (objectTypeInput.value === ObjectType.PC) {
         return ["img", "CustomImage"].map(elType => `<${elType} src="${imageSrc}" class="${className}" />`);
       }
       return ["img", "CustomImage"].map(elType => `<${elType} src="${imageSrc}" class="${className}" mode="aspectFit" />`);
     }
     /** 切图 */
-    case "icon": {
-      const className = camelToKebabCase(toValidVariableName(`${classNameInput.value}-icon`));
-      const srcVarName = kebabToCamelCase(toValidVariableName(`${classNameInput.value}-icon`), true);
-      if (objectTypeInput.value === "pc") {
+    case ElType.Icon: {
+      const className = getClassName(ElType.Icon);
+      const srcVarName = kebabToCamelCase(className, true);
+      if (objectTypeInput.value === ObjectType.PC) {
         return [`<img :src="${srcVarName}" class="${className}" />`];
       }
       return [`<image :src="${srcVarName}" class="${className}" mode="scaleToFill" />`];
     }
     /** 盒子 */
-    case "div": {
-      const className = camelToKebabCase(toValidVariableName(classNameInput.value));
-      if (objectTypeInput.value === "pc") {
+    case ElType.Div: {
+      const className = getClassName(ElType.Div);
+      if (objectTypeInput.value === ObjectType.PC) {
         return [`<div class="${className}"></div>`];
       }
       return [`<view class="${className}"></view>`];
@@ -220,41 +223,37 @@ const vueTemplateList = computed(() => {
 });
 
 const jsList = computed(() => {
-  switch (type.value) {
-    case "icon": {
-      return [
-        `const ${kebabToCamelCase(toValidVariableName(`${classNameInput.value}-icon`), true)} = \`${iconUrlInput.value}\`;`
-      ];
+  switch (elType.value) {
+    case ElType.Icon: {
+      return [`const ${kebabToCamelCase(getClassName(ElType.Icon), true)} = \`${iconUrlInput.value}\`;`];
     }
   }
   return [];
 });
 
 const cssList = computed(() => {
-  const getCssProps = (item: CssRulesType) => {
+  const getCssProps = (item: CssRule) => {
     return "\n" + item.props.map(prop => `  ${prop.name}: ${prop.value};`).join("\n") + "\n";
   };
-  switch (type.value) {
-    case "text": {
-      return cssRules.value.map((item, i) => {
-        return `.${camelToKebabCase(toValidVariableName(`${classNameInput.value}-text${i == 0 ? "" : `-${i}`}`))} {${getCssProps(
-          item
-        )}}`.trim();
+  switch (elType.value) {
+    case ElType.Text: {
+      return getCssRules().map((item, i) => {
+        return `.${getClassName(ElType.Text, i)} {${getCssProps(item)}}`.trim();
       });
     }
-    case "img": {
-      return cssRules.value.map(item => {
-        return `.${camelToKebabCase(toValidVariableName(`${classNameInput.value}-img`))} {${getCssProps(item)}}`.trim();
+    case ElType.Img: {
+      return getCssRules().map(item => {
+        return `.${getClassName(ElType.Img)} {${getCssProps(item)}}`.trim();
       });
     }
-    case "icon": {
-      return cssRules.value.map(item => {
-        return `.${camelToKebabCase(toValidVariableName(`${classNameInput.value}-icon`))} {${getCssProps(item)}}`.trim();
+    case ElType.Icon: {
+      return getCssRules().map(item => {
+        return `.${getClassName(ElType.Icon)} {${getCssProps(item)}}`.trim();
       });
     }
-    case "div": {
-      return cssRules.value.map(item => {
-        return `.${camelToKebabCase(toValidVariableName(classNameInput.value))} {${getCssProps(item)}}`.trim();
+    case ElType.Div: {
+      return getCssRules().map(item => {
+        return `.${getClassName(ElType.Div)} {${getCssProps(item)}}`.trim();
       });
     }
   }
@@ -274,13 +273,13 @@ onMounted(async () => {
 
     // Determine element type and set identification
     if (sectionNodeBoxs.some(item => item.title === "文本")) {
-      type.value = "text";
+      elType.value = ElType.Text;
       textContent.value =
         sectionNodeBoxs
           .find(item => item.title === "内容")
           ?.contentEl.querySelector<HTMLImageElement>(".textarea__node.node-item__input span")?.textContent || "";
     } else if (sectionNodeBoxs.some(item => item.title === "切图")) {
-      type.value = "icon";
+      elType.value = ElType.Icon;
       const iconSrc =
         sectionNodeBoxs.find(item => item.title === "切图")?.contentEl.querySelector<HTMLImageElement>(".thumb img")?.src || "";
       identification.value = md5(iconSrc + cssCode.value).toString();
@@ -291,12 +290,12 @@ onMounted(async () => {
           [...item.contentEl.querySelectorAll("span.node-item__text")].some(item2 => item2.textContent?.trim() === "图片填充")
       )
     ) {
-      type.value = "img";
+      elType.value = ElType.Img;
     } else {
-      type.value = "div";
+      elType.value = ElType.Div;
     }
 
-    if (type.value === "text") {
+    if (elType.value === ElType.Text) {
       identification.value = md5(textContent.value + cssCode.value).toString();
     } else {
       identification.value = md5(topTitle + cssCode.value).toString();
