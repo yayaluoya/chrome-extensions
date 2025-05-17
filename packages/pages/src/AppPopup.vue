@@ -147,7 +147,16 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   width: 750px;
+  position: relative;
+  height: 500px;
+  overflow-y: auto;
   > .tabs {
+    background-color: white;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+    box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.03);
     --color: #666666;
     --on-color: #409eff;
     --background-color: #ffffff;
