@@ -14,7 +14,7 @@ import { computed } from "vue";
 import Color from "color";
 
 const colorRegex =
-  /(#[0-9a-f]{1,8}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*[\d.]+\s*\))/gi;
+  /(#[0-9a-f]{3,8}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*[\d.]+\s*\))/gi;
 
 const props = defineProps<{
   code: string;
@@ -32,13 +32,17 @@ const lineCode = computed(() => {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#39;")
         .replace(/&nbsp;/g, " ")
-        .replace(colorRegex, (_, a) => {
-          return `<span style="
-      background-color: ${a};
-      color: ${new Color(a).isDark() ? "white" : "black"};
-      padding: 1px 2px;
-      border-radius: 3px;
-      ">${a}</span>`;
+        .replace(colorRegex, _ => {
+          try {
+            return `<span style="
+            background-color: ${_};
+            color: ${new Color(_).isDark() ? "white" : "black"};
+            padding: 1px 2px;
+            border-radius: 3px;
+            ">${_}</span>`;
+          } catch {
+            return _;
+          }
         })
     );
   });
@@ -107,7 +111,7 @@ const handleCopyCode = (code: string) => {
       font-family: Consolas;
 
       &:hover {
-        background-color: #f0f2f5;
+        background-color: rgba(0, 0, 0, 0.08);
       }
     }
   }
