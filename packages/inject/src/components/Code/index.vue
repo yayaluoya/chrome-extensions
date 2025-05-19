@@ -3,7 +3,7 @@
     <span class="type" v-if="type">{{ type }}</span>
     <div class="button" @click="handleCopyCode(code)">copy</div>
     <pre>
-      <code v-for="(line, index) in lineCode" :key="index" @click="handleCopyCode(line)">{{ line }}</code>
+      <code v-for="(line, index) in lineCode" :key="index" @click="handleCopyCode(line)" v-html="line"></code>
     </pre>
   </div>
 </template>
@@ -11,6 +11,10 @@
 <script lang="ts" setup>
 import { ElMessage } from "element-plus";
 import { computed } from "vue";
+import Color from "color";
+
+const colorRegex =
+  /(#[0-9a-f]{1,8}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*[\d.]+\s*\))/gi;
 
 const props = defineProps<{
   code: string;
@@ -18,7 +22,26 @@ const props = defineProps<{
 }>();
 
 const lineCode = computed(() => {
-  return props.code.split("\n");
+  return props.code.split("\n").map(line => {
+    return (
+      line
+        // 替换特殊字符
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/&nbsp;/g, " ")
+        .replace(colorRegex, (_, a) => {
+          return `<span style="
+      background-color: ${a};
+      color: ${new Color(a).isDark() ? "white" : "black"};
+      padding: 1px 2px;
+      border-radius: 3px;
+      ">${a}</span>`;
+        })
+    );
+  });
 });
 
 const handleCopyCode = (code: string) => {
