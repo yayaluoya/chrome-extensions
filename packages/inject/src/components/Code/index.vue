@@ -3,18 +3,23 @@
     <span class="type" v-if="type">{{ type }}</span>
     <div class="button" @click="handleCopyCode(code)">copy</div>
     <pre>
-      <code>{{code}}</code>
+      <code v-for="(line, index) in lineCode" :key="index" @click="handleCopyCode(line)">{{ line }}</code>
     </pre>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ElMessage } from "element-plus";
+import { computed } from "vue";
 
-defineProps<{
+const props = defineProps<{
   code: string;
   type?: string;
 }>();
+
+const lineCode = computed(() => {
+  return props.code.split("\n");
+});
 
 const handleCopyCode = (code: string) => {
   navigator.clipboard.writeText(code).then(() => {
@@ -77,6 +82,10 @@ const handleCopyCode = (code: string) => {
       white-space: pre-wrap;
       word-break: break-all;
       font-family: Consolas;
+
+      &:hover {
+        background-color: #f0f2f5;
+      }
     }
   }
 }
