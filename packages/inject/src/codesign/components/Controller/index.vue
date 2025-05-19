@@ -26,7 +26,7 @@
       <ElFormItem label-position="left" label="代码注释">
         <ElInput v-model="annotationInput" type="text" clearable />
       </ElFormItem>
-      <ElFormItem label-position="top" label="元素类名">
+      <ElFormItem label-position="top" label="元素Class">
         <div class="form-item-content">
           <ElInput v-model="translateInput" type="text" clearable @keyup.enter="handleTranslate">
             <template #append>
@@ -34,7 +34,7 @@
             </template>
           </ElInput>
           <ElInput v-model="classNameInput" type="text" clearable>
-            <template #prepend> <ElButton>类名</ElButton> </template>
+            <template #prepend> <ElButton>Class</ElButton> </template>
           </ElInput>
         </div>
       </ElFormItem>
