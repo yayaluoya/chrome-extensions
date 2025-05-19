@@ -6,7 +6,7 @@
         <ElTabs v-model="onCodeTemplateId" type="card" @tab-change="onCodeTemplateIdChange">
           <ElTabPane v-for="(item, index) in codeTemplates" :key="index" :label="item.name || '--'" :name="item.id">
             <div class="codes">
-              <Code v-for="(code, index) in codes?.filter(Boolean)" :key="index" :code="code" type="ts" />
+              <Code v-for="(code, index) in codes?.filter(Boolean)" :key="index" :code="code" :type="CodeType.Ts" />
             </div>
           </ElTabPane>
         </ElTabs>
@@ -20,6 +20,7 @@ import { ref } from "vue";
 import { getApiCallFile } from "./getApiCallFile";
 import { apifoxLocalStorage, type ApifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
 import Code from "../../../components/Code/index.vue";
+import { CodeType } from "@/components/Code";
 
 const props = defineProps<{
   projectId: string;

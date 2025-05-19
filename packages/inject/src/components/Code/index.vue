@@ -11,41 +11,15 @@
 <script lang="ts" setup>
 import { ElMessage } from "element-plus";
 import { computed } from "vue";
-import Color from "color";
-
-const colorRegex =
-  /(#[0-9a-f]{3,8}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)|rgba\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*,\s*[\d.]+\s*\)|hsl\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*\)|hsla\(\s*\d+\s*,\s*\d+%\s*,\s*\d+%\s*,\s*[\d.]+\s*\))/gi;
+import { parseCode, type CodeType } from ".";
 
 const props = defineProps<{
   code: string;
-  type?: string;
+  type: CodeType;
 }>();
 
 const lineCode = computed(() => {
-  return props.code.split("\n").map(line => {
-    return (
-      line
-        // 替换特殊字符
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;")
-        .replace(/&nbsp;/g, " ")
-        .replace(colorRegex, _ => {
-          try {
-            return `<span style="
-            background-color: ${_};
-            color: ${new Color(_).isDark() ? "white" : "black"};
-            padding: 1px 2px;
-            border-radius: 3px;
-            ">${_}</span>`;
-          } catch {
-            return _;
-          }
-        })
-    );
-  });
+  return parseCode(props.code, props.type);
 });
 
 const handleCopyCode = (code: string) => {

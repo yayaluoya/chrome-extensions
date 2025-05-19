@@ -40,7 +40,12 @@
       </ElFormItem>
       <ElFormItem label-position="top" label="vue-template" v-if="vueTemplateList.length > 0">
         <div class="form-item-content">
-          <Code v-for="(item, index) in vueTemplateList" :key="index" :code="getAnnotation('template') + item" type="vue" />
+          <Code
+            v-for="(item, index) in vueTemplateList"
+            :key="index"
+            :code="getAnnotation('template') + item"
+            :type="CodeType.Vue"
+          />
         </div>
       </ElFormItem>
       <ElFormItem label-position="top" label="js" v-if="jsList.length > 0">
@@ -48,12 +53,12 @@
           <ElInput v-if="elType === ElType.Icon" v-model="iconUrlInput" type="text">
             <template #prepend> <span>iconUrl</span> </template>
           </ElInput>
-          <Code v-for="(item, index) in jsList" :key="index" :code="getAnnotation('js') + item" type="js" />
+          <Code v-for="(item, index) in jsList" :key="index" :code="getAnnotation('js') + item" :type="CodeType.Js" />
         </div>
       </ElFormItem>
       <ElFormItem label-position="top" label="css" v-if="cssList.length > 0">
         <div class="form-item-content">
-          <Code v-for="(item, index) in cssList" :key="index" :code="getAnnotation('css') + item" type="css" />
+          <Code v-for="(item, index) in cssList" :key="index" :code="getAnnotation('css') + item" :type="CodeType.Css" />
         </div>
       </ElFormItem>
     </ElForm>
@@ -73,6 +78,7 @@ import Code from "../../../components/Code/index.vue";
 import { codesignLocalStorage, type CodesignLocalStorage } from "@taozi-chrome-extensions/common/src/local/codesign";
 import { getCssPropConfig, ElType, ObjectType, OBJECT_TYPE_OPTIONS, ElTypeDesc } from "./index";
 import { parseCssRules, type CssProp, type CssRule } from "./parseCssRules";
+import { CodeType } from "@/components/Code";
 
 // State
 const identification = ref("");
