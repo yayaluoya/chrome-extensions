@@ -16,7 +16,8 @@ export function parseCssRules({
   cssCode,
   includePropNames = [],
   excludeProps = [],
-  supplementProps = []
+  supplementProps = [],
+  options = {}
 }: {
   cssCode: string;
   /** 包含的css属性名 */
@@ -25,6 +26,11 @@ export function parseCssRules({
   excludeProps?: CssProp<string | RegExp, string | RegExp>[];
   /** 补充的css属性 */
   supplementProps?: CssProp[];
+  /** 选项 */
+  options?: {
+    /** 在有padding属性时是否加入box-sizing: border-box */
+    boxSizing?: boolean;
+  };
 }) {
   const cssRules: CssRule[] = [];
 
@@ -80,5 +86,18 @@ export function parseCssRules({
       }
     });
   });
+
+  // 处理box-sizing
+  if (options?.boxSizing) {
+    cssRules.forEach(item => {
+      if (
+        item.props.some(p => /^padding/.test(p.name)) &&
+        !item.props.some(p => p.name === "box-sizing" && p.value === "border-box")
+      ) {
+        item.props.push({ name: "box-sizing", value: "border-box" });
+      }
+    });
+  }
+
   return cssRules;
 }

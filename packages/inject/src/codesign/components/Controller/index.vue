@@ -87,7 +87,8 @@ const objectTypeInput = ref<ObjectType>(ObjectType.PC);
 const annotationInput = ref("");
 
 const config = ref<CodesignLocalStorage["config"]>({
-  ignoreCssFontFamily: false
+  ignoreCssFontFamily: false,
+  boxSizing: false
 });
 
 watch([classNameInput, translateInput, objectTypeInput, iconUrlInput, annotationInput], () => {
@@ -131,7 +132,10 @@ const getCssRules = () => {
     cssCode: cssCode.value,
     includePropNames: cssPropConfig.includePropNames[elType.value],
     excludeProps: cssPropConfig.excludeProps[elType.value],
-    supplementProps: cssPropConfig.supplementProps[elType.value]
+    supplementProps: cssPropConfig.supplementProps[elType.value],
+    options: {
+      boxSizing: config.value.boxSizing
+    }
   });
 };
 
@@ -320,7 +324,10 @@ onMounted(async () => {
     objectTypeInput.value = (objectType as ObjectType) || "pc";
     iconUrlInput.value = iconUrls[identification.value] || "";
     annotationInput.value = annotations[identification.value] || "";
-    config.value = config2 || {};
+    config.value = config2 || {
+      ignoreCssFontFamily: false,
+      boxSizing: false
+    };
   } catch (e) {
     console.error("Error in onMounted:", e);
   }

@@ -4,6 +4,9 @@
       <ElFormItem label="生成文本css样式时忽略字体样式">
         <ElSwitch v-model="config.ignoreCssFontFamily" />
       </ElFormItem>
+      <ElFormItem label="在有padding属性时加入box-sizing: border-box">
+        <ElSwitch v-model="config.boxSizing" />
+      </ElFormItem>
     </ElForm>
   </div>
 </template>
@@ -14,7 +17,8 @@ import { ElForm, ElFormItem, ElSwitch } from "element-plus";
 import { codesignLocalStorage, type CodesignLocalStorage } from "@taozi-chrome-extensions/common/src/local/codesign";
 
 const config = ref<CodesignLocalStorage["config"]>({
-  ignoreCssFontFamily: false
+  ignoreCssFontFamily: false,
+  boxSizing: false
 });
 
 watch(
@@ -29,7 +33,10 @@ watch(
 
 onMounted(async () => {
   const { config: config2 = {} } = (await codesignLocalStorage.get()) || {};
-  config.value = config2 || {};
+  config.value = config2 || {
+    ignoreCssFontFamily: false,
+    boxSizing: false
+  };
 });
 </script>
 

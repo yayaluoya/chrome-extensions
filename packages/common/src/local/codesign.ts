@@ -9,6 +9,8 @@ export interface CodesignLocalStorage {
   config: {
     /** 是否忽略css的字体 */
     ignoreCssFontFamily?: boolean;
+    /** 在有padding属性时是否加入box-sizing: border-box */
+    boxSizing?: boolean;
   };
 }
 
