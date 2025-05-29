@@ -212,7 +212,7 @@ const vueTemplateList = computed(() => {
       if (objectTypeInput.value === ObjectType.PC) {
         return ["img", "CustomImage"].map(elType => `<${elType} src="${imageSrc}" class="${className}" />`);
       }
-      return ["img", "CustomImage"].map(elType => `<${elType} src="${imageSrc}" class="${className}" mode="aspectFit" />`);
+      return ["img", "CustomImage"].map(elType => `<${elType} src="${imageSrc}" class="${className}" mode="aspectFill" />`);
     }
     /** 切图 */
     case ElType.Icon: {
