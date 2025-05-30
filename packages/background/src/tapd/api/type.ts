@@ -27,5 +27,7 @@ export interface MyWorktableByPage {
     /** 优先级 */
     priority_name: string;
     entity_type: string;
+    /** 短id */
+    short_id: string;
   }[];
 }

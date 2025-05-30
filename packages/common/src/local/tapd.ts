@@ -14,6 +14,7 @@ export interface TapdLocalStorage {
     detail_url: string;
     priority_name: string;
     entity_type: string;
+    short_id: string;
   }[];
   dataUpdateTime?: number;
   errMsg?: string;

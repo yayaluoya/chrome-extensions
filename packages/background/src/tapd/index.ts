@@ -20,7 +20,8 @@ export async function tapdTask() {
             title: item.title || item.name,
             detail_url: item.detail_url,
             priority_name: item.priority_name,
-            entity_type: item.entity_type
+            entity_type: item.entity_type,
+            short_id: item.short_id
           };
         });
         const { bug = 0 } = v?.workitemCount || {};

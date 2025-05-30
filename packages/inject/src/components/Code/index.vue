@@ -23,12 +23,20 @@ const lineCode = computed(() => {
 });
 
 const handleCopyCode = (code: string) => {
-  navigator.clipboard.writeText(code).then(() => {
-    ElMessage({
-      message: "复制成功",
-      type: "success"
+  navigator.clipboard
+    .writeText(code)
+    .then(() => {
+      ElMessage({
+        message: "复制成功",
+        type: "success"
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        message: "复制失败",
+        type: "error"
+      });
     });
-  });
 };
 </script>
 

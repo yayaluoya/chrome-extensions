@@ -78,20 +78,21 @@ const handleClick = async () => {
   }
 };
 
-const handleCodeItem = async (item: string) => {
-  try {
-    await navigator.clipboard.writeText(item);
-    ElMessage({
-      message: "复制成功",
-      type: "success"
+const handleCodeItem = async (code: string) => {
+  navigator.clipboard
+    .writeText(code)
+    .then(() => {
+      ElMessage({
+        message: "复制成功",
+        type: "success"
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        message: "复制失败",
+        type: "error"
+      });
     });
-  } catch (err) {
-    console.error("Copy error:", err);
-    ElMessage({
-      message: "复制失败",
-      type: "error"
-    });
-  }
 };
 
 // Lifecycle

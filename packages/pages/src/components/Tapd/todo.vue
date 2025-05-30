@@ -12,11 +12,16 @@
             >
               {{ row.entity_type.toLocaleUpperCase() }}
             </ElTag>
-            <span style="cursor: pointer" @click="openTab(row.detail_url)">{{ row.title }}</span>
+            <span class="title-span" @click="openTab(row.detail_url)">{{ row.title }}</span>
           </div>
         </template>
       </ElTableColumn>
-      <ElTableColumn prop="priority_name" width="120" label="优先级" />
+      <ElTableColumn prop="priority_name" width="100" label="优先级" />
+      <ElTableColumn prop="short_id" width="100" label="短id">
+        <template #default="{ row }">
+          <span class="short-id-span" @click="copyShortId(row.short_id)">{{ row.short_id }}</span>
+        </template>
+      </ElTableColumn>
     </ElTable>
     <ElEmpty v-else description="暂无代办" />
   </div>
@@ -25,7 +30,7 @@
 <script setup lang="ts">
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 import { onMounted, onUnmounted, ref, computed } from "vue";
-import { ElTable, ElTableColumn, ElTag, ElLoading, ElEmpty } from "element-plus";
+import { ElTable, ElTableColumn, ElTag, ElLoading, ElEmpty, ElMessage } from "element-plus";
 
 const bugEntityTypeReg = /^bug$/i;
 
@@ -60,6 +65,23 @@ const openTab = async (url: string) => {
   }
 };
 
+const copyShortId = async (shortId: string) => {
+  navigator.clipboard
+    .writeText(shortId)
+    .then(() => {
+      ElMessage({
+        message: "复制成功",
+        type: "success"
+      });
+    })
+    .catch(() => {
+      ElMessage({
+        message: "复制失败",
+        type: "error"
+      });
+    });
+};
+
 onMounted(() => {
   t = setInterval(getTapdInfo, 50);
   getTapdInfo();
@@ -74,5 +96,19 @@ onUnmounted(() => {
 .tapd-todo {
   display: flex;
   flex-direction: column;
+  .title-span {
+    cursor: pointer;
+    &:hover {
+      color: #409eff;
+      text-decoration: underline;
+    }
+  }
+  .short-id-span {
+    cursor: pointer;
+    &:hover {
+      color: #409eff;
+      text-decoration: underline;
+    }
+  }
 }
 </style>
