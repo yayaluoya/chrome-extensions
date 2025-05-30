@@ -25,7 +25,7 @@ import { ElInput, ElButton, ElMessage, ElEmpty, ElSkeleton } from "element-plus"
 import { sendMessage } from "@taozi-chrome-extensions/common/src/messageServer";
 import { MessageType } from "@taozi-chrome-extensions/common/src/constant/messageType";
 import { kebabToCamelCase, camelToKebabCase, toValidVariableName } from "@taozi-chrome-extensions/common/src/utils/global";
-import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
+import { genVarNameLocalStorage } from "@taozi-chrome-extensions/common/src/local/genVarName";
 
 // Types
 type ResultType = {
@@ -41,7 +41,7 @@ const results = ref<ResultType[]>([]);
 
 // Watchers
 watch(input, () => {
-  configLocalStorage.edit(v => {
+  genVarNameLocalStorage.edit(v => {
     v.genVarNameInput = input.value;
   });
 });
@@ -96,12 +96,8 @@ const handleCodeItem = async (item: string) => {
 
 // Lifecycle
 onMounted(async () => {
-  try {
-    const config = await configLocalStorage.get();
-    input.value = config?.genVarNameInput || "";
-  } catch (err) {
-    console.error("Failed to load saved input:", err);
-  }
+  const { genVarNameInput = "" } = (await genVarNameLocalStorage.get()) || {};
+  input.value = genVarNameInput;
 });
 </script>
 

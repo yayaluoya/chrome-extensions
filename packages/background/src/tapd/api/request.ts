@@ -10,11 +10,11 @@ export async function request<T>(url: string, op: RequestInit): Promise<T> {
   if (!op.headers) {
     op.headers = {};
   }
-  const cfWorkerUrl = (await configLocalStorage.get())?.cfWorkerUrl;
-  if (!cfWorkerUrl) {
-    throw new Error("cfWorkerUrl is not set");
+  const proxyServiceUrl = (await configLocalStorage.get())?.proxyServiceUrl;
+  if (!proxyServiceUrl) {
+    throw new Error("未配置代理服务");
   }
-  url = `${cfWorkerUrl.replace(/\/+$/, "")}${url}`;
+  url = `${proxyServiceUrl.replace(/\/+$/, "")}${url}`;
   Object.assign(op.headers, {
     "x-target": tapdOrigin,
     "x-cookie": (

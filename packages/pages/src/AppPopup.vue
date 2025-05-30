@@ -9,9 +9,9 @@ import ApifoxTem from "./components/Apifox/tem.vue";
 import TapdBoard from "./components/Tapd/board.vue";
 import { configLocalStorage } from "@taozi-chrome-extensions/common/src/local/config";
 import CodesignRecentViewed from "./components/Codesign/recentViewed.vue";
-import CFWorkerConfig from "./components/CFWorkerConfig/index.vue";
 import CodesignConfig from "./components/Codesign/config.vue";
 import TapdTodo from "./components/Tapd/todo.vue";
+import ProxyServerConfig from "./components/ProxyServerConfig/index.vue";
 
 enum TabType {
   GenVarName = "GenVarName",
@@ -128,7 +128,7 @@ onMounted(async () => {
           <span>代理服务配置</span>
         </div>
         <div class="content">
-          <CFWorkerConfig />
+          <ProxyServerConfig />
         </div>
         <div class="title">
           <div class="left"></div>
@@ -150,6 +150,7 @@ onMounted(async () => {
   position: relative;
   height: 500px;
   overflow-y: auto;
+  background: #f7f7f7;
   > .tabs {
     background-color: white;
     flex-shrink: 0;
@@ -170,7 +171,6 @@ onMounted(async () => {
     box-sizing: border-box;
   }
   > .content-container {
-    background: #f7f7f7;
     padding: 12px;
     box-sizing: border-box;
     display: flex;
