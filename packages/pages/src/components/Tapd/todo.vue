@@ -1,10 +1,15 @@
 <template>
   <div class="tapd-todo">
-    <ElTable class="bug-list" :data="tapdInfo?.todoList || []" v-if="tapdInfo?.todoList && tapdInfo.todoList.length > 0">
+    <ElTable class="bug-list" :data="showTodoList" v-if="showTodoList && showTodoList.length > 0">
       <ElTableColumn prop="title" label="标题">
         <template #default="{ row }">
           <div style="display: flex; align-items: center">
-            <ElTag style="margin-right: 6px" effect="dark" round :type="/^bug$/i.test(row.entity_type) ? 'danger' : 'info'">
+            <ElTag
+              style="margin-right: 6px"
+              effect="dark"
+              round
+              :type="bugEntityTypeReg.test(row.entity_type) ? 'danger' : 'info'"
+            >
               {{ row.entity_type.toLocaleUpperCase() }}
             </ElTag>
             <span style="cursor: pointer" @click="openTab(row.detail_url)">{{ row.title }}</span>
@@ -19,8 +24,10 @@
 
 <script setup lang="ts">
 import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, computed } from "vue";
 import { ElTable, ElTableColumn, ElTag, ElLoading, ElEmpty } from "element-plus";
+
+const bugEntityTypeReg = /^bug$/i;
 
 const tapdInfo = ref<TapdLocalStorage>();
 
@@ -29,6 +36,12 @@ let t: ReturnType<typeof setInterval>;
 const getTapdInfo = async () => {
   tapdInfo.value = await tapdLocalStorage.get();
 };
+
+const showTodoList = computed(() => {
+  return tapdInfo.value?.todoList.sort((a, b) => {
+    return bugEntityTypeReg.test(a.entity_type) && !bugEntityTypeReg.test(b.entity_type) ? -1 : 0;
+  });
+});
 
 const openTab = async (url: string) => {
   const loadingInstance = ElLoading.service({ fullscreen: true });
