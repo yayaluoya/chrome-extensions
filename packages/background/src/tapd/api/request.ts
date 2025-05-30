@@ -14,7 +14,7 @@ export async function request<T>(url: string, op: RequestInit): Promise<T> {
   if (!cfWorkerUrl) {
     throw new Error("cfWorkerUrl is not set");
   }
-  url = `${cfWorkerUrl}${url}`;
+  url = `${cfWorkerUrl.replace(/\/+$/, "")}${url}`;
   Object.assign(op.headers, {
     "x-target": tapdOrigin,
     "x-cookie": (
