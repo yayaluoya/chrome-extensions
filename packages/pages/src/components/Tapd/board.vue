@@ -1,6 +1,7 @@
 <template>
   <div class="tapd">
     <img class="logo" src="../../assets/TAPD_Logo.svg" alt="" />
+    <ElIcon v-if="tapdInfo?.loading" size="20" class="loading-icon is-loading"><Loading /></ElIcon>
     <div class="alert">
       注意！必须登录
       <a href="https://www.tapd.cn/" target="_blank">tapd</a>
@@ -47,18 +48,13 @@
 </template>
 
 <script setup lang="ts">
-import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
-import { computed, onMounted, onUnmounted, ref } from "vue";
-import { ElAlert, ElStatistic } from "element-plus";
+import { computed } from "vue";
+import { ElAlert, ElStatistic, ElIcon } from "element-plus";
 import dayjs from "dayjs";
+import { Loading } from "@element-plus/icons-vue";
+import { useTapdInfo } from "../../hooks/useTapdInfo";
 
-const tapdInfo = ref<TapdLocalStorage>();
-
-let t: ReturnType<typeof setInterval>;
-
-const getTapdInfo = async () => {
-  tapdInfo.value = await tapdLocalStorage.get();
-};
+const { tapdInfo } = useTapdInfo();
 
 const statistics = computed(() => {
   return [
@@ -91,15 +87,6 @@ const current_tab = computed(() => {
     ""
   );
 });
-
-onMounted(() => {
-  t = setInterval(getTapdInfo, 50);
-  getTapdInfo();
-});
-
-onUnmounted(() => {
-  t && clearInterval(t);
-});
 </script>
 
 <style lang="scss" scoped>
@@ -112,10 +99,16 @@ onUnmounted(() => {
   box-sizing: border-box;
   gap: 12px;
 
-  > .logo {
+  .logo {
     height: 27px;
     position: absolute;
     top: 12px;
+    right: 12px;
+  }
+
+  .loading-icon {
+    position: absolute;
+    bottom: 12px;
     right: 12px;
   }
 

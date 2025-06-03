@@ -1,6 +1,7 @@
 import { useLocalStorage } from ".";
 
 export interface TapdLocalStorage {
+  loading: boolean;
   workitemCount: {
     story: number;
     task: number;
@@ -21,6 +22,7 @@ export interface TapdLocalStorage {
 }
 
 export const tapdLocalStorage = useLocalStorage<string, TapdLocalStorage>("tapd-local-storage", {
+  loading: false,
   workitemCount: {
     story: 0,
     task: 0,

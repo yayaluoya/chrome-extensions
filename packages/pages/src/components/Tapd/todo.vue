@@ -28,19 +28,13 @@
 </template>
 
 <script setup lang="ts">
-import { tapdLocalStorage, type TapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
-import { onMounted, onUnmounted, ref, computed } from "vue";
+import { computed } from "vue";
 import { ElTable, ElTableColumn, ElTag, ElLoading, ElEmpty, ElMessage } from "element-plus";
+import { useTapdInfo } from "../../hooks/useTapdInfo";
 
 const bugEntityTypeReg = /^bug$/i;
 
-const tapdInfo = ref<TapdLocalStorage>();
-
-let t: ReturnType<typeof setInterval>;
-
-const getTapdInfo = async () => {
-  tapdInfo.value = await tapdLocalStorage.get();
-};
+const { tapdInfo } = useTapdInfo();
 
 const showTodoList = computed(() => {
   return tapdInfo.value?.todoList.sort((a, b) => {
@@ -81,15 +75,6 @@ const copyShortId = async (shortId: string) => {
       });
     });
 };
-
-onMounted(() => {
-  t = setInterval(getTapdInfo, 50);
-  getTapdInfo();
-});
-
-onUnmounted(() => {
-  t && clearInterval(t);
-});
 </script>
 
 <style lang="scss" scoped>
