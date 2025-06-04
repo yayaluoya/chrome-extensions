@@ -19,6 +19,7 @@
       <ElTableColumn width="100" label="待发版">
         <template #default="{ row }">
           <ElCheckbox
+            v-if="bugEntityTypeReg.test(row.entity_type)"
             :model-value="tapdInfo?.toBeReleasedBugIds?.includes(row.short_id)"
             @change="handleBugToBeReleasedChange(row.short_id)"
           />
