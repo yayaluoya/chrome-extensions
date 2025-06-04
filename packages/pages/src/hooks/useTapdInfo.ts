@@ -6,7 +6,13 @@ export const useTapdInfo = () => {
   const tapdInfo = ref<TapdLocalStorage>();
 
   const getTapdInfo = async () => {
-    tapdInfo.value = await tapdLocalStorage.get();
+    const v = await tapdLocalStorage.get();
+    if (!tapdInfo.value) {
+      tapdInfo.value = v;
+    } else if (v) {
+      const { toBeReleasedBugIds, ...rest } = v;
+      tapdInfo.value = { ...tapdInfo.value, ...rest };
+    }
   };
 
   onMounted(() => {

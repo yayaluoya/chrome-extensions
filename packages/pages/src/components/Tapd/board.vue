@@ -60,17 +60,17 @@ const statistics = computed(() => {
   return [
     {
       title: "story".toLocaleUpperCase(),
-      value: tapdInfo.value?.workitemCount.story || 0,
+      value: tapdInfo.value?.workitemCount?.story || 0,
       color: "#409EFF"
     },
     {
       title: "task".toLocaleUpperCase(),
-      value: tapdInfo.value?.workitemCount.task || 0,
+      value: tapdInfo.value?.workitemCount?.task || 0,
       color: "#303133"
     },
     {
       title: "bug".toLocaleUpperCase(),
-      value: tapdInfo.value?.workitemCount.bug || 0,
+      value: tapdInfo.value?.workitemCount?.bug || 0,
       color: "#F56C6C"
     }
   ];
@@ -82,8 +82,8 @@ const current_tab = computed(() => {
       todo: "待办",
       done: "已办",
       created: "已创建"
-    }[tapdInfo.value?.viewConfig.current_tab || ""] ||
-    tapdInfo.value?.viewConfig.current_tab ||
+    }[tapdInfo.value?.viewConfig?.current_tab || ""] ||
+    tapdInfo.value?.viewConfig?.current_tab ||
     ""
   );
 });

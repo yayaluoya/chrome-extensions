@@ -1,22 +1,23 @@
 import { useLocalStorage } from ".";
 
 export interface TapdLocalStorage {
-  loading: boolean;
-  workitemCount: {
+  loading?: boolean;
+  workitemCount?: {
     story: number;
     task: number;
     bug: number;
   };
-  viewConfig: {
+  viewConfig?: {
     current_tab: string;
   };
-  todoList: {
+  todoList?: {
     title: string;
     detail_url: string;
     priority_name: string;
     entity_type: string;
     short_id: string;
   }[];
+  toBeReleasedBugIds?: string[];
   dataUpdateTime?: number;
   errMsg?: string;
 }
@@ -31,5 +32,6 @@ export const tapdLocalStorage = useLocalStorage<string, TapdLocalStorage>("tapd-
   viewConfig: {
     current_tab: ""
   },
-  todoList: []
+  todoList: [],
+  toBeReleasedBugIds: []
 });

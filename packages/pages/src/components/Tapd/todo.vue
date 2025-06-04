@@ -16,6 +16,14 @@
           </div>
         </template>
       </ElTableColumn>
+      <ElTableColumn width="100" label="待发版">
+        <template #default="{ row }">
+          <ElCheckbox
+            :model-value="tapdInfo?.toBeReleasedBugIds?.includes(row.short_id)"
+            @change="handleBugToBeReleasedChange(row.short_id)"
+          />
+        </template>
+      </ElTableColumn>
       <ElTableColumn prop="priority_name" width="100" label="优先级" />
       <ElTableColumn prop="short_id" width="100" label="短id">
         <template #default="{ row }">
@@ -29,18 +37,40 @@
 
 <script setup lang="ts">
 import { computed } from "vue";
-import { ElTable, ElTableColumn, ElTag, ElLoading, ElEmpty, ElMessage } from "element-plus";
+import { ElTable, ElTableColumn, ElTag, ElLoading, ElEmpty, ElMessage, ElCheckbox } from "element-plus";
 import { useTapdInfo } from "../../hooks/useTapdInfo";
+import { tapdLocalStorage } from "@taozi-chrome-extensions/common/src/local/tapd";
 
 const bugEntityTypeReg = /^bug$/i;
 
 const { tapdInfo } = useTapdInfo();
 
 const showTodoList = computed(() => {
-  return tapdInfo.value?.todoList.sort((a, b) => {
-    return bugEntityTypeReg.test(a.entity_type) && !bugEntityTypeReg.test(b.entity_type) ? -1 : 0;
-  });
+  return (
+    tapdInfo.value?.todoList?.sort((a, b) => {
+      return bugEntityTypeReg.test(a.entity_type) && !bugEntityTypeReg.test(b.entity_type) ? -1 : 0;
+    }) || []
+  );
 });
+
+const handleBugToBeReleasedChange = async (shortId: string) => {
+  if (!tapdInfo.value) {
+    return;
+  }
+
+  const { toBeReleasedBugIds = [] } = tapdInfo.value;
+  const index = toBeReleasedBugIds.indexOf(shortId);
+  if (index === -1) {
+    toBeReleasedBugIds.push(shortId);
+  } else {
+    toBeReleasedBugIds.splice(index, 1);
+  }
+  tapdInfo.value.toBeReleasedBugIds = toBeReleasedBugIds;
+
+  await tapdLocalStorage.edit(v => {
+    v.toBeReleasedBugIds = [...toBeReleasedBugIds];
+  });
+};
 
 const openTab = async (url: string) => {
   const loadingInstance = ElLoading.service({ fullscreen: true });

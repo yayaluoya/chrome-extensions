@@ -25,7 +25,7 @@ watch(
   [config],
   () => {
     codesignLocalStorage.edit(v => {
-      v.config = config.value;
+      v.config = JSON.parse(JSON.stringify(config.value));
     });
   },
   { deep: true }
