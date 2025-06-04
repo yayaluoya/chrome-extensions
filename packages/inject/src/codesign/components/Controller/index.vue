@@ -100,9 +100,13 @@ const config = ref<CodesignLocalStorage["config"]>({
 watch([classNameInput, translateInput, objectTypeInput, iconUrlInput, annotationInput], () => {
   codesignLocalStorage.edit(v => {
     v.objectType = objectTypeInput.value;
+    if (!v.classNames) v.classNames = {};
     v.classNames[identification.value] = classNameInput.value;
+    if (!v.translateInputs) v.translateInputs = {};
     v.translateInputs[identification.value] = translateInput.value;
+    if (!v.iconUrls) v.iconUrls = {};
     v.iconUrls[identification.value] = iconUrlInput.value;
+    if (!v.annotations) v.annotations = {};
     v.annotations[identification.value] = annotationInput.value;
   });
 });
@@ -132,7 +136,7 @@ const handleTranslate = async () => {
 
 const getCssRules = () => {
   const cssPropConfig = getCssPropConfig(objectTypeInput.value, {
-    ignoreCssFontFamily: config.value.ignoreCssFontFamily
+    ignoreCssFontFamily: config.value?.ignoreCssFontFamily
   });
   return parseCssRules({
     cssCode: cssCode.value,
@@ -140,7 +144,7 @@ const getCssRules = () => {
     excludeProps: cssPropConfig.excludeProps[elType.value],
     supplementProps: cssPropConfig.supplementProps[elType.value],
     options: {
-      boxSizing: config.value.boxSizing
+      boxSizing: config.value?.boxSizing
     }
   });
 };

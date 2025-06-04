@@ -2,11 +2,17 @@ import { useLocalStorage } from ".";
 
 export interface ApifoxLocalStorage {
   /** 当前的代码模板id */
-  onCodeTemplateId: string;
+  onCodeTemplateId?: string;
   /** 代码模板列表 */
-  codeTemplates: { id: string; name: string; value: string }[];
+  codeTemplates?: ApifoxCodeTemplate[];
   /** 响应data字段名 */
-  responseDataName: string;
+  responseDataName?: string;
+}
+
+export interface ApifoxCodeTemplate {
+  id: string;
+  name: string;
+  value: string;
 }
 
 export const apifoxLocalStorage = useLocalStorage<string, ApifoxLocalStorage>("apifox-local-storage", {

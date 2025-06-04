@@ -48,11 +48,11 @@ import {
   type TabPaneName
 } from "element-plus";
 import { ApifoxTemFields, ApifoxTemFieldsDocs } from "@taozi-chrome-extensions/common/src/constant/apifoxTemFields";
-import { apifoxLocalStorage, type ApifoxLocalStorage } from "@taozi-chrome-extensions/common/src/local/apifox";
+import { apifoxLocalStorage, type ApifoxCodeTemplate } from "@taozi-chrome-extensions/common/src/local/apifox";
 import { md5 } from "@taozi-chrome-extensions/common/src/utils/md5";
 
 const onCodeTemplateId = ref<string>("");
-const codeTemplates = ref<ApifoxLocalStorage["codeTemplates"]>([]);
+const codeTemplates = ref<ApifoxCodeTemplate[]>([]);
 
 watch(
   [codeTemplates, onCodeTemplateId],
@@ -104,6 +104,7 @@ onMounted(async () => {
   onCodeTemplateId.value = onCodeTemplateIdValue;
 });
 </script>
+
 <style lang="scss" scoped>
 .apifox {
   display: flex;

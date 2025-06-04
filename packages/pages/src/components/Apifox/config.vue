@@ -31,6 +31,7 @@ onMounted(async () => {
   responseDataName.value = (await apifoxLocalStorage.get())?.responseDataName || "";
 });
 </script>
+
 <style lang="scss" scoped>
 .apifox-config {
   display: flex;
